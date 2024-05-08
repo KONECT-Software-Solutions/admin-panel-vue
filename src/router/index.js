@@ -7,6 +7,9 @@ import Home from '../views/Home.vue';
 const routes = [
   { path: '/', component: Home },
   { path: '/blog-management', component: () => import('../views/BlogManagement.vue') },
+  { path: '/lawyers', component: () => import('../views/Lawyers.vue') },
+  { path: '/settings', component: () => import('../views/Settings.vue') },
+  { path: '/login', component: () => import('../views/Login.vue') },
 ];
 
 // Create the router instance
