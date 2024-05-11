@@ -26,6 +26,11 @@ let menus = [
         link: '/'
     },
     {
+        title: 'Online Görüşmeler',
+        icon: 'ri-video-on-line',
+        link: '/online-meetings'
+    },
+    {
         title: 'Blog Yönetimi',
         icon: 'ri-article-line',
         link: '/blog-management'
@@ -44,5 +49,5 @@ let menus = [
         title: 'Çıkış',
         icon: 'ri-logout-box-line',
         link: '/login'
-    }]
+    },]
 </script>

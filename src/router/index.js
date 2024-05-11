@@ -2,14 +2,19 @@ import { createRouter, createWebHistory } from 'vue-router';
 
 // Import your component files here
 import Home from '../views/Home.vue';
+import OnlineMeetings from '../views/OnlineMeetings.vue';
+import BlogManagement from '../views/BlogManagement.vue';
+import Lawyers from '../views/Lawyers.vue';
+import Settings from '../views/Settings.vue';
+
 
 // Define your routes
 const routes = [
   { path: '/', component: Home },
-  { path: '/blog-management', component: () => import('../views/BlogManagement.vue') },
-  { path: '/lawyers', component: () => import('../views/Lawyers.vue') },
-  { path: '/settings', component: () => import('../views/Settings.vue') },
-  { path: '/login', component: () => import('../views/Login.vue') },
+  { path: '/online-meetings', component: OnlineMeetings },
+  { path: '/blog-management', component: BlogManagement },
+  { path: '/lawyers', component: Lawyers },
+  { path: '/settings', component: Settings },
 ];
 
 // Create the router instance
