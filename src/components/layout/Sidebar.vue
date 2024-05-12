@@ -23,31 +23,31 @@ let menus = [
     {
         title: 'Ana Sayfa',
         icon: 'ri-home-2-line',
-        link: '/'
+        link: '/main/home'
     },
     {
         title: 'Online Görüşmeler',
         icon: 'ri-video-on-line',
-        link: '/online-meetings'
+        link: '/main/online-meetings'
     },
     {
         title: 'Blog Yönetimi',
         icon: 'ri-article-line',
-        link: '/blog-management'
+        link: '/main/blog-management'
     },
     {
         title: 'Avukatlar',
         icon: 'ri-team-line',
-        link: '/lawyers'
+        link: '/main/lawyers'
     },
     {
         title: 'Ayarlar',
         icon: 'ri-settings-2-line',
-        link: '/settings'
+        link: '/main/settings'
     },
     {
         title: 'Çıkış',
         icon: 'ri-logout-box-line',
-        link: '/login'
+        link: '/'
     },]
 </script>

@@ -28,7 +28,7 @@
                             </div>
                             <a href="#" class="text-sm font-medium text-white text-white-600 hover:underline ">Forgot password?</a>
                         </div>
-                        <a href="#" id="signin" class="w-full inline-block text-white bg-gray-800 focus:ring-4  font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-white  dark:focus:ring-primary-800">Sign in</a>
+                        <a href="/main" id="signin" class="w-full inline-block text-white bg-gray-600 focus:ring-4  font-medium rounded-lg text-sm px-5 py-2.5 text-center">Sign in</a>
                     </form>
                 </div>
             </div>
