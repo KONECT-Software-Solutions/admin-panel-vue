@@ -1,6 +1,7 @@
 <template>
-  <BlogModal :show="showBlogModal" @close="showBlogModal = false" @addBlog="handleAddBlog"/>
+  <BlogModalAdd :show="showBlogModal" @close="showBlogModal = false" @addBlog="handleAddBlog"/>
   <DeleteModal :show="showDeleteModal" @close="showDeleteModal = false" @delete="handleDelete"/>
+  <BlogModalEdit :show="showEditModal" @close="showEditModal = false" @updateBlog="handleUpdate" :editBlogData="editBlogData"/>
 
   <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
     <div class="bg-gray-200 rounded-md border border-gray-300 p-6 shadow-md shadow-black/5">
@@ -153,8 +154,10 @@
           <td class="py-2 px-4 border-b border-b-gray-50 flex justify-between">
             <div class="button-container relative flex flex-row gap-1">
               <button
+                @click="toggleEdit(blog)"
                 class="ri-edit-line text-lg bg-orange-400 hover:bg-gray-900 text-white font-bold px-2 rounded"></button>
               <button
+               @click="openURL(blog.url)"
                 class="ri-eye-line text-lg bg-green-700 hover:bg-gray-900 text-white font-bold px-2 rounded"></button>
               <button
                 @click="confirmDelete(blog.id)"
@@ -181,13 +184,15 @@
 
 </template>
 <script setup>
-import BlogModal from "../components/layout/BlogModal.vue";
+import BlogModalAdd from "../components/layout/BlogModalAdd.vue";
 import DeleteModal from "../components/layout/DeleteModal.vue";
+import BlogModalEdit from "../components/layout/BlogModalEdit.vue";
 import {
   collection,
   getDocs,
   addDoc,
   deleteDoc,
+  updateDoc,
   doc,
 } from "firebase/firestore";
 import { db } from "../firebase";
@@ -195,9 +200,21 @@ import { onMounted, ref, computed } from "vue";
 import ShadowBox from "../components/container/ShadowBox.vue";
 
 const showBlogModal = ref(false);
+const showEditModal = ref(false);
 const showDeleteModal = ref(false);
 let blogIdToDelete = null;
+const editBlogData = ref(null);
  
+function toggleEdit(blog) {
+  showEditModal.value = true;
+  editBlogData.value = blog;
+  console.log(editBlogData.value);
+}
+
+function openURL(url) {
+  window.open(url, "_blank");
+}
+
 function confirmDelete(blogId) {
   blogIdToDelete = blogId;
   showDeleteModal.value = true;
@@ -320,10 +337,35 @@ async function handleAddBlog(blogDataToAdd){
     }
 };
 
+async function handleUpdate(blogDataToUpdate){
+    console.log('Received updated blog data:', blogDataToUpdate);
+    // Perform actions with the received blog data, e.g., send to backend, update state, etc.
+    // Calling the function to update the blog post
+
+    return console.log('update function end')
+    try {
+      await updateDoc(doc(db, "blogs", blogDataToUpdate.id), blogDataToUpdate); // Ensure updateDoc is awaited
+
+      // Update local blogData with the updated blog
+      blogData.value = blogData.value.map(blog => {
+        if (blog.id === blogDataToUpdate.id) {
+          return blogDataToUpdate;
+        } else {
+          return blog;
+        }
+      });
+
+      // Update cachedBlogs in local storage
+      localStorage.setItem("cachedBlogs", JSON.stringify(blogData.value));
+
+    } catch (error) {
+      console.error("Error updating document:", error);
+    }
+};
+
 onMounted(async () => {
   getAllBlogs().then((data) => {
     blogData.value = data;
-    console.log(new Date())
   });
 });
 

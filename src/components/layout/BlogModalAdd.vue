@@ -7,7 +7,7 @@
                 <!-- Modal header -->
                 <div class="flex items-center justify-between p-4 md:p-5 border-b rounded-t dark:border-gray-600">
                     <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
-                        Yeni Blog Yazısı Ekle
+                      Yeni Blog Yazısı
                     </h3>
                     <button type="button" @click="$emit('close')" class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white" data-modal-toggle="add-blog-modal">
                         <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
@@ -45,7 +45,7 @@
                                 <option value="TV">Hukuk</option>
                                 <option value="PC">Haberler</option>
                                 <option value="GA">Son Dakika</option>
-                                <option selected= "" value="PH">Blog Yazısı</option>
+                                <option value="PH">Blog Yazısı</option>
                             </select>
                         </div>
                         <div class="col-span-2">
@@ -63,20 +63,23 @@
 
 <script setup>
 
-import { ref, computed} from 'vue'
+import { ref, computed, onMounted} from 'vue'
 
 const emits = defineEmits(['close', 'addBlog']);
 const props = defineProps({
-  show: Boolean
+  show: Boolean,
 })
+
+
 
 // Data for blog fields
 const title = ref('');
 const content = ref('');
-const category = ref('Blog Yazısı'); // Default category
+const category = ref('PH'); // Default category
 
 const fileInput = ref(null);
 const selectedFileName = ref(null);
+
 
 const openFilePicker = () => {
   // Click the hidden file input element
@@ -133,11 +136,10 @@ const handleSubmit = () => {
     // Clear form fields or perform any other necessary actions
     title.value = '';
     content.value = '';
-    category.value = 'Blog Yazısı';
+    category.value = 'PH';
 
     emits('close');
 };
-
 
 
 </script>
