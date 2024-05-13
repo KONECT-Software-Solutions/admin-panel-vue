@@ -1,4 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router';
+import store from '../store';
 
 // Import your component files here
 import LoginPage from '../views/LoginPage.vue';
@@ -24,27 +25,32 @@ const routes = [
       {
         path: 'home',
         name: 'Home',
-        component: Home
+        component: Home,
+        meta: { requiresAuth: true }
       },
       {
         path: 'online-meetings',
         name: 'Online Meetings',
-        component: OnlineMeetings
+        component: OnlineMeetings,
+        meta: { requiresAuth: true }
       },
       {
         path: 'blog-management',
         name: 'Blog Management',
-        component: BlogManagement
+        component: BlogManagement,
+        meta: { requiresAuth: true }
       },
       {
         path: 'lawyers',
         name: 'Lawyers',
-        component: Lawyers
+        component: Lawyers,
+        meta: { requiresAuth: true }
       },
       {
         path: 'settings',
         name: 'Settings',
-        component: Settings
+        component: Settings,
+        meta: { requiresAuth: true }
       }
     ]
   }
@@ -54,6 +60,15 @@ const router = createRouter({
     linkActiveClass: 'bg-gray-950 text-white',
   history: createWebHistory(),
   routes,
+});
+
+router.beforeEach((to, from, next) => {
+  if (to.meta.requiresAuth && !store.getters.isAuthenticated) {
+    // Redirect to login page if trying to access a protected route without authentication
+    next('/');
+  } else {
+    next();
+  }
 });
 
 export default router;
