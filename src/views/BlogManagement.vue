@@ -16,6 +16,8 @@
     :editBlogData="editBlogData"
   />
 
+  <AnalyticsCardTotal :length="blogDataLength" />
+
   <shadow-box class="p-6">
     <div class="flex justify-between mb-4 items-start">
       <h1 class="font-medium">Blog Yönetimi</h1>
@@ -29,9 +31,10 @@
     <form action="" class="flex items-center mb-4">
       <div class="relative w-full mr-2">
         <input
+          v-model="searchTerm"
           type="text"
           class="py-2 pr-4 pl-10 bg-gray-100 w-full outline-none border border-gray-100 rounded-md text-sm focus:border-blue-500"
-          placeholder="Ara..."
+          placeholder="Başlığa göre ara..."
         />
         <i
           class="ri-search-line absolute top-1/2 left-4 -translate-y-1/2 text-gray-400"
@@ -137,7 +140,6 @@
       ></button>
     </div>
   </shadow-box>
-  <AnalyticsCardTotal :length="blogDataLength" />
 </template>
 <script setup>
 import BlogModalAdd from "../components/layout/BlogModalAdd.vue";
@@ -154,7 +156,7 @@ import {
   doc,
 } from "firebase/firestore";
 import { db } from "../firebase";
-import { onMounted, ref, computed } from "vue";
+import { onMounted, ref, computed, watch } from "vue";
 import ShadowBox from "../components/container/ShadowBox.vue";
 
 const showBlogModal = ref(false);
@@ -180,30 +182,60 @@ function confirmDelete(blogId) {
 
 const blogRef = collection(db, "blogs");
 const blogData = ref([]);
-// blogData length
 const blogDataLength = computed(() => blogData.value.length);
 const currentPage = ref(1);
 const itemsPerPage = ref(10);
+
+const searchTerm = ref("");
+
+// Computed property to filter blogs based on the search term
+const filteredBlogs = computed(() => {
+  if (!searchTerm.value) {
+    return blogData.value;
+  } else {
+    return blogData.value.filter((blog) =>
+      blog.title.toLowerCase().includes(searchTerm.value.toLowerCase())
+    );
+  }
+});
+
+// log the filtered blogs every time the searchTerm changes
+// watch(searchTerm, (newVal) => {
+//  console.log("Filtered blogs:", filteredBlogs.value);
+// });
+
 
 // Computed property to calculate the start index of the current page
 const startIndex = computed(() => (currentPage.value - 1) * itemsPerPage.value);
 
 const paginatedItems = computed(() => {
-  const start = startIndex.value;
-  const end = start + itemsPerPage.value;
-  return blogData.value.slice(start, end);
+  if (filteredBlogs.value.length === 0) {
+    const start = startIndex.value;
+    const end = start + itemsPerPage.value;
+    return blogData.value.slice(start, end);
+  }
+  else {
+    return filteredBlogs.value.slice(startIndex.value, startIndex.value + itemsPerPage.value);
+  }
+  
 });
+
+
+
 // Computed property to calculate the total number of pages
-const totalPages = computed(() =>
-  Math.ceil(blogData.value.length / itemsPerPage.value)
-);
+const totalPages = computed(() => {
+  if (filteredBlogs.value.length === 0) {
+    return Math.ceil(blogData.value.length / itemsPerPage.value);
+  }
+  else {
+    return Math.ceil(filteredBlogs.value.length / itemsPerPage.value);
+  }
+});
 
 // Method to go to the next page
 const nextPage = () => {
   if (currentPage.value < totalPages.value) {
     currentPage.value++;
-    console.log(currentPage.value);
-    console.log(totalPages.value);
   }
 };
 
@@ -235,6 +267,7 @@ async function fetchBlogs() {
     return {
       ...blog,
       created_date: formatDate(blog.created_date),
+      updated_date: formatDate(blog.updated_date),
     };
   });
   return blogs;
@@ -303,6 +336,7 @@ async function handleAddBlog(blogDataToAdd) {
     // Include the ID in the local copy of the blog data
     const newBlogWithId = { ...blogDataToAdd, id: docRef.id };
     newBlogWithId.created_date = newBlogWithId.created_date.toLocaleDateString("tr-TR");
+    newBlogWithId.updated_date = newBlogWithId.updated_date.toLocaleDateString("tr-TR");
     // Update local blogData with the new blog including the ID
     blogData.value = [newBlogWithId, ...blogData.value];
 
@@ -335,8 +369,19 @@ async function handleUpdate(blogDataToUpdate) {
   }
 }
 
+// Custom sorting function
+function customSortByDate(a, b) {
+  // Convert date strings to Date objects for comparison
+  var dateA = new Date(a.created_date.split('.').reverse().join('.'));
+  var dateB = new Date(b.created_date.split('.').reverse().join('.'));
+  
+  // Compare the dates
+  return dateB - dateA; // Sort in descending order
+}
+
 onMounted(async () => {
   getAllBlogs().then((data) => {
+    data.sort(customSortByDate);
     blogData.value = data;
     blogDataLength.value = data.length;
   });
