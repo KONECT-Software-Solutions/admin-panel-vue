@@ -17,11 +17,11 @@
                     </button>
                 </div>
                 <!-- Modal body -->
-                <form @submit.prevent="handleSubmit" class="p-4 md:p-5">
+                <form @submit.prevent="handleSubmit(editBlogData)" class="p-4 md:p-5">
                     <div class="grid gap-4 mb-4 grid-cols-2">
                         <div class="col-span-2">
                             <label for="title" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"></label>
-                            <input v-model="formData.title" type="text" name="title" id="title" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" placeholder="Blog yazısı başlığını girin" required="">
+                            <input v-model="editBlogData.title" type="text" name="title" id="title" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" placeholder="Blog yazısı başlığını girin" required="">
                         </div>
                         <div class="col-span-2 sm:col-span-1">
                             <label for="photo-upload" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Fotoğraf Seç</label>
@@ -41,7 +41,7 @@
                         
                         <div class="col-span-2 sm:col-span-1">
                             <label for="category" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Kategori</label>
-                            <select v-model="formData.category" id="category" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500">
+                            <select v-model="editBlogData.category" id="category" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500">
                                 <option value="TV">Hukuk</option>
                                 <option value="PC">Haberler</option>
                                 <option value="GA">Son Dakika</option>
@@ -50,7 +50,7 @@
                         </div>
                         <div class="col-span-2">
                             <label for="content" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Yazı İçeriği</label>
-                            <textarea v-model="formData.content" id="content" rows="4" class="block p-2.5 w-full h-64 text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Ana içeriğinizi buraya yazınız."></textarea>                    
+                            <textarea v-model="editBlogData.content" id="content" rows="4" class="block p-2.5 w-full h-64 text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Ana içeriğinizi buraya yazınız."></textarea>                    
                         </div>
                     </div>
                     <button type="submit" class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">Kaydet</button>
@@ -71,24 +71,6 @@ const props = defineProps({
   editBlogData: Object
 })
 
-
-
-const formData = reactive({
-  title: '',
-  content: '',
-  category: ''
-})
-
-// Watch for changes in editBlogData props
-watch(() => props.editBlogData, (newData) => {
-  if (newData) {
-    // Update formData with the received blog data
-    formData.title = newData.title || '';
-    formData.content = newData.content || '';
-    formData.category = newData.category || 'Blog Yazısı';
-  }
-  
-});
 
 const fileInput = ref(null);
 const selectedFileName = ref(null);
@@ -128,30 +110,9 @@ const buttonText = computed(() => {
   }
 });
 
-const handleSubmit = () => {
+const handleSubmit = (editBlogData) => {
 
-    // Gather blog data
-    /** const blogData = {
-        author: editBlogData.author,
-        created_date: editBlogData.created_date,
-        updated_date: new Date(),
-        url: editBlogData.url,
-        title: formData.title.value,
-        image: "img link here", // Replace with dynamic data if necessary
-        content: formData.content.value,
-        category: formData.category.value
-        // Add more fields as needed
-    };
-    **/
-    const updatedBlogData = { ...formData };
-
-    // Emit the 'addBlog' event with the blog data
-    emits('updateBlog', updatedBlogData);
-
-    // Clear form fields or perform any other necessary actions
-    title.value = '';
-    content.value = '';
-    category.value = '';
+    emits('updateBlog', editBlogData);
 
     emits('close');
 };

@@ -330,7 +330,6 @@ onMounted(async () => {
   getAllBlogs().then((data) => {
     blogData.value = data;
     blogDataLength.value = data.length;
-    console.log(blogDataLength.value);
   });
 });
 </script>

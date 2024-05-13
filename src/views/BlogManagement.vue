@@ -1,7 +1,7 @@
 <template>
   <BlogModalAdd
     :show="showBlogModal"
-    @close="showBlogModal = false"
+    @close="showBlogModal = false" 
     @addBlog="handleAddBlog"
   />
   <DeleteModal
@@ -166,7 +166,6 @@ const editBlogData = ref(null);
 function toggleEdit(blog) {
   showEditModal.value = true;
   editBlogData.value = blog;
-  console.log(editBlogData.value);
 }
 
 function openURL(url) {
@@ -304,8 +303,6 @@ async function handleAddBlog(blogDataToAdd) {
 
 async function handleUpdate(blogDataToUpdate) {
   console.log("Received updated blog data:", blogDataToUpdate);
-  // Perform actions with the received blog data, e.g., send to backend, update state, etc.
-  // Calling the function to update the blog post
 
   try {
     await updateDoc(doc(db, "blogs", blogDataToUpdate.id), blogDataToUpdate); // Ensure updateDoc is awaited
@@ -330,10 +327,6 @@ onMounted(async () => {
   getAllBlogs().then((data) => {
     blogData.value = data;
     blogDataLength.value = data.length;
-    console.log(
-      "on mounted blogdatalength on blogmanagement",
-      blogDataLength.value
-    );
   });
 });
 </script>
