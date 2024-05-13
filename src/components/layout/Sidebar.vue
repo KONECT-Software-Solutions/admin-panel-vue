@@ -7,7 +7,7 @@
             </a>
             <ul class="mt-4">
                 <li v-for="menu in menus" :key="menu.title" class="mb-1 group">
-                    <router-link :to="menu.link"  class="flex items-center  py-2 px-4 text-gray-300 hover:bg-gray-950 hover:text-gray-100 rounded-md">
+                    <router-link :to="menu.link" @click="emitTitleChange(menu.title)" class="flex items-center  py-2 px-4 text-gray-300 hover:bg-gray-950 hover:text-gray-100 rounded-md">
                         <i :class="menu.icon" class="mr-3 text-lg"></i>
                         <span class="text-lg">{{menu.title}}</span>
                     </router-link>
@@ -33,7 +33,12 @@ const logout = () => {
   store.dispatch('logout');
   router.push('/'); // Redirect to login page after logout
 };
+const emit = defineEmits(['titleChange']);
 
+// Function to emit the title change event
+function emitTitleChange(title) {
+    emit('titleChange', title);
+}
 let menus = [
     {
         title: 'Ana Sayfa',

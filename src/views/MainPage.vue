@@ -1,8 +1,8 @@
 <template>
     <div class="flex flex-grow">
-        <Sidebar v-if="isSidebarOpen" @toggleSidebar="toggleSidebar"/>
+        <Sidebar v-if="isSidebarOpen" @toggleSidebar="toggleSidebar" @titleChange="handleTitleChange" />
         <main class="w-full max-h-screen overflow-scroll">
-            <Navbar @toggleSidebar="toggleSidebar" />
+            <Navbar @toggleSidebar="toggleSidebar"  :current-tab="currentTab"/>
             <ContentContainer>
                 <RouterView />
             </ContentContainer>
@@ -17,6 +17,13 @@ import Navbar from '../components/layout/Navbar.vue';
 import ContentContainer from '../components/layout/ContentContainer.vue';
 
 const isSidebarOpen = ref(true);
+
+
+const currentTab = ref('Ana Sayfa');
+
+function handleTitleChange(newTitle) {
+    currentTab.value = newTitle;
+}
 
 function toggleSidebar() {
     isSidebarOpen.value = !isSidebarOpen.value;

@@ -6,7 +6,7 @@
         </button>
         <ul class="flex items-center text-sm ml-4">
             <li class="mr-2">
-                <a href="#" class="text-gray-500 hover:text-gray-800 font-medium">Ana Sayfa</a>
+                <a href="#" class="text-gray-500 hover:text-gray-800 font-medium">{{ currentTab }}</a>
             </li>
         </ul>
     </div>
@@ -21,6 +21,13 @@
 <script setup>
 import NotificationDropdown from './NotificationDropdown.vue';
 import ProfileDropdown from './ProfileDropdown.vue';
+import { ref } from 'vue';
+
+// Accept currentTab as a prop
+const props = defineProps({
+    currentTab: String
+});
+
 </script>
 
 <style scoped>
