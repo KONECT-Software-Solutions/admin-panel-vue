@@ -3,75 +3,6 @@
   <DeleteModal :show="showDeleteModal" @close="showDeleteModal = false" @delete="handleDelete"/>
   <BlogModalEdit :show="showEditModal" @close="showEditModal = false" @updateBlog="handleUpdate" :editBlogData="editBlogData"/>
 
-  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
-    <div class="bg-gray-200 rounded-md border border-gray-300 p-6 shadow-md shadow-black/5">
-      <div class="flex justify-between mb-6">
-        <div>
-          <div class="text-3xl font-semibold mb-1">
-                10<span class="pl-2 font-medium text-gray-400">Blog Yazısı</span>
-          </div>
-        </div>
-    </div>
-      <div class="flex items-center">
-        <div class="w-full bg-gray-100 rounded-full h-4">
-          <div class="h-full bg-blue-500 rounded-full p-1" style="width: 60%">
-            <div class="w-2 h-2 rounded-full bg-white ml-auto"></div>
-          </div>
-        </div>
-        <span class="text-sm font-medium text-gray-600 ml-4">60%</span>
-      </div>
-    </div>
-
-    <div
-      class="bg-gray-200 rounded-md border border-gray-300 p-6 shadow-md shadow-black/5">
-      <div class="flex justify-between mb-4">
-        <div>
-          <div class="flex items-center mb-1">
-            <div class="text-2xl font-semibold">324</div>
-            <div
-              class="p-1 rounded bg-emerald-500/10 text-emerald-500 text-[12px] font-semibold leading-none ml-2">
-              +30%
-            </div>
-          </div>
-          <div class="text-sm font-medium text-gray-400">Ziyaretçi</div>
-        </div>
-      </div>
-      <div class="flex items-center">
-        <img
-          src="https://placehold.co/32x32"
-          alt=""
-          class="w-8 h-8 rounded-full object-cover block" />
-        <img
-          src="https://placehold.co/32x32"
-          alt=""
-          class="w-8 h-8 rounded-full object-cover block -ml-3" />
-        <img
-          src="https://placehold.co/32x32"
-          alt=""
-          class="w-8 h-8 rounded-full object-cover block -ml-3" />
-        <img
-          src="https://placehold.co/32x32"
-          alt=""
-          class="w-8 h-8 rounded-full object-cover block -ml-3" />
-        <img
-          src="https://placehold.co/32x32"
-          alt=""
-          class="w-8 h-8 rounded-full object-cover block -ml-3" />
-      </div>
-    </div>
-    <div
-      class="bg-gray-200 rounded-md border border-gray-300 p-6 shadow-md shadow-black/5">
-      <div class="flex justify-between mb-6">
-        <div>
-          <div class="text-2xl font-semibold mb-1">45</div>
-          <div class="text-sm font-medium text-gray-400">Yorumlar</div>
-        </div>
-      </div>
-      <a href="#" class="text-blue-500 font-medium text-sm hover:text-blue-600"
-        >Detayları gör.</a
-      >
-    </div>
-  </div>
   <shadow-box class="p-6">
     <div class="flex justify-between mb-4 items-start">
       <h1 class="font-medium">Blog Yönetimi</h1>
@@ -181,12 +112,15 @@
       </button>
     </div>
   </shadow-box>
+  <AnalyticsCardTotal :length="blogDataLength"/> 
 
 </template>
 <script setup>
 import BlogModalAdd from "../components/layout/BlogModalAdd.vue";
 import DeleteModal from "../components/layout/DeleteModal.vue";
 import BlogModalEdit from "../components/layout/BlogModalEdit.vue";
+import AnalyticsCardTotal from "../components/layout/AnalyticsCardTotal.vue";
+
 import {
   collection,
   getDocs,
@@ -223,6 +157,8 @@ function confirmDelete(blogId) {
 
 const blogRef = collection(db, "blogs");
 const blogData = ref([]);
+// blogData length
+const blogDataLength = computed(() => blogData.value.length);
 const currentPage = ref(1);
 const itemsPerPage = ref(10);
 
@@ -342,7 +278,6 @@ async function handleUpdate(blogDataToUpdate){
     // Perform actions with the received blog data, e.g., send to backend, update state, etc.
     // Calling the function to update the blog post
 
-    return console.log('update function end')
     try {
       await updateDoc(doc(db, "blogs", blogDataToUpdate.id), blogDataToUpdate); // Ensure updateDoc is awaited
 
@@ -366,6 +301,8 @@ async function handleUpdate(blogDataToUpdate){
 onMounted(async () => {
   getAllBlogs().then((data) => {
     blogData.value = data;
+    blogDataLength.value = data.length;
+    console.log(blogDataLength.value)
   });
 });
 
