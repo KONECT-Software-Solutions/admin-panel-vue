@@ -59,7 +59,7 @@
           <th
             class="w-1/4 text-[12px] uppercase tracking-wide font-medium text-gray-600 py-2 px-4 bg-gray-50 text-left"
           >
-            Column
+            Kategori
           </th>
           <th
             class="w-1/4 text-[12px] uppercase tracking-wide font-medium text-gray-600 py-2 px-4 bg-gray-50 text-left"
@@ -91,12 +91,12 @@
           </td>
           <td class="py-2 px-4 border-b border-b-gray-50">
             <span class="text-[13px] font-medium text-gray-600">{{
-              formatDate(blog.created_date)
+              blog.created_date
             }}</span>
           </td>
           <td class="py-2 px-4 border-b border-b-gray-50">
             <div class="flex space-x-5">
-              <span class="text-[13px] font-medium text-gray-600">Data</span>
+              <span class="text-[13px] font-medium text-gray-600">{{blog.category}}</span>
             </div>
           </td>
           <td class="py-2 px-4 border-b border-b-gray-50">
@@ -166,6 +166,7 @@ const editBlogData = ref(null);
 function toggleEdit(blog) {
   showEditModal.value = true;
   editBlogData.value = blog;
+  console.log("blog id to edit", blog.id);
 }
 
 function openURL(url) {
@@ -229,6 +230,13 @@ async function fetchBlogs() {
     docData.comments = commentData;
     blogs.push(docData);
   }
+  // for each blog created_date = formatDate(blog.created_date)
+  blogs = blogs.map((blog) => {
+    return {
+      ...blog,
+      created_date: formatDate(blog.created_date),
+    };
+  });
   return blogs;
 }
 
@@ -259,7 +267,7 @@ async function getAllBlogs() {
 }
 function formatDate(timestamp) {
   const date = new Date(timestamp.seconds * 1000);
-  return date.toLocaleDateString("en-US");
+  return date.toLocaleDateString("tr-TR");
 }
 // Function to delete a blog by ID
 async function handleDelete() {
@@ -286,13 +294,17 @@ async function handleDelete() {
 
 async function handleAddBlog(blogDataToAdd) {
   console.log("Received new blog data:", blogDataToAdd);
+  
   // Perform actions with the received blog data, e.g., send to backend, update state, etc.
   // Calling the function to add the new blog post
   try {
-    await addDoc(blogRef, blogDataToAdd); // Ensure addDoc is awaited
+    const docRef = await addDoc(blogRef, blogDataToAdd); // Ensure addDoc is awaited
 
-    // Update local blogData with the new blog
-    blogData.value = [blogDataToAdd, ...blogData.value];
+    // Include the ID in the local copy of the blog data
+    const newBlogWithId = { ...blogDataToAdd, id: docRef.id };
+    newBlogWithId.created_date = newBlogWithId.created_date.toLocaleDateString("tr-TR");
+    // Update local blogData with the new blog including the ID
+    blogData.value = [newBlogWithId, ...blogData.value];
 
     // Update cachedBlogs in local storage
     localStorage.setItem("cachedBlogs", JSON.stringify(blogData.value));

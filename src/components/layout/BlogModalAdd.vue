@@ -3,7 +3,7 @@
     <div id="add-blog-modal" tabindex="-1" aria-hidden="true" v-if="show" class="fixed inset-0 flex items-center justify-center z-50 w-full md:inset-0 h-[calc(100%-1rem)] max-h-full">
         <div class="relative p-4 w-full max-w-4xl max-h-full">
             <!-- Modal content -->
-            <div class="relative  bg-white rounded-lg shadow dark:bg-gray-700">
+            <div class="relative  bg-white rounded-lg shadown dark:bg-gray-700">
                 <!-- Modal header -->
                 <div class="flex items-center justify-between p-4 md:p-5 border-b rounded-t dark:border-gray-600">
                     <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
@@ -42,10 +42,10 @@
                         <div class="col-span-2 sm:col-span-1">
                             <label for="category" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Kategori</label>
                             <select v-model="category" id="category" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500">
-                                <option value="TV">Hukuk</option>
-                                <option value="PC">Haberler</option>
-                                <option value="GA">Son Dakika</option>
-                                <option value="PH">Blog Yazısı</option>
+                                <option value="Hukuk">Hukuk</option>
+                                <option value="Haberler">Haberler</option>
+                                <option value="Son Dakika">Son Dakika</option>
+                                <option value="Blog Yazısı">Blog Yazısı</option>
                             </select>
                         </div>
                         <div class="col-span-2">
@@ -75,7 +75,7 @@ const props = defineProps({
 // Data for blog fields
 const title = ref('');
 const content = ref('');
-const category = ref('PH'); // Default category
+const category = ref('Blog Yazısı'); // Default category
 
 const fileInput = ref(null);
 const selectedFileName = ref(null);
