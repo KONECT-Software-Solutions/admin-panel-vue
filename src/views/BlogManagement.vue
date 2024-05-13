@@ -1,52 +1,74 @@
 <template>
-  <BlogModalAdd :show="showBlogModal" @close="showBlogModal = false" @addBlog="handleAddBlog"/>
-  <DeleteModal :show="showDeleteModal" @close="showDeleteModal = false" @delete="handleDelete"/>
-  <BlogModalEdit :show="showEditModal" @close="showEditModal = false" @updateBlog="handleUpdate" :editBlogData="editBlogData"/>
+  <BlogModalAdd
+    :show="showBlogModal"
+    @close="showBlogModal = false"
+    @addBlog="handleAddBlog"
+  />
+  <DeleteModal
+    :show="showDeleteModal"
+    @close="showDeleteModal = false"
+    @delete="handleDelete"
+  />
+  <BlogModalEdit
+    :show="showEditModal"
+    @close="showEditModal = false"
+    @updateBlog="handleUpdate"
+    :editBlogData="editBlogData"
+  />
 
   <shadow-box class="p-6">
     <div class="flex justify-between mb-4 items-start">
       <h1 class="font-medium">Blog Yönetimi</h1>
       <button
         @click="showBlogModal = true"
-        class="bg-green-700 text-white px-4 py-1 font-medium rounded">
+        class="bg-green-700 text-white px-4 py-1 font-medium rounded"
+      >
         + Ekle
-      </button>   
+      </button>
     </div>
     <form action="" class="flex items-center mb-4">
       <div class="relative w-full mr-2">
         <input
           type="text"
           class="py-2 pr-4 pl-10 bg-gray-100 w-full outline-none border border-gray-100 rounded-md text-sm focus:border-blue-500"
-          placeholder="Ara..." />
+          placeholder="Ara..."
+        />
         <i
-          class="ri-search-line absolute top-1/2 left-4 -translate-y-1/2 text-gray-400"></i>
+          class="ri-search-line absolute top-1/2 left-4 -translate-y-1/2 text-gray-400"
+        ></i>
       </div>
     </form>
     <table v-if="blogData?.length" class="w-full bg-gray-100 mt-6">
       <thead>
         <tr>
           <th
-            class="w-1/4 text-[12px] uppercase tracking-wide font-medium text-gray-600 py-2 px-4 bg-gray-50 text-left rounded-tl-md rounded-bl-md">
+            class="w-1/4 text-[12px] uppercase tracking-wide font-medium text-gray-600 py-2 px-4 bg-gray-50 text-left rounded-tl-md rounded-bl-md"
+          >
             Başlık
           </th>
           <th
-            class="w-1/4 text-[12px] uppercase tracking-wide font-medium text-gray-600 py-2 px-4 bg-gray-50 text-left">
+            class="w-1/4 text-[12px] uppercase tracking-wide font-medium text-gray-600 py-2 px-4 bg-gray-50 text-left"
+          >
             Yazar
           </th>
           <th
-            class="w-1/4 text-[12px] uppercase tracking-wide font-medium text-gray-600 py-2 px-4 bg-gray-50 text-left">
+            class="w-1/4 text-[12px] uppercase tracking-wide font-medium text-gray-600 py-2 px-4 bg-gray-50 text-left"
+          >
             Yaratılma Tarihi
           </th>
           <th
-            class="w-1/4 text-[12px] uppercase tracking-wide font-medium text-gray-600 py-2 px-4 bg-gray-50 text-left">
+            class="w-1/4 text-[12px] uppercase tracking-wide font-medium text-gray-600 py-2 px-4 bg-gray-50 text-left"
+          >
             Column
           </th>
           <th
-            class="w-1/4 text-[12px] uppercase tracking-wide font-medium text-gray-600 py-2 px-4 bg-gray-50 text-left">
+            class="w-1/4 text-[12px] uppercase tracking-wide font-medium text-gray-600 py-2 px-4 bg-gray-50 text-left"
+          >
             Column
           </th>
           <th
-            class="w-1/4 text-[12px] uppercase tracking-wide font-medium text-gray-600 py-2 px-4 bg-gray-50 text-left">
+            class="w-1/4 text-[12px] uppercase tracking-wide font-medium text-gray-600 py-2 px-4 bg-gray-50 text-left"
+          >
             Aksiyonlar
           </th>
         </tr>
@@ -86,34 +108,36 @@
             <div class="button-container relative flex flex-row gap-1">
               <button
                 @click="toggleEdit(blog)"
-                class="ri-edit-line text-lg bg-orange-400 hover:bg-gray-900 text-white font-bold px-2 rounded"></button>
+                class="ri-edit-line text-lg bg-orange-400 hover:bg-gray-900 text-white font-bold px-2 rounded"
+              ></button>
               <button
-               @click="openURL(blog.url)"
-                class="ri-eye-line text-lg bg-green-700 hover:bg-gray-900 text-white font-bold px-2 rounded"></button>
+                @click="openURL(blog.url)"
+                class="ri-eye-line text-lg bg-green-700 hover:bg-gray-900 text-white font-bold px-2 rounded"
+              ></button>
               <button
                 @click="confirmDelete(blog.id)"
                 id="delete-blog-modal-button"
-                class="ri-delete-bin-6-line text-lg bg-red-700 hover:bg-gray-900 text-white font-bold px-2 rounded">
-              </button>
+                class="ri-delete-bin-6-line text-lg bg-red-700 hover:bg-gray-900 text-white font-bold px-2 rounded"
+              ></button>
             </div>
           </td>
         </tr>
       </tbody>
     </table>
     <div class="pagination-container flex justify-end mt-4 w-full">
-      <button 
-        @click="prevPage" :disabled="currentPage === 1"
-        class="ri-arrow-left-fill h-8 px-4 m-2 text-l text-white transition-colors duration-150 bg-gray-800 rounded-lg focus:shadow-outline hover:bg-indigo-800">
-      </button>
-      <button 
-        @click="nextPage" :disabled="currentPage === totalPages"
-        class="ri-arrow-right-fill h-8 px-4 m-2 text-l text-white transition-colors duration-150 bg-gray-800 rounded-lg focus:shadow-outline hover:bg-indigo-800">
-        
-      </button>
+      <button
+        @click="prevPage"
+        :disabled="currentPage === 1"
+        class="ri-arrow-left-fill h-8 px-4 m-2 text-l text-white transition-colors duration-150 bg-gray-800 rounded-lg focus:shadow-outline hover:bg-indigo-800"
+      ></button>
+      <button
+        @click="nextPage"
+        :disabled="currentPage === totalPages"
+        class="ri-arrow-right-fill h-8 px-4 m-2 text-l text-white transition-colors duration-150 bg-gray-800 rounded-lg focus:shadow-outline hover:bg-indigo-800"
+      ></button>
     </div>
   </shadow-box>
-  <AnalyticsCardTotal :length="blogDataLength"/> 
-
+  <AnalyticsCardTotal :length="blogDataLength" />
 </template>
 <script setup>
 import BlogModalAdd from "../components/layout/BlogModalAdd.vue";
@@ -138,7 +162,7 @@ const showEditModal = ref(false);
 const showDeleteModal = ref(false);
 let blogIdToDelete = null;
 const editBlogData = ref(null);
- 
+
 function toggleEdit(blog) {
   showEditModal.value = true;
   editBlogData.value = blog;
@@ -152,7 +176,6 @@ function openURL(url) {
 function confirmDelete(blogId) {
   blogIdToDelete = blogId;
   showDeleteModal.value = true;
-  
 }
 
 const blogRef = collection(db, "blogs");
@@ -171,7 +194,9 @@ const paginatedItems = computed(() => {
   return blogData.value.slice(start, end);
 });
 // Computed property to calculate the total number of pages
-const totalPages = computed(() => Math.ceil(blogData.value.length / itemsPerPage.value));
+const totalPages = computed(() =>
+  Math.ceil(blogData.value.length / itemsPerPage.value)
+);
 
 // Method to go to the next page
 const nextPage = () => {
@@ -189,7 +214,6 @@ const prevPage = () => {
   }
 };
 
-
 // Utility function to load blogs data
 async function fetchBlogs() {
   let blogs = [];
@@ -200,7 +224,7 @@ async function fetchBlogs() {
     const commentsRef = collection(db, "blogs", doc.id, "comments");
     const commentData = [];
     const commentsSnapshot = await getDocs(commentsRef);
-    commentsSnapshot.docs.forEach(commentDoc => {
+    commentsSnapshot.docs.forEach((commentDoc) => {
       commentData.push(commentDoc.data());
     });
     docData.comments = commentData;
@@ -217,7 +241,11 @@ async function getAllBlogs() {
     const cachedTime = localStorage.getItem("cachedTime");
     const expiryTime = 30 * 60 * 1000; // 30 minutes expiration time
 
-    if (cachedBlogs && cachedTime && (new Date() - new Date(parseInt(cachedTime)) < expiryTime)) {
+    if (
+      cachedBlogs &&
+      cachedTime &&
+      new Date() - new Date(parseInt(cachedTime)) < expiryTime
+    ) {
       return JSON.parse(cachedBlogs);
     } else {
       const blogs = await fetchBlogs();
@@ -239,71 +267,73 @@ async function handleDelete() {
   showDeleteModal.value = false;
   if (blogIdToDelete) {
     try {
-    // Remove the blog from Firestore
-    await deleteDoc(doc(db, "blogs", blogIdToDelete));
-    
-    // Update local blogData by filtering out the deleted blog
-    blogData.value = blogData.value.filter(blog => blog.id !== blogIdToDelete);
-    
-    // Update cachedBlogs in local storage
-    localStorage.setItem("cachedBlogs", JSON.stringify(blogData.value));
-    
-    console.log(`Blog with ID ${blogIdToDelete} deleted successfully.`);
-  } catch (error) {
-    console.error("Error deleting blog:", error);
+      // Remove the blog from Firestore
+      await deleteDoc(doc(db, "blogs", blogIdToDelete));
+
+      // Update local blogData by filtering out the deleted blog
+      blogData.value = blogData.value.filter(
+        (blog) => blog.id !== blogIdToDelete
+      );
+
+      // Update cachedBlogs in local storage
+      localStorage.setItem("cachedBlogs", JSON.stringify(blogData.value));
+
+      console.log(`Blog with ID ${blogIdToDelete} deleted successfully.`);
+    } catch (error) {
+      console.error("Error deleting blog:", error);
+    }
   }
 }
+
+async function handleAddBlog(blogDataToAdd) {
+  console.log("Received new blog data:", blogDataToAdd);
+  // Perform actions with the received blog data, e.g., send to backend, update state, etc.
+  // Calling the function to add the new blog post
+  try {
+    await addDoc(blogRef, blogDataToAdd); // Ensure addDoc is awaited
+
+    // Update local blogData with the new blog
+    blogData.value = [blogDataToAdd, ...blogData.value];
+
+    // Update cachedBlogs in local storage
+    localStorage.setItem("cachedBlogs", JSON.stringify(blogData.value));
+  } catch (error) {
+    console.error("Error adding document:", error);
+  }
 }
 
-async function handleAddBlog(blogDataToAdd){
-    console.log('Received new blog data:', blogDataToAdd);
-    // Perform actions with the received blog data, e.g., send to backend, update state, etc.
-      // Calling the function to add the new blog post
-    try {
-      await addDoc(blogRef, blogDataToAdd); // Ensure addDoc is awaited
+async function handleUpdate(blogDataToUpdate) {
+  console.log("Received updated blog data:", blogDataToUpdate);
+  // Perform actions with the received blog data, e.g., send to backend, update state, etc.
+  // Calling the function to update the blog post
 
-      // Update local blogData with the new blog
-      blogData.value = [blogDataToAdd, ...blogData.value];
+  try {
+    await updateDoc(doc(db, "blogs", blogDataToUpdate.id), blogDataToUpdate); // Ensure updateDoc is awaited
 
-      // Update cachedBlogs in local storage
-      localStorage.setItem("cachedBlogs", JSON.stringify(blogData.value));
+    // Update local blogData with the updated blog
+    blogData.value = blogData.value.map((blog) => {
+      if (blog.id === blogDataToUpdate.id) {
+        return blogDataToUpdate;
+      } else {
+        return blog;
+      }
+    });
 
-    } catch (error) {
-      console.error("Error adding document:", error);
-    }
-};
-
-async function handleUpdate(blogDataToUpdate){
-    console.log('Received updated blog data:', blogDataToUpdate);
-    // Perform actions with the received blog data, e.g., send to backend, update state, etc.
-    // Calling the function to update the blog post
-
-    try {
-      await updateDoc(doc(db, "blogs", blogDataToUpdate.id), blogDataToUpdate); // Ensure updateDoc is awaited
-
-      // Update local blogData with the updated blog
-      blogData.value = blogData.value.map(blog => {
-        if (blog.id === blogDataToUpdate.id) {
-          return blogDataToUpdate;
-        } else {
-          return blog;
-        }
-      });
-
-      // Update cachedBlogs in local storage
-      localStorage.setItem("cachedBlogs", JSON.stringify(blogData.value));
-
-    } catch (error) {
-      console.error("Error updating document:", error);
-    }
-};
+    // Update cachedBlogs in local storage
+    localStorage.setItem("cachedBlogs", JSON.stringify(blogData.value));
+  } catch (error) {
+    console.error("Error updating document:", error);
+  }
+}
 
 onMounted(async () => {
   getAllBlogs().then((data) => {
     blogData.value = data;
     blogDataLength.value = data.length;
-    console.log(blogDataLength.value)
+    console.log(
+      "on mounted blogdatalength on blogmanagement",
+      blogDataLength.value
+    );
   });
 });
-
 </script>
