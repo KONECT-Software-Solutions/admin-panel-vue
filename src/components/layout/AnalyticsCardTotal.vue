@@ -4,7 +4,7 @@
       <div class="flex justify-between mb-6">
         <div>
           <div class="text-3xl font-semibold mb-1">
-                {{totalBlogCount}}<span class="pl-2 font-medium text-gray-400">Blog Yazısı</span>
+                {{length}}<span class="pl-2 font-medium text-gray-400">Blog Yazısı</span>
           </div>
         </div>
     </div>
@@ -74,19 +74,13 @@
 
 import { ref, onMounted} from 'vue';
 
-// computed total blog count
-const totalBlogCount = ref(0);
-
 
 // props
 const props = defineProps({
   length: Number
 });
 
-// lifecycle hooks
-onMounted(() => {
-  totalBlogCount.value = props.length;
-});
+
 </script>
 
 <style>

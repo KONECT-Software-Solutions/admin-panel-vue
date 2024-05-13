@@ -302,7 +302,7 @@ onMounted(async () => {
   getAllBlogs().then((data) => {
     blogData.value = data;
     blogDataLength.value = data.length;
-    console.log(blogDataLength.value)
+    console.log("on mounted blogdatalength on blogmanagement", blogDataLength.value);
   });
 });
 
