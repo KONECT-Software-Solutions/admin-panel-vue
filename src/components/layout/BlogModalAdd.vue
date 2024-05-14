@@ -3,7 +3,7 @@
     <div id="add-blog-modal" tabindex="-1" aria-hidden="true" v-if="show" class="fixed inset-0 flex items-center justify-center z-50 w-full md:inset-0 h-[calc(100%-1rem)] max-h-full">
         <div class="relative p-4 w-full max-w-4xl max-h-full">
             <!-- Modal content -->
-            <div class="relative  bg-white rounded-lg shadown dark:bg-gray-700">
+            <div class="relative  bg-white rounded-lg shadow dark:bg-gray-700">
                 <!-- Modal header -->
                 <div class="flex items-center justify-between p-4 md:p-5 border-b rounded-t dark:border-gray-600">
                     <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
@@ -50,7 +50,10 @@
                         </div>
                         <div class="col-span-2">
                             <label for="content" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Yazı İçeriği</label>
-                            <textarea v-model="content" id="content" rows="4" class="block p-2.5 w-full h-64 text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Ana içeriğinizi buraya yazınız."></textarea>                    
+                            <!-- <textarea v-model="content" id="content" rows="4" class="block p-2.5 w-full h-64 text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Ana içeriğinizi buraya yazınız."></textarea>   -->
+                            <div class="bg-gray-200">
+                              <QuillEditor v-model:content="content" contentType="html" toolbar="essential" theme="snow" v-model="content" class="h-64"/>                 
+                            </div>
                         </div>
                     </div>
                     <button type="submit" class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">Ekle</button>
@@ -64,6 +67,8 @@
 <script setup>
 
 import { ref, computed, onMounted} from 'vue'
+import { QuillEditor } from '@vueup/vue-quill'
+import '@vueup/vue-quill/dist/vue-quill.snow.css';
 
 const emits = defineEmits(['close', 'addBlog']);
 const props = defineProps({
@@ -116,7 +121,7 @@ const buttonText = computed(() => {
 });
 
 const handleSubmit = () => {
-
+    console.log('content', content.value)
     // Gather blog data
     const blogData = {
         author: "admin",
@@ -136,7 +141,7 @@ const handleSubmit = () => {
     // Clear form fields or perform any other necessary actions
     title.value = '';
     content.value = '';
-    category.value = 'PH';
+    category.value = 'Blog Yazısı';
 
     emits('close');
 };

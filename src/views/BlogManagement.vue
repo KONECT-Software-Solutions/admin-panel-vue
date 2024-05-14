@@ -381,6 +381,7 @@ function customSortByDate(a, b) {
 
 onMounted(async () => {
   getAllBlogs().then((data) => {
+    // Sort the blog data by date in descending order
     data.sort(customSortByDate);
     blogData.value = data;
     blogDataLength.value = data.length;
