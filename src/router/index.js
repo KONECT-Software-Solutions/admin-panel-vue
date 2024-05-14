@@ -21,6 +21,7 @@ const routes = [
     path: '/main',
     name: 'MainPage',
     component: MainPage,
+    meta: { requiresAuth: true },
     children: [
       {
         path: 'home',
