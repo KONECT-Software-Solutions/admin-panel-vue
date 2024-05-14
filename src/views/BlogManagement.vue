@@ -67,7 +67,7 @@
           <th
             class="w-1/4 text-[12px] uppercase tracking-wide font-medium text-gray-600 py-2 px-4 bg-gray-50 text-left"
           >
-            Column
+            Değiştirilme  Tarihi
           </th>
           <th
             class="w-1/4 text-[12px] uppercase tracking-wide font-medium text-gray-600 py-2 px-4 bg-gray-50 text-left"
@@ -83,8 +83,8 @@
               <a
                 href="#"
                 class="text-gray-600 text-sm font-medium hover:text-blue-500 truncate"
-                >{{ blog.title || "" }}</a
-              >
+                >    {{ (blog.title && blog.title.length > 27) ? blog.title.substring(0, 27) + '...' : blog.title || "" }}
+              </a>
             </div>
           </td>
           <td class="py-2 px-4 border-b border-b-gray-50">
@@ -104,7 +104,7 @@
           </td>
           <td class="py-2 px-4 border-b border-b-gray-50">
             <div class="flex space-x-5">
-              <span class="text-[13px] font-medium text-gray-600">Data</span>
+              <span class="text-[13px] font-medium text-gray-600">{{ blog.updated_date }}</span>
             </div>
           </td>
           <td class="py-2 px-4 border-b border-b-gray-50 flex justify-between">
@@ -352,7 +352,7 @@ async function handleUpdate(blogDataToUpdate) {
 
   try {
     await updateDoc(doc(db, "blogs", blogDataToUpdate.id), blogDataToUpdate); // Ensure updateDoc is awaited
-
+    blogDataToUpdate.updated_date = blogDataToUpdate.updated_date.toLocaleDateString("tr-TR");
     // Update local blogData with the updated blog
     blogData.value = blogData.value.map((blog) => {
       if (blog.id === blogDataToUpdate.id) {

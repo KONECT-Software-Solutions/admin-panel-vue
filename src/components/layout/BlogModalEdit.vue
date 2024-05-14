@@ -115,6 +115,7 @@ const buttonText = computed(() => {
 });
 
 const handleSubmit = (editBlogData) => {
+    editBlogData.updated_date = new Date();
 
     emits('updateBlog', editBlogData);
 
