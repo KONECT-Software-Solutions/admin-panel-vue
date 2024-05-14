@@ -24,18 +24,10 @@
                             <input v-model="editBlogData.title" type="text" name="title" id="title" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" placeholder="Blog yazısı başlığını girin" required="">
                         </div>
                         <div class="col-span-2 sm:col-span-1">
-                            <label for="photo-upload" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Fotoğraf Seç</label>
-                            <input
-                                type="file"
-                                id="photo-upload"
-                                ref="fileInput"
-                                style="display: none;"
-                                accept="image/jpeg"
-                                @change="handlePhotoUpload"
-                            />
-                            <button @click="openFilePicker" type="button" id="photo-upload" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500">
+                            <label for="photo-upload" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Seçili Fotoğraf</label>
+                            <button @click="redirectToUrl" type="button" id="photo-upload" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500">
                                 <i class="ri-download-2-line"></i> 
-                                {{ buttonText }}
+                                {{ truncatedUrl }}
                             </button>
                         </div>
                         
@@ -73,46 +65,21 @@ const emits = defineEmits(['close', 'updateBlog']);
 const props = defineProps({
   show: Boolean,
   editBlogData: Object
-})
+});
 
-
-const fileInput = ref(null);
-const selectedFileName = ref(null);
-
-
-const openFilePicker = () => {
-  // Click the hidden file input element
-  fileInput.value.click();
-};
-
-const handlePhotoUpload = (event) => {
-  const selectedFile = event.target.files[0];
-  if (selectedFile && selectedFile.type === 'image/jpeg') {
-    selectedFileName.value = selectedFile.name;
+const truncatedUrl = computed(() => {
+  const maxLength = 20;
+  const url = props.editBlogData.image;
+  if (url.length <= maxLength) {
+    return url;
   } else {
-    selectedFileName.value = null;
-    // Optionally show an error message for invalid file type
-    console.error('Please select a JPEG file.');
-  }
-};
-
-const buttonText = computed(() => {
-  if (selectedFileName.value) {
-    const maxLength = 20; // Maximum length before truncation
-    const fileName = selectedFileName.value;
-    
-    if (fileName.length <= maxLength) {
-      return fileName; // Return full filename if within maximum length
-    } else {
-      const firstPart = fileName.substring(0, 10);
-      const lastPart = fileName.substring(fileName.length - 10);
-      const truncatedFileName = `${firstPart}...${lastPart}`;
-      return truncatedFileName;
-    }
-  }  else {
-    return `Dosya Seçilmedi`;
+    return `${url.substring(0, 10)}...${url.substring(url.length - 10)}`;
   }
 });
+
+const redirectToUrl = () => {
+  window.open(props.editBlogData.image, '_blank');
+};
 
 const handleSubmit = (editBlogData) => {
     editBlogData.updated_date = new Date();

@@ -68,6 +68,7 @@
 
 import { ref, computed, onMounted} from 'vue'
 import { QuillEditor } from '@vueup/vue-quill'
+import { getStorage, ref as firebaseStorageRef, uploadBytes, getDownloadURL } from "firebase/storage";
 import '@vueup/vue-quill/dist/vue-quill.snow.css';
 
 const emits = defineEmits(['close', 'addBlog']);
@@ -81,23 +82,21 @@ const props = defineProps({
 const title = ref('');
 const content = ref('');
 const category = ref('Blog Yazısı'); // Default category
-
 const fileInput = ref(null);
+const selectedFile = ref(null);
 const selectedFileName = ref(null);
 
-
 const openFilePicker = () => {
-  // Click the hidden file input element
   fileInput.value.click();
 };
 
 const handlePhotoUpload = (event) => {
-  const selectedFile = event.target.files[0];
-  if (selectedFile && selectedFile.type === 'image/jpeg') {
-    selectedFileName.value = selectedFile.name;
+  const file = event.target.files[0];
+  if (file && file.type === 'image/jpeg') {
+    selectedFile.value = file;
+    selectedFileName.value = file.name;
   } else {
     selectedFileName.value = null;
-    // Optionally show an error message for invalid file type
     console.error('Please select a JPEG file.');
   }
 };
@@ -120,30 +119,47 @@ const buttonText = computed(() => {
   }
 });
 
-const handleSubmit = () => {
-    console.log('content', content.value)
+const handleSubmit = async () => {
+  if (!selectedFile.value) {
+    console.error('Please select an image file.');
+    return;
+  }
+
+  const storage = getStorage();
+  const fileRef = firebaseStorageRef(storage, `images/${selectedFile.value.name}`);
+
+  try {
+    console.log('Uploading file...');
+    await uploadBytes(fileRef, selectedFile.value);
+    const downloadURL = await getDownloadURL(fileRef); 
+    console.log('File uploaded:', downloadURL);
+
     // Gather blog data
     const blogData = {
-        author: "admin",
-        created_date: new Date(),
-        updated_date: new Date(),
-        url: "https://konect-software-solutions.github.io/tiryaki-hukuk-web-project/blog-single.html",
-        title: title.value,
-        image: "img link here", // Replace with dynamic data if necessary
-        content: content.value,
-        category: category.value
-        // Add more fields as needed
+      author: "admin",
+      created_date: new Date(),
+      updated_date: new Date(),
+      url: "https://konect-software-solutions.github.io/tiryaki-hukuk-web-project/blog-single.html",
+      title: title.value,
+      image: downloadURL, // Add the image URL
+      content: content.value,
+      category: category.value,
     };
 
     // Emit the 'addBlog' event with the blog data
     emits('addBlog', blogData);
 
-    // Clear form fields or perform any other necessary actions
+    // Clear form fields
     title.value = '';
     content.value = '';
     category.value = 'Blog Yazısı';
+    selectedFile.value = null;
+    selectedFileName.value = null;
 
     emits('close');
+  } catch (error) {
+    console.error('Error uploading file or saving blog post:', error);
+  }
 };
 
 

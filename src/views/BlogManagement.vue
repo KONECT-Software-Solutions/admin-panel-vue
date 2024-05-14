@@ -168,6 +168,7 @@ const editBlogData = ref(null);
 function toggleEdit(blog) {
   showEditModal.value = true;
   editBlogData.value = blog;
+  console.log(editBlogData.value.created_date)
   console.log("blog id to edit", blog.id);
 }
 
@@ -279,7 +280,7 @@ async function getAllBlogs() {
     // Check if data exists and is not expired
     const cachedBlogs = localStorage.getItem("cachedBlogs");
     const cachedTime = localStorage.getItem("cachedTime");
-    const expiryTime = 30 * 60 * 1000; // 30 minutes expiration time
+    const expiryTime = 0 * 60 * 1000; // 30 minutes expiration time
 
     if (
       cachedBlogs &&
@@ -299,9 +300,18 @@ async function getAllBlogs() {
   }
 }
 function formatDate(timestamp) {
-  const date = new Date(timestamp.seconds * 1000);
+  if (!timestamp) return '';
+  if (timestamp.seconds) { // Firestore timestamp
+    const date = new Date(timestamp.seconds * 1000);
+    return date.toLocaleDateString("tr-TR");
+  }
+  if (typeof timestamp === 'string') { // Already formatted string
+    return timestamp;
+  }
+  const date = new Date(timestamp); // Fallback for any other case
   return date.toLocaleDateString("tr-TR");
 }
+
 // Function to delete a blog by ID
 async function handleDelete() {
   showDeleteModal.value = false;
@@ -334,9 +344,12 @@ async function handleAddBlog(blogDataToAdd) {
     const docRef = await addDoc(blogRef, blogDataToAdd); // Ensure addDoc is awaited
 
     // Include the ID in the local copy of the blog data
-    const newBlogWithId = { ...blogDataToAdd, id: docRef.id };
-    newBlogWithId.created_date = newBlogWithId.created_date.toLocaleDateString("tr-TR");
-    newBlogWithId.updated_date = newBlogWithId.updated_date.toLocaleDateString("tr-TR");
+    const newBlogWithId = { 
+      ...blogDataToAdd, 
+      id: docRef.id,
+      created_date: formatDate(blogDataToAdd.created_date), // This line formats the created_date
+      updated_date: formatDate(blogDataToAdd.updated_date), // This line formats the updated_date
+    };
     // Update local blogData with the new blog including the ID
     blogData.value = [newBlogWithId, ...blogData.value];
 
@@ -352,11 +365,16 @@ async function handleUpdate(blogDataToUpdate) {
 
   try {
     await updateDoc(doc(db, "blogs", blogDataToUpdate.id), blogDataToUpdate); // Ensure updateDoc is awaited
-    blogDataToUpdate.updated_date = blogDataToUpdate.updated_date.toLocaleDateString("tr-TR");
+    const updatedBlog = {
+      ...blogDataToUpdate,
+      created_date: formatDate(blogDataToUpdate.created_date), // This line formats the created_date
+      updated_date: formatDate(blogDataToUpdate.updated_date), // This line formats the updated_date
+    };
+
     // Update local blogData with the updated blog
     blogData.value = blogData.value.map((blog) => {
       if (blog.id === blogDataToUpdate.id) {
-        return blogDataToUpdate;
+        return updatedBlog;
       } else {
         return blog;
       }
