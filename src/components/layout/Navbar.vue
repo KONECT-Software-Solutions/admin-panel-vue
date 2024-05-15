@@ -19,8 +19,8 @@
 </template>
 
 <script setup>
-import NotificationDropdown from './NotificationDropdown.vue';
-import ProfileDropdown from './ProfileDropdown.vue';
+import NotificationDropdown from '../NotificationDropdown.vue';
+import ProfileDropdown from '../ProfileDropdown.vue';
 import { ref } from 'vue';
 
 // Accept currentTab as a prop

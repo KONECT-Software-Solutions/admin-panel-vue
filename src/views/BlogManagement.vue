@@ -142,10 +142,10 @@
   </shadow-box>
 </template>
 <script setup>
-import BlogModalAdd from "../components/layout/BlogModalAdd.vue";
-import DeleteModal from "../components/layout/DeleteModal.vue";
-import BlogModalEdit from "../components/layout/BlogModalEdit.vue";
-import AnalyticsCardTotal from "../components/layout/AnalyticsCardTotal.vue";
+import BlogModalAdd from "../components/BlogModalAdd.vue";
+import DeleteModal from "../components/DeleteModal.vue";
+import BlogModalEdit from "../components/BlogModalEdit.vue";
+import AnalyticsCardTotal from "../components/AnalyticsCardTotal.vue";
 
 import {
   collection,
