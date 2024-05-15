@@ -1,9 +1,4 @@
 <template>
-  <BlogModalAdd
-    :show="showBlogModal"
-    @close="showBlogModal = false"
-    @addBlog="handleAddBlog"
-  />
   <DeleteModal
     :show="showDeleteModal"
     @close="showDeleteModal = false"
@@ -13,18 +8,11 @@
     :show="showEditModal"
     @close="showEditModal = false"
     @updateBlog="handleUpdate"
-    :editBlogData="editBlogData"
+    :editmeetingData="editmeetingData"
   />
-
   <shadow-box class="p-6">
     <div class="flex justify-between mb-4 items-start">
       <h1 class="font-medium">Online Görüşmeler</h1>
-      <button
-        @click="showBlogModal = true"
-        class="bg-green-700 text-white px-4 py-1 font-medium rounded"
-      >
-        + Ekle
-      </button>
     </div>
     <form action="" class="flex items-center mb-4">
       <div class="relative w-full mr-2">
@@ -38,33 +26,33 @@
         ></i>
       </div>
     </form>
-    <table v-if="blogData?.length" class="w-full bg-gray-100 mt-6">
+    <table v-if="meetingData?.length" class="w-full bg-gray-100 mt-6">
       <thead>
         <tr>
           <th
             class="w-1/4 text-[12px] uppercase tracking-wide font-medium text-gray-600 py-2 px-4 bg-gray-50 text-left rounded-tl-md rounded-bl-md"
           >
-            Başlık
+            Müşteri İsmi
           </th>
           <th
             class="w-1/4 text-[12px] uppercase tracking-wide font-medium text-gray-600 py-2 px-4 bg-gray-50 text-left"
           >
-            Yazar
+            Avukat İsmi
           </th>
           <th
             class="w-1/4 text-[12px] uppercase tracking-wide font-medium text-gray-600 py-2 px-4 bg-gray-50 text-left"
           >
-            Yaratılma Tarihi
+            Randevu Tarihi
           </th>
           <th
             class="w-1/4 text-[12px] uppercase tracking-wide font-medium text-gray-600 py-2 px-4 bg-gray-50 text-left"
           >
-            Column
+            Randevu durumu
           </th>
           <th
             class="w-1/4 text-[12px] uppercase tracking-wide font-medium text-gray-600 py-2 px-4 bg-gray-50 text-left"
           >
-            Column
+            Randevu Linki
           </th>
           <th
             class="w-1/4 text-[12px] uppercase tracking-wide font-medium text-gray-600 py-2 px-4 bg-gray-50 text-left"
@@ -74,24 +62,24 @@
         </tr>
       </thead>
       <tbody>
-        <tr v-for="blog in paginatedItems" :key="blog.id">
+        <tr v-for="meeting in paginatedItems" :key="meeting.id">
           <td class="py-2 px-4 border-b border-b-gray-50">
             <div class="flex items-center">
               <a
                 href="#"
                 class="text-gray-600 text-sm font-medium hover:text-blue-500 truncate"
-                >{{ blog.title || "" }}</a
+                >{{ meeting.customer_name || "" }}</a
               >
             </div>
           </td>
           <td class="py-2 px-4 border-b border-b-gray-50">
             <span class="text-[13px] font-medium text-gray-600">{{
-              blog.author || ""
+              meeting.attorney_name || ""
             }}</span>
           </td>
           <td class="py-2 px-4 border-b border-b-gray-50">
             <span class="text-[13px] font-medium text-gray-600">{{
-              formatDate(blog.created_date)
+              formatDate(meeting.date)
             }}</span>
           </td>
           <td class="py-2 px-4 border-b border-b-gray-50">
@@ -107,15 +95,15 @@
           <td class="py-2 px-4 border-b border-b-gray-50 flex justify-between">
             <div class="button-container relative flex flex-row gap-1">
               <button
-                @click="toggleEdit(blog)"
+                @click="toggleEdit(meeting)"
                 class="ri-edit-line text-lg bg-orange-400 hover:bg-gray-900 text-white font-bold px-2 rounded"
               ></button>
               <button
-                @click="openURL(blog.url)"
+                @click="openURL(meeting.url)"
                 class="ri-eye-line text-lg bg-green-700 hover:bg-gray-900 text-white font-bold px-2 rounded"
               ></button>
               <button
-                @click="confirmDelete(blog.id)"
+                @click="confirmDelete(meeting.id)"
                 id="delete-blog-modal-button"
                 class="ri-delete-bin-6-line text-lg bg-red-700 hover:bg-gray-900 text-white font-bold px-2 rounded"
               ></button>
@@ -137,14 +125,12 @@
       ></button>
     </div>
   </shadow-box>
-  <AnalyticsCardTotal :length="blogDataLength" />
+  <AnalyticsCardTotal />
 </template>
 <script setup>
-import BlogModalAdd from "../components/layout/BlogModalAdd.vue";
 import DeleteModal from "../components/layout/DeleteModal.vue";
 import BlogModalEdit from "../components/layout/BlogModalEdit.vue";
 import AnalyticsCardTotal from "../components/layout/AnalyticsCardTotal.vue";
-
 import {
   collection,
   getDocs,
@@ -157,31 +143,30 @@ import { db } from "../firebase";
 import { onMounted, ref, computed } from "vue";
 import ShadowBox from "../components/container/ShadowBox.vue";
 
-const showBlogModal = ref(false);
 const showEditModal = ref(false);
 const showDeleteModal = ref(false);
-let blogIdToDelete = null;
-const editBlogData = ref(null);
+let meetingIdToDelete = null;
+const editMeetingData = ref(null);
 
 function toggleEdit(blog) {
   showEditModal.value = true;
-  editBlogData.value = blog;
-  console.log(editBlogData.value);
+  editMeetingData.value = meeting;
+  console.log(editMeetingData.value);
 }
 
 function openURL(url) {
   window.open(url, "_blank");
 }
 
-function confirmDelete(blogId) {
-  blogIdToDelete = blogId;
+function confirmDelete(meetingId) {
+  meetingIdToDelete = meetingId;
   showDeleteModal.value = true;
 }
 
-const blogRef = collection(db, "blogs");
-const blogData = ref([]);
-// blogData length
-const blogDataLength = computed(() => blogData.value.length);
+const meetingRef = collection(db, "meetings");
+const meetingData = ref([]);
+// meetingData length
+const meetingDataLength = computed(() => meetingData.value.length);
 const currentPage = ref(1);
 const itemsPerPage = ref(10);
 
@@ -191,11 +176,11 @@ const startIndex = computed(() => (currentPage.value - 1) * itemsPerPage.value);
 const paginatedItems = computed(() => {
   const start = startIndex.value;
   const end = start + itemsPerPage.value;
-  return blogData.value.slice(start, end);
+  return meetingData.value.slice(start, end);
 });
 // Computed property to calculate the total number of pages
 const totalPages = computed(() =>
-  Math.ceil(blogData.value.length / itemsPerPage.value)
+  Math.ceil(meetingData.value.length / itemsPerPage.value)
 );
 
 // Method to go to the next page
@@ -214,47 +199,40 @@ const prevPage = () => {
   }
 };
 
-// Utility function to load blogs data
-async function fetchBlogs() {
-  let blogs = [];
-  const querySnapshot = await getDocs(blogRef);
+// Utility function to load meetings data
+async function fetchMeetings() {
+  let meetings = [];
+  const querySnapshot = await getDocs(meetingRef);
   for (const doc of querySnapshot.docs) {
     let docData = doc.data();
     docData.id = doc.id;
-    const commentsRef = collection(db, "blogs", doc.id, "comments");
-    const commentData = [];
-    const commentsSnapshot = await getDocs(commentsRef);
-    commentsSnapshot.docs.forEach((commentDoc) => {
-      commentData.push(commentDoc.data());
-    });
-    docData.comments = commentData;
-    blogs.push(docData);
+    meetings.push(docData);
   }
-  return blogs;
+  return meetings;
 }
 
 // Checking and setting local storage
-async function getAllBlogs() {
+async function getAllMeetings() {
   try {
     // Check if data exists and is not expired
-    const cachedBlogs = localStorage.getItem("cachedBlogs");
+    const cachedmeetings = localStorage.getItem("cachedmeetings");
     const cachedTime = localStorage.getItem("cachedTime");
     const expiryTime = 30 * 60 * 1000; // 30 minutes expiration time
 
     if (
-      cachedBlogs &&
+      cachedmeetings &&
       cachedTime &&
       new Date() - new Date(parseInt(cachedTime)) < expiryTime
     ) {
-      return JSON.parse(cachedBlogs);
+      return JSON.parse(cachedmeetings);
     } else {
-      const blogs = await fetchBlogs();
-      localStorage.setItem("cachedBlogs", JSON.stringify(blogs));
+      const meetings = await fetchMeetings();
+      localStorage.setItem("cachedmeetings", JSON.stringify(meetings));
       localStorage.setItem("cachedTime", new Date().getTime().toString());
-      return blogs;
+      return meetings;
     }
   } catch (error) {
-    console.error("Error getting blogs with comments:", error);
+    console.error("Error getting meetings with comments:", error);
     return [];
   }
 }
@@ -262,75 +240,43 @@ function formatDate(timestamp) {
   const date = new Date(timestamp.seconds * 1000);
   return date.toLocaleDateString("en-US");
 }
-// Function to delete a blog by ID
+// Function to delete a meeting by ID
 async function handleDelete() {
   showDeleteModal.value = false;
-  if (blogIdToDelete) {
-    try {
-      // Remove the blog from Firestore
-      await deleteDoc(doc(db, "blogs", blogIdToDelete));
-
-      // Update local blogData by filtering out the deleted blog
-      blogData.value = blogData.value.filter(
-        (blog) => blog.id !== blogIdToDelete
-      );
-
-      // Update cachedBlogs in local storage
-      localStorage.setItem("cachedBlogs", JSON.stringify(blogData.value));
-
-      console.log(`Blog with ID ${blogIdToDelete} deleted successfully.`);
-    } catch (error) {
-      console.error("Error deleting blog:", error);
-    }
-  }
 }
 
-async function handleAddBlog(blogDataToAdd) {
-  console.log("Received new blog data:", blogDataToAdd);
-  // Perform actions with the received blog data, e.g., send to backend, update state, etc.
-  // Calling the function to add the new blog post
-  try {
-    await addDoc(blogRef, blogDataToAdd); // Ensure addDoc is awaited
-
-    // Update local blogData with the new blog
-    blogData.value = [blogDataToAdd, ...blogData.value];
-
-    // Update cachedBlogs in local storage
-    localStorage.setItem("cachedBlogs", JSON.stringify(blogData.value));
-  } catch (error) {
-    console.error("Error adding document:", error);
-  }
-}
-
-async function handleUpdate(blogDataToUpdate) {
-  console.log("Received updated blog data:", blogDataToUpdate);
-  // Perform actions with the received blog data, e.g., send to backend, update state, etc.
-  // Calling the function to update the blog post
+async function handleUpdate(meetingDataToUpdate) {
+  console.log("Received updated meeting data:", meetingDataToUpdate);
+  // Perform actions with the received meeting data, e.g., send to backend, update state, etc.
+  // Calling the function to update the meeting post
 
   try {
-    await updateDoc(doc(db, "blogs", blogDataToUpdate.id), blogDataToUpdate); // Ensure updateDoc is awaited
+    await updateDoc(
+      doc(db, "meetings", meetingDataToUpdate.id),
+      meetingDataToUpdate
+    ); // Ensure updateDoc is awaited
 
-    // Update local blogData with the updated blog
-    blogData.value = blogData.value.map((blog) => {
-      if (blog.id === blogDataToUpdate.id) {
-        return blogDataToUpdate;
+    // Update local meetingData with the updated meeting
+    meetingData.value = meetingData.value.map((meeting) => {
+      if (meeting.id === meetingDataToUpdate.id) {
+        return meetingDataToUpdate;
       } else {
-        return blog;
+        return meeting;
       }
     });
 
-    // Update cachedBlogs in local storage
-    localStorage.setItem("cachedBlogs", JSON.stringify(blogData.value));
+    // Update cachedmeetings in local storage
+    localStorage.setItem("cachedMeetings", JSON.stringify(meetingData.value));
   } catch (error) {
     console.error("Error updating document:", error);
   }
 }
 
 onMounted(async () => {
-  getAllBlogs().then((data) => {
-    blogData.value = data;
-    blogDataLength.value = data.length;
-    console.log(blogDataLength.value);
+  getAllMeetings().then((data) => {
+    meetingData.value = data;
+    meetingDataLength.value = data.length;
+    console.log(meetingDataLength.value);
   });
 });
 </script>
