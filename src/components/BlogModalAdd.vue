@@ -42,15 +42,18 @@
                         <div class="col-span-2 sm:col-span-1">
                             <label for="category" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Kategori</label>
                             <select v-model="category" id="category" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500">
-                                <option value="TV">Hukuk</option>
-                                <option value="PC">Haberler</option>
-                                <option value="GA">Son Dakika</option>
-                                <option value="PH">Blog Yazısı</option>
+                                <option value="Hukuk">Hukuk</option>
+                                <option value="Haberler">Haberler</option>
+                                <option value="Son Dakika">Son Dakika</option>
+                                <option value="Blog Yazısı">Blog Yazısı</option>
                             </select>
                         </div>
                         <div class="col-span-2">
                             <label for="content" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Yazı İçeriği</label>
-                            <textarea v-model="content" id="content" rows="4" class="block p-2.5 w-full h-64 text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Ana içeriğinizi buraya yazınız."></textarea>                    
+                            <!-- <textarea v-model="content" id="content" rows="4" class="block p-2.5 w-full h-64 text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Ana içeriğinizi buraya yazınız."></textarea>   -->
+                            <div class="bg-gray-200">
+                              <QuillEditor v-model:content="content" contentType="html" toolbar="essential" theme="snow" v-model="content" class="h-64"/>                 
+                            </div>
                         </div>
                     </div>
                     <button type="submit" class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">Ekle</button>
@@ -64,6 +67,9 @@
 <script setup>
 
 import { ref, computed, onMounted} from 'vue'
+import { QuillEditor } from '@vueup/vue-quill'
+import { getStorage, ref as firebaseStorageRef, uploadBytes, getDownloadURL } from "firebase/storage";
+import '@vueup/vue-quill/dist/vue-quill.snow.css';
 
 const emits = defineEmits(['close', 'addBlog']);
 const props = defineProps({
@@ -75,24 +81,22 @@ const props = defineProps({
 // Data for blog fields
 const title = ref('');
 const content = ref('');
-const category = ref('PH'); // Default category
-
+const category = ref('Blog Yazısı'); // Default category
 const fileInput = ref(null);
+const selectedFile = ref(null);
 const selectedFileName = ref(null);
 
-
 const openFilePicker = () => {
-  // Click the hidden file input element
   fileInput.value.click();
 };
 
 const handlePhotoUpload = (event) => {
-  const selectedFile = event.target.files[0];
-  if (selectedFile && selectedFile.type === 'image/jpeg') {
-    selectedFileName.value = selectedFile.name;
+  const file = event.target.files[0];
+  if (file && file.type === 'image/jpeg') {
+    selectedFile.value = file;
+    selectedFileName.value = file.name;
   } else {
     selectedFileName.value = null;
-    // Optionally show an error message for invalid file type
     console.error('Please select a JPEG file.');
   }
 };
@@ -115,30 +119,47 @@ const buttonText = computed(() => {
   }
 });
 
-const handleSubmit = () => {
+const handleSubmit = async () => {
+  if (!selectedFile.value) {
+    console.error('Please select an image file.');
+    return;
+  }
+
+  const storage = getStorage();
+  const fileRef = firebaseStorageRef(storage, `images/${selectedFile.value.name}`);
+
+  try {
+    console.log('Uploading file...');
+    await uploadBytes(fileRef, selectedFile.value);
+    const downloadURL = await getDownloadURL(fileRef); 
+    console.log('File uploaded:', downloadURL);
 
     // Gather blog data
     const blogData = {
-        author: "admin",
-        created_date: new Date(),
-        updated_date: new Date(),
-        url: "https://konect-software-solutions.github.io/tiryaki-hukuk-web-project/blog-single.html",
-        title: title.value,
-        image: "img link here", // Replace with dynamic data if necessary
-        content: content.value,
-        category: category.value
-        // Add more fields as needed
+      author: "admin",
+      created_date: new Date(),
+      updated_date: new Date(),
+      url: "https://konect-software-solutions.github.io/tiryaki-hukuk-web-project/blog-single.html",
+      title: title.value,
+      image: downloadURL, // Add the image URL
+      content: content.value,
+      category: category.value,
     };
 
     // Emit the 'addBlog' event with the blog data
     emits('addBlog', blogData);
 
-    // Clear form fields or perform any other necessary actions
+    // Clear form fields
     title.value = '';
     content.value = '';
-    category.value = 'PH';
+    category.value = 'Blog Yazısı';
+    selectedFile.value = null;
+    selectedFileName.value = null;
 
     emits('close');
+  } catch (error) {
+    console.error('Error uploading file or saving blog post:', error);
+  }
 };
 
 

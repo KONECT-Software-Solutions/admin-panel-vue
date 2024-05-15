@@ -1,7 +1,7 @@
 <template>
   <BlogModalAdd
     :show="showBlogModal"
-    @close="showBlogModal = false"
+    @close="showBlogModal = false" 
     @addBlog="handleAddBlog"
   />
   <DeleteModal
@@ -16,6 +16,8 @@
     :editBlogData="editBlogData"
   />
 
+  <AnalyticsCardTotal :length="blogDataLength" />
+
   <shadow-box class="p-6">
     <div class="flex justify-between mb-4 items-start">
       <h1 class="font-medium">Blog Yönetimi</h1>
@@ -29,9 +31,10 @@
     <form action="" class="flex items-center mb-4">
       <div class="relative w-full mr-2">
         <input
+          v-model="searchTerm"
           type="text"
           class="py-2 pr-4 pl-10 bg-gray-100 w-full outline-none border border-gray-100 rounded-md text-sm focus:border-blue-500"
-          placeholder="Ara..."
+          placeholder="Başlığa göre ara..."
         />
         <i
           class="ri-search-line absolute top-1/2 left-4 -translate-y-1/2 text-gray-400"
@@ -59,12 +62,12 @@
           <th
             class="w-1/4 text-[12px] uppercase tracking-wide font-medium text-gray-600 py-2 px-4 bg-gray-50 text-left"
           >
-            Column
+            Kategori
           </th>
           <th
             class="w-1/4 text-[12px] uppercase tracking-wide font-medium text-gray-600 py-2 px-4 bg-gray-50 text-left"
           >
-            Column
+            Değiştirilme  Tarihi
           </th>
           <th
             class="w-1/4 text-[12px] uppercase tracking-wide font-medium text-gray-600 py-2 px-4 bg-gray-50 text-left"
@@ -80,8 +83,8 @@
               <a
                 href="#"
                 class="text-gray-600 text-sm font-medium hover:text-blue-500 truncate"
-                >{{ blog.title || "" }}</a
-              >
+                >    {{ (blog.title && blog.title.length > 27) ? blog.title.substring(0, 27) + '...' : blog.title || "" }}
+              </a>
             </div>
           </td>
           <td class="py-2 px-4 border-b border-b-gray-50">
@@ -91,17 +94,17 @@
           </td>
           <td class="py-2 px-4 border-b border-b-gray-50">
             <span class="text-[13px] font-medium text-gray-600">{{
-              formatDate(blog.created_date)
+              blog.created_date
             }}</span>
           </td>
           <td class="py-2 px-4 border-b border-b-gray-50">
             <div class="flex space-x-5">
-              <span class="text-[13px] font-medium text-gray-600">Data</span>
+              <span class="text-[13px] font-medium text-gray-600">{{blog.category}}</span>
             </div>
           </td>
           <td class="py-2 px-4 border-b border-b-gray-50">
             <div class="flex space-x-5">
-              <span class="text-[13px] font-medium text-gray-600">Data</span>
+              <span class="text-[13px] font-medium text-gray-600">{{ blog.updated_date }}</span>
             </div>
           </td>
           <td class="py-2 px-4 border-b border-b-gray-50 flex justify-between">
@@ -137,13 +140,12 @@
       ></button>
     </div>
   </shadow-box>
-  <AnalyticsCardTotal :length="blogDataLength" />
 </template>
 <script setup>
-import BlogModalAdd from "../components/layout/BlogModalAdd.vue";
-import DeleteModal from "../components/layout/DeleteModal.vue";
-import BlogModalEdit from "../components/layout/BlogModalEdit.vue";
-import AnalyticsCardTotal from "../components/layout/AnalyticsCardTotal.vue";
+import BlogModalAdd from "../components/BlogModalAdd.vue";
+import DeleteModal from "../components/DeleteModal.vue";
+import BlogModalEdit from "../components/BlogModalEdit.vue";
+import AnalyticsCardTotal from "../components/AnalyticsCardTotal.vue";
 
 import {
   collection,
@@ -154,7 +156,7 @@ import {
   doc,
 } from "firebase/firestore";
 import { db } from "../firebase";
-import { onMounted, ref, computed } from "vue";
+import { onMounted, ref, computed, watch } from "vue";
 import ShadowBox from "../components/container/ShadowBox.vue";
 
 const showBlogModal = ref(false);
@@ -166,7 +168,8 @@ const editBlogData = ref(null);
 function toggleEdit(blog) {
   showEditModal.value = true;
   editBlogData.value = blog;
-  console.log(editBlogData.value);
+  console.log(editBlogData.value.created_date)
+  console.log("blog id to edit", blog.id);
 }
 
 function openURL(url) {
@@ -180,30 +183,60 @@ function confirmDelete(blogId) {
 
 const blogRef = collection(db, "blogs");
 const blogData = ref([]);
-// blogData length
 const blogDataLength = computed(() => blogData.value.length);
 const currentPage = ref(1);
 const itemsPerPage = ref(10);
+
+const searchTerm = ref("");
+
+// Computed property to filter blogs based on the search term
+const filteredBlogs = computed(() => {
+  if (!searchTerm.value) {
+    return blogData.value;
+  } else {
+    return blogData.value.filter((blog) =>
+      blog.title.toLowerCase().includes(searchTerm.value.toLowerCase())
+    );
+  }
+});
+
+// log the filtered blogs every time the searchTerm changes
+// watch(searchTerm, (newVal) => {
+//  console.log("Filtered blogs:", filteredBlogs.value);
+// });
+
 
 // Computed property to calculate the start index of the current page
 const startIndex = computed(() => (currentPage.value - 1) * itemsPerPage.value);
 
 const paginatedItems = computed(() => {
-  const start = startIndex.value;
-  const end = start + itemsPerPage.value;
-  return blogData.value.slice(start, end);
+  if (filteredBlogs.value.length === 0) {
+    const start = startIndex.value;
+    const end = start + itemsPerPage.value;
+    return blogData.value.slice(start, end);
+  }
+  else {
+    return filteredBlogs.value.slice(startIndex.value, startIndex.value + itemsPerPage.value);
+  }
+  
 });
+
+
+
 // Computed property to calculate the total number of pages
-const totalPages = computed(() =>
-  Math.ceil(blogData.value.length / itemsPerPage.value)
-);
+const totalPages = computed(() => {
+  if (filteredBlogs.value.length === 0) {
+    return Math.ceil(blogData.value.length / itemsPerPage.value);
+  }
+  else {
+    return Math.ceil(filteredBlogs.value.length / itemsPerPage.value);
+  }
+});
 
 // Method to go to the next page
 const nextPage = () => {
   if (currentPage.value < totalPages.value) {
     currentPage.value++;
-    console.log(currentPage.value);
-    console.log(totalPages.value);
   }
 };
 
@@ -230,6 +263,14 @@ async function fetchBlogs() {
     docData.comments = commentData;
     blogs.push(docData);
   }
+  // for each blog created_date = formatDate(blog.created_date)
+  blogs = blogs.map((blog) => {
+    return {
+      ...blog,
+      created_date: formatDate(blog.created_date),
+      updated_date: formatDate(blog.updated_date),
+    };
+  });
   return blogs;
 }
 
@@ -259,9 +300,18 @@ async function getAllBlogs() {
   }
 }
 function formatDate(timestamp) {
-  const date = new Date(timestamp.seconds * 1000);
-  return date.toLocaleDateString("en-US");
+  if (!timestamp) return '';
+  if (timestamp.seconds) { // Firestore timestamp
+    const date = new Date(timestamp.seconds * 1000);
+    return date.toLocaleDateString("tr-TR");
+  }
+  if (typeof timestamp === 'string') { // Already formatted string
+    return timestamp;
+  }
+  const date = new Date(timestamp); // Fallback for any other case
+  return date.toLocaleDateString("tr-TR");
 }
+
 // Function to delete a blog by ID
 async function handleDelete() {
   showDeleteModal.value = false;
@@ -287,13 +337,21 @@ async function handleDelete() {
 
 async function handleAddBlog(blogDataToAdd) {
   console.log("Received new blog data:", blogDataToAdd);
+  
   // Perform actions with the received blog data, e.g., send to backend, update state, etc.
   // Calling the function to add the new blog post
   try {
-    await addDoc(blogRef, blogDataToAdd); // Ensure addDoc is awaited
+    const docRef = await addDoc(blogRef, blogDataToAdd); // Ensure addDoc is awaited
 
-    // Update local blogData with the new blog
-    blogData.value = [blogDataToAdd, ...blogData.value];
+    // Include the ID in the local copy of the blog data
+    const newBlogWithId = { 
+      ...blogDataToAdd, 
+      id: docRef.id,
+      created_date: formatDate(blogDataToAdd.created_date), // This line formats the created_date
+      updated_date: formatDate(blogDataToAdd.updated_date), // This line formats the updated_date
+    };
+    // Update local blogData with the new blog including the ID
+    blogData.value = [newBlogWithId, ...blogData.value];
 
     // Update cachedBlogs in local storage
     localStorage.setItem("cachedBlogs", JSON.stringify(blogData.value));
@@ -304,16 +362,19 @@ async function handleAddBlog(blogDataToAdd) {
 
 async function handleUpdate(blogDataToUpdate) {
   console.log("Received updated blog data:", blogDataToUpdate);
-  // Perform actions with the received blog data, e.g., send to backend, update state, etc.
-  // Calling the function to update the blog post
 
   try {
     await updateDoc(doc(db, "blogs", blogDataToUpdate.id), blogDataToUpdate); // Ensure updateDoc is awaited
+    const updatedBlog = {
+      ...blogDataToUpdate,
+      created_date: formatDate(blogDataToUpdate.created_date), // This line formats the created_date
+      updated_date: formatDate(blogDataToUpdate.updated_date), // This line formats the updated_date
+    };
 
     // Update local blogData with the updated blog
     blogData.value = blogData.value.map((blog) => {
       if (blog.id === blogDataToUpdate.id) {
-        return blogDataToUpdate;
+        return updatedBlog;
       } else {
         return blog;
       }
@@ -326,14 +387,22 @@ async function handleUpdate(blogDataToUpdate) {
   }
 }
 
+// Custom sorting function
+function customSortByDate(a, b) {
+  // Convert date strings to Date objects for comparison
+  var dateA = new Date(a.created_date.split('.').reverse().join('.'));
+  var dateB = new Date(b.created_date.split('.').reverse().join('.'));
+  
+  // Compare the dates
+  return dateB - dateA; // Sort in descending order
+}
+
 onMounted(async () => {
   getAllBlogs().then((data) => {
+    // Sort the blog data by date in descending order
+    data.sort(customSortByDate);
     blogData.value = data;
     blogDataLength.value = data.length;
-    console.log(
-      "on mounted blogdatalength on blogmanagement",
-      blogDataLength.value
-    );
   });
 });
 </script>

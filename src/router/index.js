@@ -9,6 +9,7 @@ import OnlineMeetings from '../views/OnlineMeetings.vue';
 import BlogManagement from '../views/BlogManagement.vue';
 import Lawyers from '../views/Lawyers.vue';
 import Settings from '../views/Settings.vue';
+import NotFound from '../views/NotFound.vue';
 
 
 const routes = [
@@ -18,9 +19,15 @@ const routes = [
     component: LoginPage
   },
   {
+    path: '/:pathMatch(.*)*', // Catch-all route
+    name: 'NotFound',
+    component: NotFound
+  },
+  {
     path: '/main',
     name: 'MainPage',
     component: MainPage,
+    meta: { requiresAuth: true },
     children: [
       {
         path: 'home',

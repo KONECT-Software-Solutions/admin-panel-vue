@@ -1,5 +1,9 @@
 // store/index.js
 import { createStore } from 'vuex';
+import { auth } from '../firebase';
+import { signInWithEmailAndPassword, signOut } from 'firebase/auth';
+
+
 
 const store = createStore({
   state: {
@@ -17,19 +21,26 @@ const store = createStore({
     }
   },
   actions: {
-    login({ commit }, { username, password }) {
-      // Hardcoded login check (replace with actual backend API call)
-      if (username === 'admin@gmail.com' && password === '12345') {
+    async login({ commit }, { username, password }) {
+      try {
+        const userCredential = await signInWithEmailAndPassword(auth, username, password);
+        const user = userCredential.user;
+        commit('login', { email: user.email, uid: user.uid });
         console.log('Login successful');
-        const user = { username };
-        commit('login', user);
-        return Promise.resolve();
-      } else {
-        return Promise.reject(new Error('Invalid credentials'));
+      } catch (error) {
+        console.error('Login failed', error);
+        throw new Error('Invalid credentials');
       }
     },
-    logout({ commit }) {
-      commit('logout');
+    async logout({ commit }) {
+      try {
+        await signOut(auth);
+        commit('logout');
+        console.log('Logout successful');
+      } catch (error) {
+        console.error('Logout failed', error);
+        throw new Error('Logout failed');
+      }
     }
   },
   getters: {
