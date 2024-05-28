@@ -1,7 +1,7 @@
 <template>
     <div class="flex flex-grow">
         <Sidebar v-if="isSidebarOpen" @toggleSidebar="toggleSidebar" @titleChange="handleTitleChange" />
-        <main class="w-full max-h-screen overflow-scroll">
+        <main class="w-full max-h-screen overflow-y-scroll">
             <Navbar @toggleSidebar="toggleSidebar"  :current-tab="currentTab"/>
             <ContentContainer>
                 <RouterView />
