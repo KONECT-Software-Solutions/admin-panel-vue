@@ -16,7 +16,11 @@
     :editBlogData="editBlogData"
   />
 
-  <AnalyticsCardTotal :length="blogDataLength" />
+  <BlogCards
+      :totalBlogs="totalBlogs"
+      :totalBlogView="totalBlogView"
+      :blogsCategorySummary="blogsCategorySummary"
+    />
 
   <shadow-box class="p-6">
     <div class="flex justify-between mb-4 items-start">
@@ -41,36 +45,36 @@
         ></i>
       </div>
     </form>
-    <table v-if="blogData?.length" class="w-full bg-gray-100 mt-6">
+    <table v-if="blogsData?.length" class="w-full bg-gray-100 mt-6 table-fixed">
       <thead>
         <tr>
           <th
-            class="w-1/4 text-[12px] uppercase tracking-wide font-medium text-gray-600 py-2 px-4 bg-gray-50 text-left rounded-tl-md rounded-bl-md"
+            class="w-1/6 text-[12px] uppercase tracking-wide font-medium text-gray-600 py-2 px-4 bg-gray-50 text-left rounded-tl-md rounded-bl-md"
           >
             Başlık
           </th>
           <th
-            class="w-1/4 text-[12px] uppercase tracking-wide font-medium text-gray-600 py-2 px-4 bg-gray-50 text-left"
+            class="w-1/6 text-[12px] uppercase tracking-wide font-medium text-gray-600 py-2 px-4 bg-gray-50 text-left"
           >
             Yazar
           </th>
           <th
-            class="w-1/4 text-[12px] uppercase tracking-wide font-medium text-gray-600 py-2 px-4 bg-gray-50 text-left"
+            class="w-1/6 text-[12px] uppercase tracking-wide font-medium text-gray-600 py-2 px-4 bg-gray-50 text-left"
           >
             Yaratılma Tarihi
           </th>
           <th
-            class="w-1/4 text-[12px] uppercase tracking-wide font-medium text-gray-600 py-2 px-4 bg-gray-50 text-left"
+            class="w-1/6 text-[12px] uppercase tracking-wide font-medium text-gray-600 py-2 px-4 bg-gray-50 text-left"
           >
             Kategori
           </th>
           <th
-            class="w-1/4 text-[12px] uppercase tracking-wide font-medium text-gray-600 py-2 px-4 bg-gray-50 text-left"
+            class="w-1/6 text-[12px] uppercase tracking-wide font-medium text-gray-600 py-2 px-4 bg-gray-50 text-left"
           >
             Değiştirilme  Tarihi
           </th>
           <th
-            class="w-1/4 text-[12px] uppercase tracking-wide font-medium text-gray-600 py-2 px-4 bg-gray-50 text-left"
+            class="w-1/6 text-[12px] uppercase tracking-wide font-medium text-gray-600 py-2 px-4 bg-gray-50 text-left"
           >
             Aksiyonlar
           </th>
@@ -145,7 +149,7 @@
 import BlogModalAdd from "../components/BlogModalAdd.vue";
 import DeleteModal from "../components/DeleteModal.vue";
 import BlogModalEdit from "../components/BlogModalEdit.vue";
-import AnalyticsCardTotal from "../components/AnalyticsCardTotal.vue";
+import BlogCards from "../components/BlogCards.vue";
 
 import {
   collection,
@@ -158,6 +162,7 @@ import {
 import { db } from "../firebase";
 import { onMounted, ref, computed, watch } from "vue";
 import ShadowBox from "../components/container/ShadowBox.vue";
+import { customSortByDate } from "../utils";
 
 const showBlogModal = ref(false);
 const showEditModal = ref(false);
@@ -182,8 +187,9 @@ function confirmDelete(blogId) {
 }
 
 const blogRef = collection(db, "blogs");
-const blogData = ref([]);
-const blogDataLength = computed(() => blogData.value.length);
+const blogsData = ref([]);
+const totalBlogs = computed(() => blogsData.value.length);
+const totalBlogView = ref(324)
 const currentPage = ref(1);
 const itemsPerPage = ref(10);
 
@@ -192,9 +198,9 @@ const searchTerm = ref("");
 // Computed property to filter blogs based on the search term
 const filteredBlogs = computed(() => {
   if (!searchTerm.value) {
-    return blogData.value;
+    return blogsData.value;
   } else {
-    return blogData.value.filter((blog) =>
+    return blogsData.value.filter((blog) =>
       blog.title.toLowerCase().includes(searchTerm.value.toLowerCase())
     );
   }
@@ -213,7 +219,7 @@ const paginatedItems = computed(() => {
   if (filteredBlogs.value.length === 0) {
     const start = startIndex.value;
     const end = start + itemsPerPage.value;
-    return blogData.value.slice(start, end);
+    return blogsData.value.slice(start, end);
   }
   else {
     return filteredBlogs.value.slice(startIndex.value, startIndex.value + itemsPerPage.value);
@@ -226,19 +232,24 @@ const paginatedItems = computed(() => {
 // Computed property to calculate the total number of pages
 const totalPages = computed(() => {
   if (filteredBlogs.value.length === 0) {
-    return Math.ceil(blogData.value.length / itemsPerPage.value);
+    return Math.ceil(blogsData.value.length / itemsPerPage.value);
   }
   else {
     return Math.ceil(filteredBlogs.value.length / itemsPerPage.value);
   }
 });
 
-// Method to go to the next page
-const nextPage = () => {
-  if (currentPage.value < totalPages.value) {
-    currentPage.value++;
-  }
-};
+const blogsCategorySummary = computed(() => {
+  const category = {};
+  blogsData.value.forEach((blog) => {
+    if (category[blog.category]) {
+      category[blog.category]++;
+    } else {
+      category[blog.category] = 1;
+    }
+  });
+  return category;
+});
 
 // Method to go to the previous page
 const prevPage = () => {
@@ -279,19 +290,19 @@ async function getAllBlogs() {
   try {
     // Check if data exists and is not expired
     const cachedBlogs = localStorage.getItem("cachedBlogs");
-    const cachedTime = localStorage.getItem("cachedTime");
-    const expiryTime = 30 * 60 * 1000; // 30 minutes expiration time
+    const cachedTimeBlogs = localStorage.getItem("cachedTimeBlogs");
+    const expiryTime = 5 * 60 * 1000; // 30 minutes expiration time
 
     if (
       cachedBlogs &&
-      cachedTime &&
-      new Date() - new Date(parseInt(cachedTime)) < expiryTime
+      cachedTimeBlogs &&
+      new Date() - new Date(parseInt(cachedTimeBlogs)) < expiryTime
     ) {
-      return JSON.parse(cachedBlogs);
+  return JSON.parse(cachedBlogs);
     } else {
       const blogs = await fetchBlogs();
       localStorage.setItem("cachedBlogs", JSON.stringify(blogs));
-      localStorage.setItem("cachedTime", new Date().getTime().toString());
+      localStorage.setItem("cachedTimeBlogs", new Date().getTime().toString());
       return blogs;
     }
   } catch (error) {
@@ -320,13 +331,13 @@ async function handleDelete() {
       // Remove the blog from Firestore
       await deleteDoc(doc(db, "blogs", blogIdToDelete));
 
-      // Update local blogData by filtering out the deleted blog
-      blogData.value = blogData.value.filter(
+      // Update local blogsData by filtering out the deleted blog
+      blogsData.value = blogsData.value.filter(
         (blog) => blog.id !== blogIdToDelete
       );
 
       // Update cachedBlogs in local storage
-      localStorage.setItem("cachedBlogs", JSON.stringify(blogData.value));
+      localStorage.setItem("cachedBlogs", JSON.stringify(blogsData.value));
 
       console.log(`Blog with ID ${blogIdToDelete} deleted successfully.`);
     } catch (error) {
@@ -350,11 +361,11 @@ async function handleAddBlog(blogDataToAdd) {
       created_date: formatDate(blogDataToAdd.created_date), // This line formats the created_date
       updated_date: formatDate(blogDataToAdd.updated_date), // This line formats the updated_date
     };
-    // Update local blogData with the new blog including the ID
-    blogData.value = [newBlogWithId, ...blogData.value];
+    // Update local blogsData with the new blog including the ID
+    blogsData.value = [newBlogWithId, ...blogsData.value];
 
     // Update cachedBlogs in local storage
-    localStorage.setItem("cachedBlogs", JSON.stringify(blogData.value));
+    localStorage.setItem("cachedBlogs", JSON.stringify(blogsData.value));
   } catch (error) {
     console.error("Error adding document:", error);
   }
@@ -371,8 +382,8 @@ async function handleUpdate(blogDataToUpdate) {
       updated_date: formatDate(blogDataToUpdate.updated_date), // This line formats the updated_date
     };
 
-    // Update local blogData with the updated blog
-    blogData.value = blogData.value.map((blog) => {
+    // Update local blogsData with the updated blog
+    blogsData.value = blogsData.value.map((blog) => {
       if (blog.id === blogDataToUpdate.id) {
         return updatedBlog;
       } else {
@@ -381,28 +392,16 @@ async function handleUpdate(blogDataToUpdate) {
     });
 
     // Update cachedBlogs in local storage
-    localStorage.setItem("cachedBlogs", JSON.stringify(blogData.value));
+    localStorage.setItem("cachedBlogs", JSON.stringify(blogsData.value));
   } catch (error) {
     console.error("Error updating document:", error);
   }
 }
 
-// Custom sorting function
-function customSortByDate(a, b) {
-  // Convert date strings to Date objects for comparison
-  var dateA = new Date(a.created_date.split('.').reverse().join('.'));
-  var dateB = new Date(b.created_date.split('.').reverse().join('.'));
-  
-  // Compare the dates
-  return dateB - dateA; // Sort in descending order
-}
-
 onMounted(async () => {
   getAllBlogs().then((data) => {
-    // Sort the blog data by date in descending order
     data.sort(customSortByDate);
-    blogData.value = data;
-    blogDataLength.value = data.length;
+    blogsData.value = data;
   });
 });
 </script>
