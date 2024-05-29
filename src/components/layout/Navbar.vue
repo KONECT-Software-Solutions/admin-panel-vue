@@ -12,7 +12,6 @@
     </div>
     <div class="flex items-center">
         <NotificationDropdown />
-        <ProfileDropdown />
     </div>
 </div>
 
