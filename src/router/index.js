@@ -40,10 +40,22 @@ const routes = [
         meta: { requiresAuth: true }
       },
       {
+        path: 'home/:uid',
+        name: 'HomeWithUID',
+        component: Home,
+        meta: { requiresAuth: true }
+      },
+      {
         path: 'online-meetings',
         name: 'OnlineMeetings',
         component: OnlineMeetings,
         meta: { requiresAuth: true, role: 'admin' }
+      },
+      {
+        path: 'online-meetings/:uid',
+        name: 'OnlineMeetingsWithUID',
+        component: OnlineMeetings,
+        meta: { requiresAuth: true,}
       },
       {
         path: 'blog-management',
@@ -60,6 +72,12 @@ const routes = [
       {
         path: 'settings',
         name: 'Settings',
+        component: Settings,
+        meta: { requiresAuth: true }
+      },
+      {
+        path: 'settings/:uid',
+        name: 'SettingsWithUID',
         component: Settings,
         meta: { requiresAuth: true }
       }
