@@ -43,27 +43,27 @@ let menus = [
     {
         title: 'Ana Sayfa',
         icon: 'ri-home-2-line',
-        link: '/main/home'
+        link: '/home'
     },
     {
         title: 'Online Görüşmeler',
         icon: 'ri-video-on-line',
-        link: '/main/online-meetings'
+        link: '/online-meetings'
     },
     {
         title: 'Blog Yönetimi',
         icon: 'ri-article-line',
-        link: '/main/blog-management'
+        link: '/blog-management'
     },
     {
         title: 'Avukatlar',
         icon: 'ri-team-line',
-        link: '/main/lawyers'
+        link: '/lawyers'
     },
     {
         title: 'Ayarlar',
         icon: 'ri-settings-2-line',
-        link: '/main/settings'
+        link: '/settings'
     },
     ]
 </script>

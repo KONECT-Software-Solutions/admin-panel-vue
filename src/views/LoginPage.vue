@@ -52,7 +52,7 @@ const login = () => {
   // Perform login action
   const user = { username: email.value, password: password.value };
   store.dispatch('login', user).then(() => {
-    router.push('/main/home'); // Redirect to dashboard after successful login
+    router.push('/home'); // Redirect to dashboard after successful login
   });
 };
 </script>

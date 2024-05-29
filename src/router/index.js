@@ -3,7 +3,7 @@ import store from '../store';
 
 // Import your component files here
 import LoginPage from '../views/LoginPage.vue';
-import MainPage from '../views/MainPage.vue';
+import MainPage from '../views/MainPage.vue'; // Main layout component
 import Home from '../views/Home.vue';
 import OnlineMeetings from '../views/OnlineMeetings.vue';
 import BlogManagement from '../views/BlogManagement.vue';
@@ -12,7 +12,6 @@ import Settings from '../views/Settings.vue';
 import NotFound from '../views/NotFound.vue';
 import Unauthorized from '../views/Unauthorized.vue'; // Add an Unauthorized component
 
-
 const routes = [
   {
     path: '/',
@@ -20,19 +19,18 @@ const routes = [
     component: LoginPage
   },
   {
-    path: '/:pathMatch(.*)*', // Catch-all route
-    name: 'NotFound',
-    component: NotFound
-  },
-  {
     path: '/unauthorized',
     name: 'Unauthorized',
     component: Unauthorized
   },
   {
-    path: '/main',
-    name: 'MainPage',
-    component: MainPage,
+    path: '/:pathMatch(.*)*', // Catch-all route
+    name: 'NotFound',
+    component: NotFound
+  },
+  {
+    path: '/',
+    component: MainPage, // Main layout component
     meta: { requiresAuth: true },
     children: [
       {
@@ -43,13 +41,13 @@ const routes = [
       },
       {
         path: 'online-meetings',
-        name: 'Online Meetings',
+        name: 'OnlineMeetings',
         component: OnlineMeetings,
         meta: { requiresAuth: true, role: 'admin' }
       },
       {
         path: 'blog-management',
-        name: 'Blog Management',
+        name: 'BlogManagement',
         component: BlogManagement,
         meta: { requiresAuth: true, role: 'admin' }
       },
@@ -71,12 +69,12 @@ const routes = [
 
 // Create the router instance
 const router = createRouter({
-  linkActiveClass: 'bg-gray-950 text-white',
   history: createWebHistory(),
   routes,
+  linkActiveClass: 'bg-gray-950 text-white',
 });
 
-router.beforeEach(async(to, from, next) => {
+router.beforeEach(async (to, from, next) => {
   await store.dispatch('initializeAuth');
 
   if (to.meta.requiresAuth && !store.getters.isAuthenticated) {
@@ -87,7 +85,7 @@ router.beforeEach(async(to, from, next) => {
     if (to.meta.role && to.meta.role !== userRole) {
       // If the route requires a specific role and the user doesn't have it, redirect to home or an appropriate page
       if (userRole === 'attorney') {
-        next('/main/home');
+        next('/home');
       } else {
         next('/unauthorized');
       }
