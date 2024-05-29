@@ -48,11 +48,18 @@ const router = useRouter();
 const email = ref('');
 const password = ref('');
 
-const login = () => {
+const login = async () => {
   // Perform login action
   const user = { username: email.value, password: password.value };
-  store.dispatch('login', user).then(() => {
-    router.push('/home'); // Redirect to dashboard after successful login
-  });
+  await store.dispatch('login', user);
+  
+  const userRole = store.getters.userRole;
+  const userUid = store.getters.user ? store.getters.user.uid : null;
+  
+  if (userRole === 'attorney' && userUid) {
+    router.push(`/home/${userUid}`); // Redirect attorneys to /home/:uid
+  } else {
+    router.push('/home'); // Redirect admins to /home
+  }
 };
 </script>
