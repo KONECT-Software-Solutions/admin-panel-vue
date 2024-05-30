@@ -4,15 +4,34 @@
     :customerNotes="customerNotes"
     @close="showNotesModal = false" 
   />
-  <MeetingCards
+  <!-- Last changes-->
+  <section v-if="chosenLawyer === null && userRole === 'admin' " class="flex flex-col">
+    <h1 class="font-bold text-2xl text-gray-900 text-center">Online Randevuları Görüntülemek için Avukat Seçimi Yapın</h1>
+    <div class="mt-6 justify-center grid grid-cols-[repeat(auto-fill,minmax(210px,_1fr))] gap-4">
+      <button @click="chosenLawyer = 0" class="bg-gray-300 drop-shadow-lg card max-w-56 h-80 rounded-xl flex justify-center">
+          <h1 class="font-bold text-2xl leading-none self-center  text-gray-800">Tümünü Gör</h1>
+        </button>
+      <LawyerCard
+            v-for="lawyer in lawyers"
+            @click="goToMeeting(lawyer.url)"
+            :key="lawyer.id"
+            :lawyerPhoto="lawyer.photo"
+            :lawyerName="lawyer.name"
+            :waitingApproveCount="lawyer.waitingApproveCount"
+            :approachingCount="lawyer.approachingCount"
+            :completedCount="lawyer.completedCount"
+            :successRatio="lawyer.successRatio"
+        />
+    </div>   
+    </section>
+    <section v-else>
+      <MeetingCards
       :totalMeetings="totalMeetings"
       :approvedMeetings="approvedMeetings"
       :satisfactionRate="satisfactionRate"
       :meetingStatusSummary="meetingStatusSummary"
       :topAttorneys="topAttorneys"
     />
-
-  
   <shadow-box class="p-6">
     <div class="flex justify-between mb-4 items-start">
       <h1 class="font-medium">Online Görüşmeler</h1>
@@ -132,10 +151,12 @@
       ></button>
     </div>
   </shadow-box>
+    </section>
+ 
 </template>
 <script setup>
 import MeetingCards from "../components/MeetingCards.vue";
-
+import LawyerCard from '../components/LawyerCard.vue';
 
 import {
   collection,
@@ -148,11 +169,64 @@ import {
 } from "firebase/firestore";
 import { db } from "../firebase";
 import { onMounted, ref, computed, watch } from "vue";
+import { useStore } from 'vuex';
+import { useRouter } from 'vue-router';
 import ShadowBox from "../components/container/ShadowBox.vue";
 import NotesModal from "../components/NotesModal.vue";
-import { customSortByDate } from "../utils";
+import { customSortByDate } from "../utils"
 
+const router = useRouter()
+const store = useStore()
+
+const userRole = computed(() => store.getters.userRole);
 const showNotesModal = ref(false);
+const chosenLawyer = ref(null);
+const goToMeeting = (id) => {
+  chosenLawyer.value = id
+  router.push({ name: 'OnlineMeetingsWithUID', params: { uid:id } })
+};
+const lawyers = ref([
+        {
+            id: 1,
+            photo: 'https://scontent-ist1-1.xx.fbcdn.net/v/t39.30808-6/355382710_750604147067322_2070113516506872817_n.jpg?_nc_cat=105&ccb=1-7&_nc_sid=5f2048&_nc_ohc=M0AqpBJOiA4Q7kNvgGG_FKN&_nc_ht=scontent-ist1-1.xx&oh=00_AYCRuGPuuS8WADJenCgNl8kNmxcTiihvL6QbFNhE4nMXug&oe=665BA541',
+            name: 'John Doe',
+            waitingApproveCount: 2,
+            approachingCount: 5,
+            completedCount: 10,
+            successRatio: 70,
+            url: 'UCjKRboUFzbXGOYC6BjrVxnx1cE2'
+        },
+        {
+            id: 2,
+            photo: 'https://scontent-ist1-1.xx.fbcdn.net/v/t39.30808-6/355382710_750604147067322_2070113516506872817_n.jpg?_nc_cat=105&ccb=1-7&_nc_sid=5f2048&_nc_ohc=M0AqpBJOiA4Q7kNvgGG_FKN&_nc_ht=scontent-ist1-1.xx&oh=00_AYCRuGPuuS8WADJenCgNl8kNmxcTiihvL6QbFNhE4nMXug&oe=665BA541',
+            name: 'Jane Doe',
+            waitingApproveCount: 1,
+            approachingCount: 3,
+            completedCount: 5,
+            successRatio: 60,
+            url: 'UCjKRboUFzbXGOYC6BjrVxnx1cE2'
+        },
+        {
+            id: 3,
+            photo: 'https://scontent-ist1-1.xx.fbcdn.net/v/t39.30808-6/355382710_750604147067322_2070113516506872817_n.jpg?_nc_cat=105&ccb=1-7&_nc_sid=5f2048&_nc_ohc=M0AqpBJOiA4Q7kNvgGG_FKN&_nc_ht=scontent-ist1-1.xx&oh=00_AYCRuGPuuS8WADJenCgNl8kNmxcTiihvL6QbFNhE4nMXug&oe=665BA541',
+            name: 'John Smith',
+            waitingApproveCount: 3,
+            approachingCount: 7,
+            completedCount: 15,
+            successRatio: 80,
+            url: 'UCjKRboUFzbXGOYC6BjrVxnx1cE2'
+        },
+        {
+            id: 4,
+            photo: 'https://scontent-ist1-1.xx.fbcdn.net/v/t39.30808-6/355382710_750604147067322_2070113516506872817_n.jpg?_nc_cat=105&ccb=1-7&_nc_sid=5f2048&_nc_ohc=M0AqpBJOiA4Q7kNvgGG_FKN&_nc_ht=scontent-ist1-1.xx&oh=00_AYCRuGPuuS8WADJenCgNl8kNmxcTiihvL6QbFNhE4nMXug&oe=665BA541',
+            name: 'Jane Smith',
+            waitingApproveCount: 0,
+            approachingCount: 2,
+            completedCount: 3,
+            successRatio: 50,
+            url: 'UCjKRboUFzbXGOYC6BjrVxnx1cE2'
+        }
+    ]);
 const customerNotes = ref(null);
 const filterOptions = ref({
   requests: false,
