@@ -41,27 +41,28 @@
       </div>
     </div>
 
-      <!-- Top Performing Attorneys Card -->
+      <!-- Top Performing Attorneys Card 
       <div class="bg-white rounded-lg border border-gray-200 p-6 shadow-lg">
-      <div class="flex justify-between items-center mb-4">
-          <div>
-            <div class="text-2xl font-bold text-gray-800">En İyi Avukatlar</div>
-      <div class="text-lg font-medium text-gray-500">Toplantı Sayısına Göre</div>
-          </div>
-          <div class="text-gray-400">
-          <i class="ri-award-line text-4xl"></i>
-          </div>
-      </div>
-      <ul class="mt-2 space-y-2">
-          <li v-for="(attorney, index) in topAttorneys" :key="index" class="text-lg font-semibold text-gray-700">
-            <span class="flex-1">{{ index + 1 }}. {{ attorney.name }}</span>
-            <span class="text-xl font-bold text-gray-900">
-              <i class="ri-calendar-line"></i> {{ attorney.meetings }}
-            </span>
-            </li>
-      </ul>
-      </div>
-  </div>
+        <div class="flex justify-between items-center mb-4">
+            <div>
+              <div class="text-2xl font-bold text-gray-800">En İyi Avukatlar</div>
+              <div class="text-lg font-medium text-gray-500">Toplantı Sayısına Göre</div>
+            </div>
+            <div class="text-gray-400">
+            <i class="ri-award-line text-4xl"></i>
+            </div>
+        </div>
+          <ul class="mt-2 space-y-2">
+              <li v-for="(attorney, index) in topAttorneys" :key="index" class="text-lg font-semibold text-gray-700">
+                <span class="flex-1">{{ index + 1 }}. {{ attorney.name }}</span>
+                <span class="text-xl font-bold text-gray-900">
+                  <i class="ri-calendar-line"></i> {{ attorney.meetings }}
+                </span>
+              </li>
+          </ul>
+        </div>
+        -->
+    </div>
 </template>
 
 <script setup>
@@ -73,7 +74,7 @@ const props = defineProps({
   approvedMeetings: Number,
   satisfactionRate: Number,
   meetingStatusSummary: Object,
-  topAttorneys: Array
+  //topAttorneys: Array
 });
 
 const statusColors = {
