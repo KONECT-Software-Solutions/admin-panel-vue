@@ -4,6 +4,7 @@
     :customerNotes="customerNotes"
     @close="showNotesModal = false" 
   />
+  <!-- Last changes-->
   <section v-if="chosenLawyer === null && userRole === 'admin' " class="flex flex-col">
     <h1 class="font-bold text-2xl text-gray-900 text-center">Online Randevuları Görüntülemek için Avukat Seçimi Yapın</h1>
     <div class="mt-6 justify-center grid grid-cols-[repeat(auto-fill,minmax(210px,_1fr))] gap-4">
