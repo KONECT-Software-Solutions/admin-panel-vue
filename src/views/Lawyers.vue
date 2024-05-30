@@ -1,5 +1,5 @@
 <template>
-    <section class="grid  grid-cols-[repeat(auto-fill,minmax(210px,_1fr))] gap-4">
+    <section class="grid grid-cols-[repeat(auto-fill,minmax(210px,_1fr))] gap-4">
         <LawyerCard
             v-for="lawyer in lawyers"
             :key="lawyer.id"
