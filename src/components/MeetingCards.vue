@@ -41,7 +41,6 @@
       </div>
     </div>
 
-      <!-- Top Performing Attorneys Card 
       <div class="bg-white rounded-lg border border-gray-200 p-6 shadow-lg">
         <div class="flex justify-between items-center mb-4">
             <div>
@@ -61,7 +60,6 @@
               </li>
           </ul>
         </div>
-        -->
     </div>
 </template>
 
@@ -74,7 +72,7 @@ const props = defineProps({
   approvedMeetings: Number,
   satisfactionRate: Number,
   meetingStatusSummary: Object,
-  //topAttorneys: Array
+  topAttorneys: Array
 });
 
 const statusColors = {

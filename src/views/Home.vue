@@ -7,8 +7,9 @@
         <!-- Admin-specific content -->
       </div>
       <div v-else-if="userRole === 'attorney'">
-        <p>Welcome, Attorney!</p>
+        <p>Welcome, <span>{{ userRole }}</span>!</p>
         <p>Your data {{ userData }}</p>
+        <p></p>
         <!-- Attorney-specific content -->
       </div>
     </div>

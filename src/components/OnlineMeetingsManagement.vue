@@ -1,4 +1,10 @@
 <template>
+     <button
+        @click="handleGoBack"
+        class="bg-green-700 text-white px-4 py-1 font-medium rounded mb-4"
+      >
+        Geri Dön
+    </button>
     <NotesModal
     :show="showNotesModal"
     :customerNotes="customerNotes"
@@ -9,7 +15,10 @@
       :approvedMeetings="approvedMeetings"
       :satisfactionRate="satisfactionRate"
       :meetingStatusSummary="meetingStatusSummary"
+      :topAttorneys="topAttorneys"
     />
+
+ 
   <shadow-box class="p-6">
     <div class="flex justify-between mb-4 items-start">
       <h1 class="font-medium">Online Görüşmeler</h1>
@@ -149,10 +158,13 @@ import { onMounted, ref, computed, watch } from "vue";
 import { customSortByDate } from "../utils"
 
 const props = defineProps({
-  userRole: String,
-  userUid: String
+  showAll: Boolean,
+  uid: String,
 });
 
+const emit = defineEmits(["goBack"]);
+
+const handleGoBack = () => { emit('goBack')};
 
 const showNotesModal = ref(false);
 
@@ -193,7 +205,7 @@ const topAttorneys = computed(() => {
   const topAttorneys = Object.entries(attorneyMeetings)
     .sort((a, b) => b[1] - a[1])
     .map(([name, meetings]) => ({ name, meetings }));
-  return topAttorneys.slice(0, 5);
+  return topAttorneys.slice(0, 3);
 });
 
 function handleNotesModal(notes) {
@@ -354,7 +366,7 @@ async function getAllMeetings() {
     // Check if data exists and is not expired
     const cachedMeetings = localStorage.getItem("cachedMeetings");
     const cachedTimeMeetings = localStorage.getItem("cachedTimeMeetings");
-    const expiryTime = 0 * 60 * 1000; // 30 minutes expiration time
+    const expiryTime = 30 * 60 * 1000; // 30 minutes expiration time
 
     if (
       cachedMeetings &&
@@ -405,11 +417,13 @@ async function fetchAttorney(id) {
 onMounted(async () => {
   const meetings = await getAllMeetings();
   
-  if (props.userRole === 'attorney' && props.userUid) {
-    meetingsData.value = meetings.filter(meeting => meeting.attorney_id === props.userUid);
-  } else {
+  if (props.showAll) {
     meetingsData.value = meetings;
   }
+  else{
+    meetingsData.value = meetings.filter(meeting => meeting.attorney_id === props.uid);
+  } 
+ 
 });
 
 </script>

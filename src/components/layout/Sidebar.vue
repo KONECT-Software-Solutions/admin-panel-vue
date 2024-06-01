@@ -1,5 +1,5 @@
 <template>
-    <div class="h-screen min-w-[16rem] bg-gray-800 p-4 z-50 sidebar-menu transition-opacity ease-in-out delay-150 duration-300 transition-transform">
+    <div class="h-screen min-w-[16rem] bg-gray-800 p-4 z-50 sidebar-menu ease-in-out delay-150 duration-300 transition-transform">
         <a href="#" class="flex items-center pb-4 border-b border-b-gray-800">
             <img src="https://flowbite.s3.amazonaws.com/blocks/marketing-ui/logo.svg" alt="" class="w-8 h-8 rounded object-cover">
             <span class="text-lg font-bold text-white ml-3">Admin Panel</span>

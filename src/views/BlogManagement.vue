@@ -291,7 +291,7 @@ async function getAllBlogs() {
     // Check if data exists and is not expired
     const cachedBlogs = localStorage.getItem("cachedBlogs");
     const cachedTimeBlogs = localStorage.getItem("cachedTimeBlogs");
-    const expiryTime = 5 * 60 * 1000; // 30 minutes expiration time
+    const expiryTime = 30 * 60 * 1000; // 30 minutes expiration time
 
     if (
       cachedBlogs &&
