@@ -16,6 +16,8 @@
       :satisfactionRate="satisfactionRate"
       :meetingStatusSummary="meetingStatusSummary"
       :topAttorneys="topAttorneys"
+      :showTopAttorneys="props.showAll"
+      :showAttorneySchedule="!props.showAll"
     />
 
  
@@ -29,7 +31,7 @@
           v-model="searchTerm"
           type="text"
           class="py-2 pr-4 pl-10 bg-gray-100 w-full outline-none border border-gray-100 rounded-md text-sm focus:border-blue-500"
-          placeholder="Avukat ismine göre ara..."
+          placeholder="Müşteri ismine göre ara..."
         />
         <i
           class="ri-search-line absolute top-1/2 left-4 -translate-y-1/2 text-gray-400"
@@ -229,7 +231,7 @@ const filteredMeetings = computed(() => {
 
   if (searchTerm.value) {
     meetings = meetings.filter((meeting) =>
-      meeting.attorney_name.toLowerCase().includes(searchTerm.value.toLowerCase())
+      meeting.customer_name.toLowerCase().includes(searchTerm.value.toLowerCase())
     );
   }
 
@@ -424,6 +426,8 @@ onMounted(async () => {
     meetingsData.value = meetings.filter(meeting => meeting.attorney_id === props.uid);
   } 
  
+  console.log(topAttorneys.value);  
+  
 });
 
 </script>
