@@ -1,9 +1,13 @@
 <template>
-  <BlogModalAdd
-    :show="showBlogModal"
-    @close="showBlogModal = false" 
+
+
+  <AddBlog
+    :show="showAddBlogPage"
     @addBlog="handleAddBlog"
+    @goBack="handleAddBlogClose"
   />
+  <div v-if="showBlogPage" >
+
   <DeleteModal
     :show="showDeleteModal"
     @close="showDeleteModal = false"
@@ -15,7 +19,7 @@
     @updateBlog="handleUpdate"
     :editBlogData="editBlogData"
   />
-
+  
   <BlogCards
       :totalBlogs="totalBlogs"
       :totalBlogView="totalBlogView"
@@ -26,7 +30,7 @@
     <div class="flex justify-between mb-4 items-start">
       <h1 class="font-medium">Blog Yönetimi</h1>
       <button
-        @click="showBlogModal = true"
+        @click="handleAddBlogOpen"
         class="bg-green-700 text-white px-4 py-1 font-medium rounded"
       >
         + Ekle
@@ -144,12 +148,14 @@
       ></button>
     </div>
   </shadow-box>
+</div>
 </template>
 <script setup>
 import BlogModalAdd from "../components/BlogModalAdd.vue";
 import DeleteModal from "../components/DeleteModal.vue";
 import BlogModalEdit from "../components/BlogModalEdit.vue";
 import BlogCards from "../components/BlogCards.vue";
+import AddBlog from "../components/AddBlog.vue";
 
 import {
   collection,
@@ -164,7 +170,8 @@ import { onMounted, ref, computed, watch } from "vue";
 import ShadowBox from "../components/container/ShadowBox.vue";
 import { customSortByDate } from "../utils";
 
-const showBlogModal = ref(false);
+const showAddBlogPage = ref(false);
+const showBlogPage = ref(true);
 const showEditModal = ref(false);
 const showDeleteModal = ref(false);
 let blogIdToDelete = null;
@@ -175,6 +182,16 @@ function toggleEdit(blog) {
   editBlogData.value = blog;
   console.log(editBlogData.value.created_date)
   console.log("blog id to edit", blog.id);
+}
+
+function handleAddBlogOpen() {
+  showAddBlogPage.value = true;
+  showBlogPage.value = false;
+}
+
+function handleAddBlogClose() {
+  showAddBlogPage.value = false;
+  showBlogPage.value = true;
 }
 
 function openURL(url) {
