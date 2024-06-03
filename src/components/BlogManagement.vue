@@ -144,11 +144,9 @@
 </template>
 
 <script setup>
-import BlogModalAdd from "../components/BlogModalAdd.vue";
 import DeleteModal from "../components/DeleteModal.vue";
 import BlogModalEdit from "../components/BlogModalEdit.vue";
 import BlogCards from "../components/BlogCards.vue";
-import AddBlog from "../components/AddBlog.vue";
 
 import {
   collection,
@@ -161,8 +159,8 @@ import {
 import { db } from "../firebase";
 import { onMounted, ref, computed, watch } from "vue";
 import ShadowBox from "../components/container/ShadowBox.vue";
-import { customSortByDate } from "../utils";
 import { defineEmits } from 'vue';
+import { customSortByDate } from "../utils";
 
 
 const showEditModal = ref(false);
@@ -187,6 +185,7 @@ function confirmDelete(blogId) {
 
 const blogRef = collection(db, "blogs");
 const blogsData = ref([]);
+
 const totalBlogs = computed(() => blogsData.value.length);
 const totalBlogView = ref(324)
 const currentPage = ref(1);
@@ -352,7 +351,7 @@ async function handleDelete() {
   }
 }
 
-async function handleAddBlog(blogDataToAdd) {
+async function addBlog(blogDataToAdd) {
   console.log("Received new blog data:", blogDataToAdd);
   
   // Perform actions with the received blog data, e.g., send to backend, update state, etc.

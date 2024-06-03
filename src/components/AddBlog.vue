@@ -86,7 +86,9 @@ import Loading from './Loading.vue';
 import '@vueup/vue-quill/dist/vue-quill.snow.css';
 import { defineEmits } from 'vue';
 
-const emits = defineEmits(['addBlog', 'goBlogManagement']);
+
+
+const emits = defineEmits(['goBlogManagement']);
 
 const showLoading = ref(false);
 const showLoadingModal = ref(false);
@@ -99,10 +101,7 @@ const fileInput = ref(null);
 const selectedFile = ref(null);
 const selectedFileName = ref(null);
 
-const handleGoBack = () => { 
-showLoadingModal.value = false;
-emits('goBack')
-};
+
 
 const handlePhotoUpload = (event) => {
 const file = event.target.files[0];
@@ -127,6 +126,7 @@ return;
 const storage = getStorage();
 const fileRef = firebaseStorageRef(storage, `images/${selectedFile.value.name}`);
 
+
 try {
 console.log('Uploading file...');
 await uploadBytes(fileRef, selectedFile.value);
@@ -145,8 +145,8 @@ const blogData = {
   category: category.value,
 };
 
-// Emit the 'addBlog' event with the blog data
-emits('addBlog', blogData);
+// call addBlog' function with the blog data
+console.log('Adding blog post:', blogData);
 
 // Clear form fields
 title.value = '';

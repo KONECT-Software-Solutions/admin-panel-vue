@@ -23,15 +23,8 @@
                             <label for="title" class="block mb-2 text-sm font-medium text-gray-900"></label>
                             <input v-model="editBlogData.title" type="text" name="title" id="title" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5" placeholder="Blog yazısı başlığını girin" required="">
                         </div>
-                        <div class="col-span-2 sm:col-span-1">
-                            <label for="photo-upload" class="block mb-2 text-sm font-medium text-gray-900">Seçili Fotoğraf</label>
-                            <button @click="redirectToUrl" type="button" id="photo-upload" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5">
-                                <i class="ri-download-2-line"></i> 
-                                {{ truncatedUrl }}
-                            </button>
-                        </div>
                         
-                        <div class="col-span-2 sm:col-span-1">
+                        <div class="col-span-2">
                             <label for="category" class="block mb-2 text-sm font-medium text-gray-900">Kategori</label>
                             <select v-model="editBlogData.category" id="category" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5">
                                 <option value="Hukuk">Hukuk</option>
@@ -43,7 +36,7 @@
                         <div class="col-span-2">
                             <label for="content" class="block mb-2 text-sm font-medium text-gray-900">Yazı İçeriği</label>
                             <div class="bg-gray-100">
-                              <QuillEditor v-model:content="editBlogData.content" contentType="html" toolbar="essential" theme="snow" v-model="content" class="h-64"/>                 
+                              <QuillEditor v-model:content="editBlogData.content" contentType="html" id="content" toolbar="essential" theme="snow" class="h-64"/>                 
                             </div>                        </div>
                     </div>
                     <button type="submit" class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">Kaydet</button>
