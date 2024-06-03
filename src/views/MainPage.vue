@@ -4,7 +4,9 @@
         <main class="w-full h-screen overflow-y-scroll">
             <Navbar @toggleSidebar="toggleSidebar"  :current-tab="currentTab"/>
             <ContentContainer>
-                <RouterView />
+                <transition name="fade">
+                    <RouterView />
+                </transition>
             </ContentContainer>
         </main>
     </div>
@@ -32,4 +34,12 @@ function toggleSidebar() {
 
 <style scoped>
 /* Scoped CSS specific to MainPage */
+
+/* Fade transition CSS */
+.fade-enter-active, .fade-leave-active {
+    transition: opacity 1.2s;
+}
+.fade-enter-from, .fade-leave-to {
+    opacity: 0;
+}
 </style>

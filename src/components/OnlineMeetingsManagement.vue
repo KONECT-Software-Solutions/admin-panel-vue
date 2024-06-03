@@ -1,4 +1,5 @@
 <template>
+  <div>
      <button
         @click="handleGoBack"
         class="bg-green-700 text-white px-4 py-1 font-medium rounded mb-4"
@@ -71,6 +72,9 @@
           Tarih
         </th>
         <th class="w-1/6 text-[12px] uppercase tracking-wide font-medium text-gray-600 py-2 px-4 bg-gray-50 text-left">
+          Saat
+        </th>
+        <th class="w-1/6 text-[12px] uppercase tracking-wide font-medium text-gray-600 py-2 px-4 bg-gray-50 text-left">
           Notlar
         </th>
         <th class="w-1/6 text-[12px] uppercase tracking-wide font-medium text-gray-600 py-2 px-4 bg-gray-50 text-left">
@@ -103,6 +107,11 @@
         <td class="py-2 px-4 border-b border-b-gray-50">
           <span class="text-[13px] font-medium text-gray-600">
             {{ meeting.date }}
+          </span>
+        </td>
+        <td class="py-2 px-4 border-b border-b-gray-50">
+          <span class="text-[13px] font-medium text-gray-600">
+            {{ meeting.time }}
           </span>
         </td>
         <td class="py-2 px-4 border-b border-b-gray-50">
@@ -140,6 +149,7 @@
       ></button>
     </div>
   </shadow-box>
+</div>
  
 </template>
 <script setup>
@@ -340,11 +350,14 @@ async function fetchMeetings() {
     meetings.push({ id: doc.id, ...doc.data() });
   });
   meetings = meetings.map((meeting) => {
-    return {
-      ...meeting,
-      date: formatDate(meeting.date),
-    };
-  });
+  const formattedDateTime = formatDate(meeting.date);
+  return {
+    ...meeting,
+    date: formattedDateTime.date,
+    time: formattedDateTime.time,
+  };
+});
+
   return meetings;
 }
 
@@ -391,8 +404,22 @@ function formatDate(timestamp) {
   if (!timestamp) return '';
   if (timestamp.seconds) { // Firestore timestamp
     const date = new Date(timestamp.seconds * 1000);
-    return date.toLocaleDateString("tr-TR");
+    
+    // Get date in "DD/MM/YYYY" format
+    const formattedDate = date.toLocaleDateString("tr-TR");
+    
+    // Get time in "HH:mm" format
+    const hours = date.getHours().toString().padStart(2, '0');
+    const minutes = date.getMinutes().toString().padStart(2, '0');
+    const formattedTime = `${hours}:${minutes}`;
+
+    // Return an object with date and time
+    return {
+      date: formattedDate,
+      time: formattedTime
+    };
   }
+
   if (typeof timestamp === 'string') { // Already formatted string
     return timestamp;
   }
@@ -415,19 +442,48 @@ async function fetchAttorney(id) {
     throw error; 
   }
 }
-  
+
+// write sorting function here
+
+function sortMeetings(meetings) {
+  // Define the status priorities
+  const statusPriority = {
+    "1": 1, // Kabul edildi
+    "0": 2, // İstek
+    "4": 3, // Müşteri onayı
+    "5": 3, // Avukat onayı
+    "2": 4, // Tamamlandı
+    "3": 5, // Reddedildi
+    "6": 6, // Geri ödemeli iptal
+    "7": 7  // Geri ödemesiz iptal
+  };
+
+  // Convert date strings to Date objects and sort the meetings
+  return meetings.sort((a, b) => {
+    const statusComparison = statusPriority[a.status] - statusPriority[b.status];
+    if (statusComparison !== 0) {
+      return statusComparison;
+    } else {
+      // Convert dates to comparable format (dd.MM.yyyy -> yyyy-MM-dd)
+      const dateA = new Date(a.date.split('.').reverse().join('-'));
+      const dateB = new Date(b.date.split('.').reverse().join('-'));
+      return dateA - dateB;
+    }
+  });
+}
+
+// Usage
 onMounted(async () => {
   const meetings = await getAllMeetings();
-  
+  const sortedMeetings = sortMeetings(meetings);
+
+
   if (props.showAll) {
-    meetingsData.value = meetings;
+    meetingsData.value = sortedMeetings;
   }
   else{
-    meetingsData.value = meetings.filter(meeting => meeting.attorney_id === props.uid);
-  } 
- 
-  console.log(topAttorneys.value);  
-  
+    meetingsData.value = sortedMeetings.filter(meeting => meeting.attorney_id === props.uid);
+  }   
 });
 
 </script>

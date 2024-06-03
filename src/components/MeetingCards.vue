@@ -52,39 +52,34 @@
         </div>
 
         <div v-if="showTopAttorneys" class="bg-white rounded-lg border border-gray-200 p-6 shadow-lg">
-  <div class="flex justify-between items-center mb-4">
-    <div>
-      <div class="text-2xl font-bold text-gray-800">En İyi Avukatlar</div>
-      <div class="text-lg font-medium text-gray-500">Toplantı Sayısına Göre</div>
-    </div>
-    <div class="text-gray-400">
-      <i class="ri-award-line text-4xl"></i>
-    </div>
-  </div>
-  <ul class="mt-2 space-y-4">
-    <li v-for="(attorney, index) in topAttorneys" :key="index" class="flex items-center justify-between text-lg font-semibold text-gray-700">
-      <div class="flex items-center">
-        <img :src="attorney.pp_url" alt="Profile Image" class="w-10 h-10 rounded-full mr-4">
-        <div>
-          <div class="text-xl font-bold text-gray-900">{{ index + 1 }}. {{ attorney.name }}</div>
-          <div class="text-sm text-gray-500">{{ attorney.specialty }}</div>
+          <div class="flex justify-between items-center mb-4">
+            <div>
+              <div class="text-2xl font-bold text-gray-800">En İyi Avukatlar</div>
+              <div class="text-lg font-medium text-gray-500">Toplantı Sayısına Göre</div>
+            </div>
+            <div class="text-gray-400">
+              <i class="ri-award-line text-4xl"></i>
+            </div>
+          </div>
+          <ul class="mt-2 space-y-4">
+            <li v-for="(attorney, index) in topAttorneys" :key="index" class="flex items-center justify-between text-lg font-semibold text-gray-700">
+              <div class="flex items-center">
+                <div class="text-yellow-500">
+                  <i class="ri-star-fill"></i> {{ attorney.rating }}
+                </div>
+                <div class="pl-4">
+                  <div class="text-xl font-bold text-gray-900">{{ index + 1 }}. {{ attorney.name }}</div>
+                </div>
+              </div>
+            </li>
+          </ul>
         </div>
-      </div>
-      <div class="text-xl font-bold text-gray-900 flex items-center">
-        <i class="ri-calendar-line mr-2"></i> {{ attorney.meetings }}
-        <div class="ml-4 text-yellow-500">
-          <i class="ri-star-fill"></i> {{ attorney.rating }}
-        </div>
-      </div>
-    </li>
-  </ul>
-</div>
 
       </div>
 </template>
 
 <script setup>
-import { computed, defineProps, onMounted } from "vue";
+import { computed, defineProps, onMounted, onUpdated } from "vue";
 import { useStore } from 'vuex';
 
 // Access the Vuex store

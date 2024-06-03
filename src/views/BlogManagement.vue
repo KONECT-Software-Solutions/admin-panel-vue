@@ -1,154 +1,154 @@
 <template>
-
-
-  <AddBlog
-    :show="showAddBlogPage"
-    @addBlog="handleAddBlog"
-    @goBack="handleAddBlogClose"
-  />
-  <div v-if="showBlogPage" >
-
-  <DeleteModal
-    :show="showDeleteModal"
-    @close="showDeleteModal = false"
-    @delete="handleDelete"
-  />
-  <BlogModalEdit
-    :show="showEditModal"
-    @close="showEditModal = false"
-    @updateBlog="handleUpdate"
-    :editBlogData="editBlogData"
-  />
-  
-  <BlogCards
-      :totalBlogs="totalBlogs"
-      :totalBlogView="totalBlogView"
-      :blogsCategorySummary="blogsCategorySummary"
+  <div>
+    <AddBlog
+    v-if="showAddBlogPage"
+      @addBlog="handleAddBlog"
+      @goBack="handleAddBlogClose"
     />
-
-  <shadow-box class="p-6">
-    <div class="flex justify-between mb-4 items-start">
-      <h1 class="font-medium">Blog Yönetimi</h1>
-      <button
-        @click="handleAddBlogOpen"
-        class="bg-green-700 text-white px-4 py-1 font-medium rounded"
-      >
-        + Ekle
-      </button>
-    </div>
-    <form action="" class="flex items-center mb-4">
-      <div class="relative w-full mr-2">
-        <input
-          v-model="searchTerm"
-          type="text"
-          class="py-2 pr-4 pl-10 bg-gray-100 w-full outline-none border border-gray-100 rounded-md text-sm focus:border-blue-500"
-          placeholder="Başlığa göre ara..."
+  
+    <div v-if="showBlogPage">
+        <DeleteModal
+          :show="showDeleteModal"
+          @close="showDeleteModal = false"
+          @delete="handleDelete"
         />
-        <i
-          class="ri-search-line absolute top-1/2 left-4 -translate-y-1/2 text-gray-400"
-        ></i>
+        <BlogModalEdit
+          :show="showEditModal"
+          @close="showEditModal = false"
+          @updateBlog="handleUpdate"
+          :editBlogData="editBlogData"
+        />
+        
+        <BlogCards
+            :totalBlogs="totalBlogs"
+            :totalBlogView="totalBlogView"
+            :blogsCategorySummary="blogsCategorySummary"
+          />
+
+        <shadow-box class="p-6">
+          <div class="flex justify-between mb-4 items-start">
+            <h1 class="font-medium">Blog Yönetimi</h1>
+            <button
+              @click="handleAddBlogOpen"
+              class="bg-green-600 text-white px-4 py-1 font-medium rounded"
+            >
+              + Ekle
+            </button>
+          </div>
+          <form action="" class="flex items-center mb-4">
+            <div class="relative w-full mr-2">
+              <input
+                v-model="searchTerm"
+                type="text"
+                class="py-2 pr-4 pl-10 bg-gray-100 w-full outline-none border border-gray-100 rounded-md text-sm focus:border-blue-500"
+                placeholder="Başlığa göre ara..."
+              />
+              <i
+                class="ri-search-line absolute top-1/2 left-4 -translate-y-1/2 text-gray-400"
+              ></i>
+            </div>
+          </form>
+          <table v-if="blogsData?.length" class="w-full bg-gray-100 mt-6 table-fixed">
+            <thead>
+              <tr>
+                <th
+                  class="w-1/6 text-[12px] uppercase tracking-wide font-medium text-gray-600 py-2 px-4 bg-gray-50 text-left rounded-tl-md rounded-bl-md"
+                >
+                  Başlık
+                </th>
+                <th
+                  class="w-1/6 text-[12px] uppercase tracking-wide font-medium text-gray-600 py-2 px-4 bg-gray-50 text-left"
+                >
+                  Yazar
+                </th>
+                <th
+                  class="w-1/6 text-[12px] uppercase tracking-wide font-medium text-gray-600 py-2 px-4 bg-gray-50 text-left"
+                >
+                  Yaratılma Tarihi
+                </th>
+                <th
+                  class="w-1/6 text-[12px] uppercase tracking-wide font-medium text-gray-600 py-2 px-4 bg-gray-50 text-left"
+                >
+                  Kategori
+                </th>
+                <th
+                  class="w-1/6 text-[12px] uppercase tracking-wide font-medium text-gray-600 py-2 px-4 bg-gray-50 text-left"
+                >
+                  Değiştirilme  Tarihi
+                </th>
+                <th
+                  class="w-1/6 text-[12px] uppercase tracking-wide font-medium text-gray-600 py-2 px-4 bg-gray-50 text-left"
+                >
+                  Aksiyonlar
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="blog in paginatedItems" :key="blog.id">
+                <td class="py-2 px-4 border-b border-b-gray-50">
+                  <div class="flex items-center">
+                    <a
+                      href="#"
+                      class="text-gray-600 text-sm font-medium hover:text-blue-500 truncate"
+                      >    {{ (blog.title && blog.title.length > 27) ? blog.title.substring(0, 27) + '...' : blog.title || "" }}
+                    </a>
+                  </div>
+                </td>
+                <td class="py-2 px-4 border-b border-b-gray-50">
+                  <span class="text-[13px] font-medium text-gray-600">{{
+                    blog.author || ""
+                  }}</span>
+                </td>
+                <td class="py-2 px-4 border-b border-b-gray-50">
+                  <span class="text-[13px] font-medium text-gray-600">{{
+                    blog.created_date
+                  }}</span>
+                </td>
+                <td class="py-2 px-4 border-b border-b-gray-50">
+                  <div class="flex space-x-5">
+                    <span class="text-[13px] font-medium text-gray-600">{{blog.category}}</span>
+                  </div>
+                </td>
+                <td class="py-2 px-4 border-b border-b-gray-50">
+                  <div class="flex space-x-5">
+                    <span class="text-[13px] font-medium text-gray-600">{{ blog.updated_date }}</span>
+                  </div>
+                </td>
+                <td class="py-2 px-4 border-b border-b-gray-50 flex justify-between">
+                  <div class="button-container relative flex flex-row gap-1">
+                    <button
+                      @click="toggleEdit(blog)"
+                      class="ri-edit-line text-lg bg-orange-400 hover:bg-gray-900 text-white font-bold px-2 rounded"
+                    ></button>
+                    <button
+                      @click="openURL(blog.url)"
+                      class="ri-eye-line text-lg bg-green-500 hover:bg-gray-900 text-white font-bold px-2 rounded"
+                    ></button>
+                    <button
+                      @click="confirmDelete(blog.id)"
+                      id="delete-blog-modal-button"
+                      class="ri-delete-bin-6-line text-lg bg-red-700 hover:bg-gray-900 text-white font-bold px-2 rounded"
+                    ></button>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+          <div class="pagination-container flex justify-end mt-4 w-full">
+            <button
+              @click="prevPage"
+              :disabled="currentPage === 1"
+              class="ri-arrow-left-fill h-8 px-4 m-2 text-l text-white transition-colors duration-150 bg-gray-800 rounded-lg focus:shadow-outline hover:bg-indigo-800"
+            ></button>
+            <button
+              @click="nextPage"
+              :disabled="currentPage === totalPages"
+              class="ri-arrow-right-fill h-8 px-4 m-2 text-l text-white transition-colors duration-150 bg-gray-800 rounded-lg focus:shadow-outline hover:bg-indigo-800"
+            ></button>
+          </div>
+        </shadow-box>
       </div>
-    </form>
-    <table v-if="blogsData?.length" class="w-full bg-gray-100 mt-6 table-fixed">
-      <thead>
-        <tr>
-          <th
-            class="w-1/6 text-[12px] uppercase tracking-wide font-medium text-gray-600 py-2 px-4 bg-gray-50 text-left rounded-tl-md rounded-bl-md"
-          >
-            Başlık
-          </th>
-          <th
-            class="w-1/6 text-[12px] uppercase tracking-wide font-medium text-gray-600 py-2 px-4 bg-gray-50 text-left"
-          >
-            Yazar
-          </th>
-          <th
-            class="w-1/6 text-[12px] uppercase tracking-wide font-medium text-gray-600 py-2 px-4 bg-gray-50 text-left"
-          >
-            Yaratılma Tarihi
-          </th>
-          <th
-            class="w-1/6 text-[12px] uppercase tracking-wide font-medium text-gray-600 py-2 px-4 bg-gray-50 text-left"
-          >
-            Kategori
-          </th>
-          <th
-            class="w-1/6 text-[12px] uppercase tracking-wide font-medium text-gray-600 py-2 px-4 bg-gray-50 text-left"
-          >
-            Değiştirilme  Tarihi
-          </th>
-          <th
-            class="w-1/6 text-[12px] uppercase tracking-wide font-medium text-gray-600 py-2 px-4 bg-gray-50 text-left"
-          >
-            Aksiyonlar
-          </th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr v-for="blog in paginatedItems" :key="blog.id">
-          <td class="py-2 px-4 border-b border-b-gray-50">
-            <div class="flex items-center">
-              <a
-                href="#"
-                class="text-gray-600 text-sm font-medium hover:text-blue-500 truncate"
-                >    {{ (blog.title && blog.title.length > 27) ? blog.title.substring(0, 27) + '...' : blog.title || "" }}
-              </a>
-            </div>
-          </td>
-          <td class="py-2 px-4 border-b border-b-gray-50">
-            <span class="text-[13px] font-medium text-gray-600">{{
-              blog.author || ""
-            }}</span>
-          </td>
-          <td class="py-2 px-4 border-b border-b-gray-50">
-            <span class="text-[13px] font-medium text-gray-600">{{
-              blog.created_date
-            }}</span>
-          </td>
-          <td class="py-2 px-4 border-b border-b-gray-50">
-            <div class="flex space-x-5">
-              <span class="text-[13px] font-medium text-gray-600">{{blog.category}}</span>
-            </div>
-          </td>
-          <td class="py-2 px-4 border-b border-b-gray-50">
-            <div class="flex space-x-5">
-              <span class="text-[13px] font-medium text-gray-600">{{ blog.updated_date }}</span>
-            </div>
-          </td>
-          <td class="py-2 px-4 border-b border-b-gray-50 flex justify-between">
-            <div class="button-container relative flex flex-row gap-1">
-              <button
-                @click="toggleEdit(blog)"
-                class="ri-edit-line text-lg bg-orange-400 hover:bg-gray-900 text-white font-bold px-2 rounded"
-              ></button>
-              <button
-                @click="openURL(blog.url)"
-                class="ri-eye-line text-lg bg-green-700 hover:bg-gray-900 text-white font-bold px-2 rounded"
-              ></button>
-              <button
-                @click="confirmDelete(blog.id)"
-                id="delete-blog-modal-button"
-                class="ri-delete-bin-6-line text-lg bg-red-700 hover:bg-gray-900 text-white font-bold px-2 rounded"
-              ></button>
-            </div>
-          </td>
-        </tr>
-      </tbody>
-    </table>
-    <div class="pagination-container flex justify-end mt-4 w-full">
-      <button
-        @click="prevPage"
-        :disabled="currentPage === 1"
-        class="ri-arrow-left-fill h-8 px-4 m-2 text-l text-white transition-colors duration-150 bg-gray-800 rounded-lg focus:shadow-outline hover:bg-indigo-800"
-      ></button>
-      <button
-        @click="nextPage"
-        :disabled="currentPage === totalPages"
-        class="ri-arrow-right-fill h-8 px-4 m-2 text-l text-white transition-colors duration-150 bg-gray-800 rounded-lg focus:shadow-outline hover:bg-indigo-800"
-      ></button>
     </div>
-  </shadow-box>
-</div>
 </template>
 <script setup>
 import BlogModalAdd from "../components/BlogModalAdd.vue";
@@ -193,11 +193,6 @@ function handleAddBlogClose() {
   showAddBlogPage.value = false;
   showBlogPage.value = true;
 }
-
-function openURL(url) {
-  window.open(url, "_blank");
-}
-
 function confirmDelete(blogId) {
   blogIdToDelete = blogId;
   showDeleteModal.value = true;
@@ -272,6 +267,13 @@ const blogsCategorySummary = computed(() => {
 const prevPage = () => {
   if (currentPage.value > 1) {
     currentPage.value--;
+  }
+};
+
+// Method to go to the next page
+const nextPage = () => {
+  if (currentPage.value < totalPages.value) {
+    currentPage.value++;
   }
 };
 
@@ -422,3 +424,6 @@ onMounted(async () => {
   });
 });
 </script>
+
+
+
