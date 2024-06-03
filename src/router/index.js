@@ -6,7 +6,7 @@ import LoginPage from '../views/LoginPage.vue';
 import MainPage from '../views/MainPage.vue'; // Main layout component
 import Home from '../views/Home.vue';
 import OnlineMeetings from '../views/OnlineMeetings.vue';
-import BlogManagement from '../views/BlogManagement.vue';
+import Blogs from '../views/Blogs.vue';
 import Lawyers from '../views/Lawyers.vue';
 import Settings from '../views/Settings.vue';
 import NotFound from '../views/NotFound.vue';
@@ -58,9 +58,9 @@ const routes = [
         meta: { requiresAuth: true,}
       },
       {
-        path: 'blog-management',
-        name: 'BlogManagement',
-        component: BlogManagement,
+        path: 'blogs',
+        name: 'Blogs',
+        component: Blogs,
         meta: { requiresAuth: true, role: 'admin' }
       },
       {

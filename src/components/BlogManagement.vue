@@ -1,12 +1,5 @@
 <template>
-  <div>
-    <AddBlog
-    v-if="showAddBlogPage"
-      @addBlog="handleAddBlog"
-      @goBack="handleAddBlogClose"
-    />
-  
-    <div v-if="showBlogPage">
+   <div>
         <DeleteModal
           :show="showDeleteModal"
           @close="showDeleteModal = false"
@@ -29,7 +22,7 @@
           <div class="flex justify-between mb-4 items-start">
             <h1 class="font-medium">Blog Yönetimi</h1>
             <button
-              @click="handleAddBlogOpen"
+            @click="emits('goAddBlog')"
               class="bg-green-600 text-white px-4 py-1 font-medium rounded"
             >
               + Ekle
@@ -148,8 +141,8 @@
           </div>
         </shadow-box>
       </div>
-    </div>
 </template>
+
 <script setup>
 import BlogModalAdd from "../components/BlogModalAdd.vue";
 import DeleteModal from "../components/DeleteModal.vue";
@@ -169,13 +162,16 @@ import { db } from "../firebase";
 import { onMounted, ref, computed, watch } from "vue";
 import ShadowBox from "../components/container/ShadowBox.vue";
 import { customSortByDate } from "../utils";
+import { defineEmits } from 'vue';
 
-const showAddBlogPage = ref(false);
-const showBlogPage = ref(true);
+
 const showEditModal = ref(false);
 const showDeleteModal = ref(false);
 let blogIdToDelete = null;
 const editBlogData = ref(null);
+
+const emits = defineEmits(['goAddBlog']);
+
 
 function toggleEdit(blog) {
   showEditModal.value = true;
@@ -184,15 +180,6 @@ function toggleEdit(blog) {
   console.log("blog id to edit", blog.id);
 }
 
-function handleAddBlogOpen() {
-  showAddBlogPage.value = true;
-  showBlogPage.value = false;
-}
-
-function handleAddBlogClose() {
-  showAddBlogPage.value = false;
-  showBlogPage.value = true;
-}
 function confirmDelete(blogId) {
   blogIdToDelete = blogId;
   showDeleteModal.value = true;
@@ -423,7 +410,5 @@ onMounted(async () => {
     blogsData.value = data;
   });
 });
+
 </script>
-
-
-

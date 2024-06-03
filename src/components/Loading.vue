@@ -6,6 +6,7 @@
                 </svg>
                 {{ props.text }}
             </div>
+            
 </template>
 
 <script setup>
