@@ -69,8 +69,6 @@
     </div>
   </div>
   <!-- -->
-  <PeriodicSchedule></PeriodicSchedule>
-
 </template>
 
 <script setup>

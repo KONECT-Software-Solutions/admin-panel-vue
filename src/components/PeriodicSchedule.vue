@@ -75,11 +75,4 @@ const schedule = {
   ],
 };
 
-onMounted(() => {
-  console.log("07:30 = ", calculateStartColumn("07:30"));
-  console.log("08:00 = ", calculateStartColumn("08:00"));
-  console.log("08:30 = ", calculateStartColumn("08:30"));
-  console.log("09:00 = ", calculateStartColumn("09:00"));
-});
-
 </script>
