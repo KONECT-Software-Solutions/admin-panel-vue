@@ -4,7 +4,7 @@
       v-if="showBlogs"
       @goAddBlog="showBlogs = false"
       />  
-      <AddBlog
+    <AddBlog
       v-else
       @goBlogManagement="showBlogs = true"
        />      

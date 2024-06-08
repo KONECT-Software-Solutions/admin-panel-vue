@@ -56,74 +56,74 @@
 
             
     
-  <table v-if="meetingsData?.length" class="w-full bg-gray-100 mt-4 table-fixed">
+  <table v-if="meetingsData?.length" class="w-full mt-4 table-fixed">
     <thead>
       <tr>
-        <th class="w-1/6 text-[12px] uppercase tracking-wide font-medium text-gray-600 py-2 px-4 bg-gray-50 text-left rounded-tl-md rounded-bl-md">
+        <th class="w-1/6 text-[12px] uppercase tracking-wide font-medium text-black py-2 px-4 bg-gray-100 text-left">
           Avukat
         </th>
-        <th class="w-1/6 text-[12px] uppercase tracking-wide font-medium text-gray-600 py-2 px-4 bg-gray-50 text-left">
+        <th class="w-1/6 text-[12px] uppercase tracking-wide font-medium text-black py-2 px-4 bg-gray-100 text-left">
           Danışan
         </th>
-        <th class="w-1/6 text-[12px] uppercase tracking-wide font-medium text-gray-600 py-2 px-4 bg-gray-50 text-left">
+        <th class="w-1/6 text-[12px] uppercase tracking-wide font-medium text-black py-2 px-4 bg-gray-100 text-left">
           Danışan Tel
         </th>
-        <th class="w-1/6 text-[12px] uppercase tracking-wide font-medium text-gray-600 py-2 px-4 bg-gray-50 text-left">
+        <th class="w-1/6 text-[12px] uppercase tracking-wide font-medium text-black py-2 px-4 bg-gray-100 text-left">
           Tarih
         </th>
-        <th class="w-1/6 text-[12px] uppercase tracking-wide font-medium text-gray-600 py-2 px-4 bg-gray-50 text-left">
+        <th class="w-1/6 text-[12px] uppercase tracking-wide font-medium text-black py-2 px-4 bg-gray-100 text-left">
           Saat
         </th>
-        <th class="w-1/6 text-[12px] uppercase tracking-wide font-medium text-gray-600 py-2 px-4 bg-gray-50 text-left">
+        <th class="w-1/6 text-[12px] uppercase tracking-wide font-medium text-black py-2 px-4 bg-gray-100 text-left">
           Notlar
         </th>
-        <th class="w-1/6 text-[12px] uppercase tracking-wide font-medium text-gray-600 py-2 px-4 bg-gray-50 text-left">
+        <th class="w-1/6 text-[12px] uppercase tracking-wide font-medium text-black py-2 px-4 bg-gray-100 text-left">
           Kategori
         </th>
-        <th class="w-1/6 text-[12px] uppercase tracking-wide font-medium text-gray-600 py-2 px-4 bg-gray-50 text-left">
+        <th class="w-1/6 text-[12px] uppercase tracking-wide font-medium text-black py-2 px-4 bg-gray-100 text-left">
           Durum
         </th>
       </tr>
     </thead>
     <tbody>
       <tr v-for="meeting in paginatedItems" :key="meeting.id">
-        <td class="py-2 px-4 border-b border-b-gray-50">
+        <td class="py-2 px-4 border-b border-b-gray-200">
           <div class="flex items-center">
             <span class="text-gray-600 text-sm font-medium hover:text-blue-500">
               {{ meeting.attorney_name }}
             </span>
           </div>
         </td>
-        <td class="py-2 px-4 border-b border-b-gray-50">
+        <td class="py-2 px-4 border-b border-b-gray-200">
           <span class="text-[13px] font-medium text-gray-600">
             {{ meeting.customer_name }}
           </span>
         </td>
-        <td class="py-2 px-4 border-b border-b-gray-50">
+        <td class="py-2 px-4 border-b border-b-gray-200">
           <span class="text-[13px] font-medium text-gray-600">
             {{ meeting.customer_phone}}
           </span>
         </td>
-        <td class="py-2 px-4 border-b border-b-gray-50">
+        <td class="py-2 px-4 border-b border-b-gray-200">
           <span class="text-[13px] font-medium text-gray-600">
             {{ meeting.date }}
           </span>
         </td>
-        <td class="py-2 px-4 border-b border-b-gray-50">
+        <td class="py-2 px-4 border-b border-b-gray-200">
           <span class="text-[13px] font-medium text-gray-600">
             {{ meeting.time }}
           </span>
         </td>
-        <td class="py-2 px-4 border-b border-b-gray-50">
+        <td class="py-2 px-4 border-b border-b-gray-200">
           <button @click="handleNotesModal(meeting.notes)" class="ri-file-text-line flex items-center justify-center ml-2 text-lg bg-yellow-400 hover:bg-gray-900 text-white font-bold px-2 rounded" >
           </button>
         </td>
-        <td class="py-2 px-4 border-b border-b-gray-50">
+        <td class="py-2 px-4 border-b border-b-gray-200">
           <span class="text-[13px] font-medium text-gray-600">
             {{ meeting.category }}
           </span>
         </td>
-        <td class="py-2 px-4 border-b border-b-gray-50">
+        <td class="py-2 px-4 border-b border-b-gray-200">
           <div class="tooltip">
             <div
               :class="buttonClass(meeting.status)"

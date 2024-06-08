@@ -1,20 +1,5 @@
 <template>
-
-
-
-<h2>asd</h2>
-
-
-    
+<h3>Empty tab</h3>
 </template>
 <script setup>
-import { initFlowbite} from 'flowbite'
-import { onMounted } from 'vue';
-
-
-
-onMounted(() => {
-    initFlowbite();
-})
-
 </script>

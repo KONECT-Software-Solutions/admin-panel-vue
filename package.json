@@ -9,8 +9,10 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@vuepic/vue-datepicker": "^8.7.0",
     "@vueup/vue-quill": "^1.2.0",
     "amqplib": "^0.5.2",
+    "date-fns": "^3.6.0",
     "firebase": "^10.11.1",
     "flowbite": "^2.3.0",
     "remixicon": "^4.2.0",
