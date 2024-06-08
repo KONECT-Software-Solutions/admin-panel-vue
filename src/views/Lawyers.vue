@@ -1,5 +1,13 @@
 <template>
-<h3>Empty tab</h3>
+
+
+          <!-- --><PeriodicSchedule></PeriodicSchedule> 
+
 </template>
 <script setup>
+import PeriodicSchedule from "../components/PeriodicSchedule.vue";
+
+// mock data for schedule
+
+
 </script>

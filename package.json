@@ -18,6 +18,7 @@
     "remixicon": "^4.2.0",
     "tailwind": "^4.0.0",
     "vue": "^3.4.21",
+    "vue-cal": "^4.8.1",
     "vue-loading-overlay": "^6.0.4",
     "vue-quill-editor": "^3.0.6",
     "vue-router": "^4.3.2",

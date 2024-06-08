@@ -77,7 +77,7 @@
 <script setup>
 import VueDatePicker from "@vuepic/vue-datepicker";
 import "@vuepic/vue-datepicker/dist/main.css";
-import { ref } from "vue";
+import { onMounted, ref } from "vue";
 import { format } from "date-fns";
 
 const date = ref(new Date());
@@ -87,6 +87,8 @@ const isRepeatEnabled = ref(false);
 const emit = defineEmits(["close", "save-exception"]);
 
 const times = [
+"07:00",
+"07:30",
   "08:00",
   "08:30",
   "09:00",
@@ -110,6 +112,7 @@ const times = [
   "18:00",
 ];
 
+
 const saveUnavailableTime = () => {
   const formattedDate = date.value
     ? format(new Date(date.value), "dd/MM/yy")
@@ -123,6 +126,8 @@ const saveUnavailableTime = () => {
   emit("save-exception", exception);
   emit("close");
 };
+
+
 </script>
 
 <style></style>

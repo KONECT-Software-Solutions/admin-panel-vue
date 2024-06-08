@@ -29,10 +29,10 @@
               </p>
             </div>
             <div>
-              <button
-              v-if="exception.repeat"
+              <button v-if="exception.repeat"
                 class="inline-flex items-center ml-2 p-1.5 text-sm font-medium text-center text-gray-500 rounded-lg focus:outline-none ">
-                <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                  fill="currentColor">
                   <path
                     d="M6 4H21C21.5523 4 22 4.44772 22 5V12H20V6H6V9L1 5L6 1V4ZM18 20H3C2.44772 20 2 19.5523 2 19V12H4V18H18V15L23 19L18 23V20Z">
                   </path>
@@ -67,21 +67,27 @@
       <WorkingHoursExceptionModal v-if="showExceptionModal" @close="showExceptionModal = false"
         @save-exception="addException" />
     </div>
-
-    <periodic-schedule :schedule="schedule" :exceptions="exceptions" class="col-span-2"></periodic-schedule>
   </div>
+  <!-- -->
+  <PeriodicSchedule></PeriodicSchedule>
+
 </template>
 
 <script setup>
-import PeriodicSchedule from "../components/PeriodicSchedule.vue";
 import WorkingHoursExceptionModal from "../components/WorkingHoursExceptionModal.vue";
 import { ref } from "vue";
 import WorkingHoursScheduler from "../components/WorkingHoursScheduler.vue";
+import PeriodicSchedule from "../components/PeriodicSchedule.vue";
 
 const showExceptionModal = ref(false);
 
-const exceptions = ref([]);
-const schedule = ref([]);
+const exceptions = ref([{
+  date: "01/01/22",
+  startTime: "12:00",
+  endTime: "13:00",
+  repeat: false,
+}]);
+const schedule = ref();
 
 const addException = (exception) => {
   exceptions.value.push(exception);
@@ -89,7 +95,7 @@ const addException = (exception) => {
 };
 
 const addSchedule = (schedule_) => {
-  schedule.value.push(schedule_);
+  schedule.value = schedule_;
   console.log("Saved Schedule:", schedule.value);
 };
 

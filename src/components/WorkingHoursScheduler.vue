@@ -1,5 +1,5 @@
 <template>
-	<div class="max-w-xl mx-auto bg-white p-6 rounded-lg shadow-md">
+	<div class="max-w-xl mx-auto bg-white">
 		<form @submit.prevent="saveSchedule">
 			<div class="rounded-lg border border-gray-200 bg-gray-50 p-4 mb-6">
 				<div class="flex justify-between items-center mb-3">
@@ -29,12 +29,13 @@
 							<input v-model="day.enabled" type="checkbox" :id="`toggle-${day.name}`"
 								class="sr-only peer" />
 							<div
-							class="relative w-11 h-5 bg-gray-200 rounded-full ring-[0.18rem] peer peer-focus:ring-blue-300 dark:bg-gray-600 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-1 after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-[1.12rem] after:transition-all dark:border-gray-600 peer-checked:bg-blue-600">
+								class="relative w-11 h-5 bg-gray-200 rounded-full ring-[0.18rem] peer peer-focus:ring-blue-300 dark:bg-gray-600 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-1 after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-[1.12rem] after:transition-all dark:border-gray-600 peer-checked:bg-blue-600">
 							</div>
 							<span class="sr-only">Çalışma Saatleri</span>
 						</label>
-						<label :for="`toggle-${day.name}`" class="ml-2 p-1.5 text-sm font-medium text-gray-900">{{ day.name
-							}}</label>
+						<label :for="`toggle-${day.name}`" class="ml-2 p-1.5 text-sm font-medium text-gray-900">{{
+							day.name
+						}}</label>
 					</div>
 					<div @click="toggleCollapse(index)" v-if="day.enabled"
 						class="text-gray-500 p-1.5 hover:text-gray-800 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-lg focus:outline-none dark:text-gray-400 dark:hover:text-gray-100">
@@ -102,13 +103,15 @@
 </template>
 
 <script setup>
-import { reactive, watch, ref } from "vue";
+import { reactive, watch, ref, onMounted } from "vue";
 
 const emit = defineEmits(["save-schedule"]);
 
 const isWorkingHoursEnabled = ref(true);
 
 const times = [
+	"07:00",
+	"07:30",
 	"08:00",
 	"08:30",
 	"09:00",
@@ -138,40 +141,40 @@ const days = reactive([
 		name: "Pazartesi",
 		enabled: true,
 		timeSlots: [
-			{ start: "08:00", end: "12:30" },
-			{ start: "13:30", end: "17:00" },
+			{ start: "07:00", end: "12:00" },
+			//{ start: "13:30", end: "17:00" },
 		],
 	},
 	{
 		name: "Salı",
 		enabled: true,
 		timeSlots: [
-			{ start: "08:00", end: "12:30" },
-			{ start: "13:30", end: "17:00" },
+			{ start: "08:00", end: "12:00" },
+			//{ start: "13:30", end: "17:00" },
 		],
 	},
 	{
 		name: "Çarşamba",
 		enabled: true,
 		timeSlots: [
-			{ start: "08:00", end: "12:30" },
-			{ start: "13:30", end: "17:00" },
+			{ start: "06:00", end: "12:00" },
+			//{ start: "13:30", end: "17:00" },
 		],
 	},
 	{
 		name: "Perşembe",
 		enabled: true,
 		timeSlots: [
-			{ start: "08:00", end: "12:30" },
-			{ start: "13:30", end: "17:00" },
+			{ start: "09:30", end: "12:00" },
+			//{ start: "13:30", end: "17:00" },
 		],
 	},
 	{
 		name: "Cuma",
 		enabled: true,
 		timeSlots: [
-			{ start: "08:00", end: "12:30" },
-			{ start: "13:30", end: "17:00" },
+			{ start: "10:00", end: "18:00" },
+			//{ start: "13:30", end: "17:00" },
 		],
 	},
 ]);
@@ -200,21 +203,38 @@ const addTimeSlot = (index) => {
 const removeTimeSlot = (dayIndex, slotIndex) => {
 	days[dayIndex].timeSlots.splice(slotIndex, 1);
 };
+function timeToMinutes(time) {
+	const [hours, minutes] = time.split(':').map(Number);
+	return hours * 60 + minutes;
+}
 
 // create a save schedule function to emit the schedule to the parent component. get the active days and intervals, time slots and all business hours enabled status
 const saveSchedule = () => {
 	const schedule = {
 		isWorkingHoursEnabled: isWorkingHoursEnabled.value,
-		days: days
-			.map((day) => ({
-				name: day.name,
-				enabled: day.enabled,
-				intervals: day.timeSlots,
-			})),
+		days: days.map((day) => ({
+			name: day.name,
+			enabled: day.enabled,
+			intervals: day.timeSlots.map((slot) => {
+				const startMinutes = timeToMinutes(slot.start);
+				const endMinutes = timeToMinutes(slot.end);
+				const length = (endMinutes - startMinutes) / 60; // convert minutes to hours
+				return {
+					start: slot.start,
+					end: slot.end,
+					length: length
+				};
+			}),
+		})),
 	};
 	emit("save-schedule", schedule);
 };
 
+
+onMounted(() => {
+	console.log("WorkingHoursScheduler component mounted");
+	saveSchedule();
+});
 </script>
 
 <style>
