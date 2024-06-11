@@ -74,7 +74,10 @@ async function getAllAttorneys() {
 }
 
 onMounted(async () => {
-  const dataFetched= await getAllAttorneys();
+  let dataFetched= await getAllAttorneys();
+
+  //filter out the attorneys, if mail equals to admin@gmail.com
+  dataFetched = dataFetched.filter(attorney => attorney.mail !== 'admin@gmail.com');
 
   attorneysData.value = dataFetched
   console.log(attorneysData.value)

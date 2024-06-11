@@ -74,9 +74,7 @@
 									href="#"
 									class="text-gray-600 text-sm font-medium hover:text-blue-500 truncate">
 									{{
-										blog.title && blog.title.length > 27
-											? blog.title.substring(0, 27) + "..."
-											: blog.title || ""
+										blog.title
 									}}
 								</a>
 							</div>

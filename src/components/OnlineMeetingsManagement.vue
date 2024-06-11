@@ -1,156 +1,149 @@
 <template>
   <div>
-     <button
-        @click="handleGoBack"
-        class="bg-green-700 text-white px-4 py-1 font-medium rounded mb-4"
-      >
-        Geri Dön
+    <button @click="handleGoBack" class="bg-green-700 text-white px-4 py-1 font-medium rounded mb-4">
+      Geri Dön
     </button>
-    <NotesModal
-    :show="showNotesModal"
-    :customerNotes="customerNotes"
-    @close="showNotesModal = false" 
-  />
-    <MeetingCards
-      :totalMeetings="totalMeetings"
-      :approvedMeetings="approvedMeetings"
-      :satisfactionRate="satisfactionRate"
-      :meetingStatusSummary="meetingStatusSummary"
-      :topAttorneys="topAttorneys"
-      :showTopAttorneys="props.showAll"
-      :showAttorneySchedule="!props.showAll"
-    />
+    <NotesModal :show="showNotesModal" :customerNotes="customerNotes" @close="showNotesModal = false" />
+    <MeetingCards :totalMeetings="totalMeetings" :approvedMeetings="approvedMeetings"
+      :satisfactionRate="satisfactionRate" :meetingStatusSummary="meetingStatusSummary" :topAttorneys="topAttorneys"
+      :showTopAttorneys="props.showAll" :showAttorneySchedule="!props.showAll" />
 
- 
-  <shadow-box class="p-6">
-    <div class="flex justify-between mb-4 items-start">
-      <h1 class="font-medium">Online Görüşmeler</h1>
-    </div>
-    <form action="" class="flex items-center mb-4">
-      <div class="relative w-full mr-2">
-        <input
-          v-model="searchTerm"
-          type="text"
-          class="py-2 pr-4 pl-10 bg-gray-100 w-full outline-none border border-gray-100 rounded-md text-sm focus:border-blue-500"
-          placeholder="Müşteri ismine göre ara..."
-        />
-        <i
-          class="ri-search-line absolute top-1/2 left-4 -translate-y-1/2 text-gray-400"
-        ></i>
+
+    <shadow-box class="p-6">
+      <div class="flex justify-between mb-4 items-start">
+        <h1 class="font-medium">Online Görüşmeler</h1>
       </div>
-    </form>
-    <div class="flex">
-            <a class="flex items-center space-x-2 p-2 hover:bg-gray-100">
-                <input type="checkbox" v-model="filterOptions.requests" class="form-checkbox h-5 w-5 text-blue-600" />
-                <p class="text-sm font-medium text-gray-800">Görüşme İstekleri</p>
-            </a>
-            <a class="flex items-center space-x-2 p-2 hover:bg-gray-100">
-                <input type="checkbox" v-model="filterOptions.accepted" class="form-checkbox h-5 w-5 text-blue-600" />
-                <p class="text-sm font-medium text-gray-800">Kabul Edilenler</p>
-            </a>
-            <a class="flex items-center space-x-2 p-2 hover:bg-gray-100">
-                <input type="checkbox" v-model="filterOptions.pending" class="form-checkbox h-5 w-5 text-blue-600" />
-                <p class="text-sm font-medium text-gray-800">Beklemede Olanlar</p>
-            </a>
-    </div>
+      <form action="" class="flex items-center mb-4">
+        <div class="relative w-full mr-2">
+          <input v-model="searchTerm" type="text"
+            class="py-2 pr-4 pl-10 bg-gray-100 w-full outline-none border border-gray-100 rounded-md text-sm focus:border-blue-500"
+            placeholder="Müşteri ismine göre ara..." />
+          <i class="ri-search-line absolute top-1/2 left-4 -translate-y-1/2 text-gray-400"></i>
+        </div>
+      </form>
+      <div class="flex">
+        <label class="inline-flex items-center space-x-2 p-2 cursor-pointer">
+          <input v-model="filterOptions.requests" type="checkbox" class="sr-only peer" />
+          <div
+            class="relative w-11 h-5 bg-gray-200 rounded-full ring-[0.18rem] peer peer-focus:ring-blue-300 dark:bg-gray-600 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-1 after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-[1.12rem] after:transition-all dark:border-gray-600 peer-checked:bg-blue-600">
+          </div>
+          <p class="text-sm font-medium text-gray-800">Görüşme İstekleri</p>
+        </label>
+        <label class="inline-flex items-center space-x-2 p-2 cursor-pointer">
+          <input v-model="filterOptions.accepted" type="checkbox" class="sr-only peer" />
+          <div
+            class="relative w-11 h-5 bg-gray-200 rounded-full ring-[0.18rem] peer peer-focus:ring-blue-300 dark:bg-gray-600 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-1 after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-[1.12rem] after:transition-all dark:border-gray-600 peer-checked:bg-blue-600">
+          </div>
+          <p class="text-sm font-medium text-gray-800">Kabul Edilenler</p>
+        </label>
+        <label class="inline-flex items-center space-x-2 p-2 cursor-pointer">
+          <input v-model="filterOptions.pending" type="checkbox" class="sr-only peer" />
+          <div
+            class="relative w-11 h-5 bg-gray-200 rounded-full ring-[0.18rem] peer peer-focus:ring-blue-300 dark:bg-gray-600 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-1 after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-[1.12rem] after:transition-all dark:border-gray-600 peer-checked:bg-blue-600">
+          </div>
+          <p class="text-sm font-medium text-gray-800">Beklemede Olanlar</p>
+        </label>
+      </div>
 
-            
-    
-  <table v-if="meetingsData?.length" class="w-full mt-4 table-fixed">
-    <thead>
-      <tr>
-        <th class="w-1/6 text-[12px] uppercase tracking-wide font-medium text-black py-2 px-4 bg-gray-100 text-left">
-          Avukat
-        </th>
-        <th class="w-1/6 text-[12px] uppercase tracking-wide font-medium text-black py-2 px-4 bg-gray-100 text-left">
-          Danışan
-        </th>
-        <th class="w-1/6 text-[12px] uppercase tracking-wide font-medium text-black py-2 px-4 bg-gray-100 text-left">
-          Danışan Tel
-        </th>
-        <th class="w-1/6 text-[12px] uppercase tracking-wide font-medium text-black py-2 px-4 bg-gray-100 text-left">
-          Tarih
-        </th>
-        <th class="w-1/6 text-[12px] uppercase tracking-wide font-medium text-black py-2 px-4 bg-gray-100 text-left">
-          Saat
-        </th>
-        <th class="w-1/6 text-[12px] uppercase tracking-wide font-medium text-black py-2 px-4 bg-gray-100 text-left">
-          Notlar
-        </th>
-        <th class="w-1/6 text-[12px] uppercase tracking-wide font-medium text-black py-2 px-4 bg-gray-100 text-left">
-          Kategori
-        </th>
-        <th class="w-1/6 text-[12px] uppercase tracking-wide font-medium text-black py-2 px-4 bg-gray-100 text-left">
-          Durum
-        </th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr v-for="meeting in paginatedItems" :key="meeting.id">
-        <td class="py-2 px-4 border-b border-b-gray-200">
-          <div class="flex items-center">
-            <span class="text-gray-600 text-sm font-medium hover:text-blue-500">
-              {{ meeting.attorney_name }}
-            </span>
-          </div>
-        </td>
-        <td class="py-2 px-4 border-b border-b-gray-200">
-          <span class="text-[13px] font-medium text-gray-600">
-            {{ meeting.customer_name }}
-          </span>
-        </td>
-        <td class="py-2 px-4 border-b border-b-gray-200">
-          <span class="text-[13px] font-medium text-gray-600">
-            {{ meeting.customer_phone}}
-          </span>
-        </td>
-        <td class="py-2 px-4 border-b border-b-gray-200">
-          <span class="text-[13px] font-medium text-gray-600">
-            {{ meeting.date }}
-          </span>
-        </td>
-        <td class="py-2 px-4 border-b border-b-gray-200">
-          <span class="text-[13px] font-medium text-gray-600">
-            {{ meeting.time }}
-          </span>
-        </td>
-        <td class="py-2 px-4 border-b border-b-gray-200">
-          <button @click="handleNotesModal(meeting.notes)" class="ri-file-text-line flex items-center justify-center ml-2 text-lg bg-yellow-400 hover:bg-gray-900 text-white font-bold px-2 rounded" >
-          </button>
-        </td>
-        <td class="py-2 px-4 border-b border-b-gray-200">
-          <span class="text-[13px] font-medium text-gray-600">
-            {{ meeting.category }}
-          </span>
-        </td>
-        <td class="py-2 px-4 border-b border-b-gray-200">
-          <div class="tooltip">
-            <div
-              :class="buttonClass(meeting.status)"
-              class="w-10 h-10 flex items-center justify-center font-medium rounded-full ml-2">
-              <i :class="iconClass(meeting.status)"></i>
-            </div>
-            <span class="tooltiptext">{{ statusText(meeting.status) }}</span>
-          </div>
-        </td> 
-      </tr>
-    </tbody>
-  </table>
-    <div class="pagination-container flex justify-end mt-4 w-full">
-      <button
-        @click="prevPage"
-        :disabled="currentPage === 1"
-        class="ri-arrow-left-fill h-8 px-4 m-2 text-l text-white transition-colors duration-150 bg-gray-800 rounded-lg focus:shadow-outline hover:bg-indigo-800"
-      ></button>
-      <button
-        @click="nextPage"
-        :disabled="currentPage === totalPages"
-        class="ri-arrow-right-fill h-8 px-4 m-2 text-l text-white transition-colors duration-150 bg-gray-800 rounded-lg focus:shadow-outline hover:bg-indigo-800"
-      ></button>
-    </div>
-  </shadow-box>
-</div>
- 
+
+
+      <table v-if="meetingsData?.length" class="w-full mt-4 table-fixed">
+        <thead>
+          <tr>
+            <th
+              class="w-1/6 text-[12px] uppercase tracking-wide font-medium text-black py-2 px-4 bg-gray-100 text-left">
+              Avukat
+            </th>
+            <th
+              class="w-1/6 text-[12px] uppercase tracking-wide font-medium text-black py-2 px-4 bg-gray-100 text-left">
+              Danışan
+            </th>
+            <th
+              class="w-1/6 text-[12px] uppercase tracking-wide font-medium text-black py-2 px-4 bg-gray-100 text-left">
+              Danışan Tel
+            </th>
+            <th
+              class="w-1/6 text-[12px] uppercase tracking-wide font-medium text-black py-2 px-4 bg-gray-100 text-left">
+              Tarih
+            </th>
+            <th
+              class="w-1/6 text-[12px] uppercase tracking-wide font-medium text-black py-2 px-4 bg-gray-100 text-left">
+              Saat
+            </th>
+            <th
+              class="w-1/6 text-[12px] uppercase tracking-wide font-medium text-black py-2 px-4 bg-gray-100 text-left">
+              Notlar
+            </th>
+            <th
+              class="w-1/6 text-[12px] uppercase tracking-wide font-medium text-black py-2 px-4 bg-gray-100 text-left">
+              Kategori
+            </th>
+            <th
+              class="w-1/6 text-[12px] uppercase tracking-wide font-medium text-black py-2 px-4 bg-gray-100 text-left">
+              Durum
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="meeting in paginatedItems" :key="meeting.id">
+            <td class="py-2 px-4 border-b border-b-gray-200">
+              <div class="flex items-center">
+                <span class="text-gray-600 text-sm font-medium hover:text-blue-500">
+                  {{ meeting.attorney_name }}
+                </span>
+              </div>
+            </td>
+            <td class="py-2 px-4 border-b border-b-gray-200">
+              <span class="text-[13px] font-medium text-gray-600">
+                {{ meeting.customer_name }}
+              </span>
+            </td>
+            <td class="py-2 px-4 border-b border-b-gray-200">
+              <span class="text-[13px] font-medium text-gray-600">
+                {{ meeting.customer_phone }}
+              </span>
+            </td>
+            <td class="py-2 px-4 border-b border-b-gray-200">
+              <span class="text-[13px] font-medium text-gray-600">
+                {{ meeting.date }}
+              </span>
+            </td>
+            <td class="py-2 px-4 border-b border-b-gray-200">
+              <span class="text-[13px] font-medium text-gray-600">
+                {{ meeting.time }}
+              </span>
+            </td>
+            <td class="py-2 px-4 border-b border-b-gray-200">
+              <button @click="handleNotesModal(meeting.notes)"
+                class="ri-file-text-line flex items-center justify-center ml-2 text-lg bg-yellow-400 hover:bg-gray-900 text-white font-bold px-2 rounded">
+              </button>
+            </td>
+            <td class="py-2 px-4 border-b border-b-gray-200">
+              <span class="text-[13px] font-medium text-gray-600">
+                {{ meeting.category }}
+              </span>
+            </td>
+            <td class="py-2 px-4 border-b border-b-gray-200">
+              <div class="tooltip">
+                <div :class="buttonClass(meeting.status)"
+                  class="w-10 h-10 flex items-center justify-center font-medium rounded-full ml-2">
+                  <i :class="iconClass(meeting.status)"></i>
+                </div>
+                <span class="tooltiptext">{{ statusText(meeting.status) }}</span>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="pagination-container flex justify-end mt-4 w-full">
+        <button @click="prevPage" :disabled="currentPage === 1"
+          class="ri-arrow-left-fill h-8 px-4 m-2 text-l text-white transition-colors duration-150 bg-gray-800 rounded-lg focus:shadow-outline hover:bg-indigo-800"></button>
+        <button @click="nextPage" :disabled="currentPage === totalPages"
+          class="ri-arrow-right-fill h-8 px-4 m-2 text-l text-white transition-colors duration-150 bg-gray-800 rounded-lg focus:shadow-outline hover:bg-indigo-800"></button>
+      </div>
+    </shadow-box>
+  </div>
+
 </template>
 <script setup>
 import MeetingCards from "../components/MeetingCards.vue";
@@ -175,7 +168,7 @@ const props = defineProps({
 
 const emit = defineEmits(["goBack"]);
 
-const handleGoBack = () => { emit('goBack')};
+const handleGoBack = () => { emit('goBack') };
 
 const showNotesModal = ref(false);
 
@@ -245,7 +238,7 @@ const filteredMeetings = computed(() => {
   }
 
   const { requests, accepted, pending } = filterOptions.value;
-  
+
   if (requests || accepted || pending) {
     meetings = meetings.filter((meeting) => {
       let match = false;
@@ -277,7 +270,7 @@ const paginatedItems = computed(() => {
   else {
     return filteredMeetings.value.slice(startIndex.value, startIndex.value + itemsPerPage.value);
   }
-  
+
 });
 
 // Computed property to calculate the total number of pages
@@ -307,38 +300,38 @@ const prevPage = () => {
 const statusTextVisible = ref(null);
 
 const statusDetails = (status) => {
-switch (status) {
-  case "0":
-    return { color: 'bg-blue-200', text: 'İstek', icon: 'ri-user-add-line' };
-  case "1":
-    return { color: 'bg-green-200', text: 'Kabul edildi', icon: 'ri-calendar-check-line' };
-  case "2":
-    return { color: 'bg-gray-200', text: 'Tamamlandı', icon: 'ri-check-line' };
-  case "3":
-    return { color: 'bg-red-200', text: 'Reddedildi', icon: 'ri-close-line' };
-  case "4":
-    return { color: 'bg-orange-200', text: 'Müşteri onayı', icon: 'ri-time-line' };
-  case "5":
-    return { color: 'bg-orange-200', text: 'Avukat onayı', icon: 'ri-time-line' };
-  case "6":
-    return { color: 'bg-black text-white', text: 'Geri ödemeli iptal', icon: 'ri-calendar-close-line' };
-  case "7":
-    return { color: 'bg-black text-white', text: 'Geri ödemesiz iptal', icon: 'ri-calendar-close-line' };
-  default:
-    return { color: 'bg-gray-200', text: 'Unknown status', icon: 'ri-question-line' };
-}
+  switch (status) {
+    case "0":
+      return { color: 'bg-blue-200', text: 'İstek', icon: 'ri-user-add-line' };
+    case "1":
+      return { color: 'bg-green-200', text: 'Kabul edildi', icon: 'ri-calendar-check-line' };
+    case "2":
+      return { color: 'bg-gray-200', text: 'Tamamlandı', icon: 'ri-check-line' };
+    case "3":
+      return { color: 'bg-red-200', text: 'Reddedildi', icon: 'ri-close-line' };
+    case "4":
+      return { color: 'bg-orange-200', text: 'Müşteri onayı', icon: 'ri-time-line' };
+    case "5":
+      return { color: 'bg-orange-200', text: 'Avukat onayı', icon: 'ri-time-line' };
+    case "6":
+      return { color: 'bg-black text-white', text: 'Geri ödemeli iptal', icon: 'ri-calendar-close-line' };
+    case "7":
+      return { color: 'bg-black text-white', text: 'Geri ödemesiz iptal', icon: 'ri-calendar-close-line' };
+    default:
+      return { color: 'bg-gray-200', text: 'Unknown status', icon: 'ri-question-line' };
+  }
 };
 
 const buttonClass = (status) => {
-return statusDetails(status).color;
+  return statusDetails(status).color;
 };
 
 const iconClass = (status) => {
-return statusDetails(status).icon;
+  return statusDetails(status).icon;
 };
 
 const statusText = (status) => {
-return statusDetails(status).text;
+  return statusDetails(status).text;
 };
 
 // Utility function to load blogs data
@@ -349,13 +342,13 @@ async function fetchMeetings() {
     meetings.push({ id: doc.id, ...doc.data() });
   });
   meetings = meetings.map((meeting) => {
-  const formattedDateTime = formatDate(meeting.date);
-  return {
-    ...meeting,
-    date: formattedDateTime.date,
-    time: formattedDateTime.time,
-  };
-});
+    const formattedDateTime = formatDate(meeting.date);
+    return {
+      ...meeting,
+      date: formattedDateTime.date,
+      time: formattedDateTime.time,
+    };
+  });
 
   return meetings;
 }
@@ -380,14 +373,14 @@ async function getAllMeetings() {
     // Check if data exists and is not expired
     const cachedMeetings = localStorage.getItem("cachedMeetings");
     const cachedTimeMeetings = localStorage.getItem("cachedTimeMeetings");
-    const expiryTime = 30 * 60 * 1000; // 30 minutes expiration time
+    const expiryTime = 0 * 60 * 1000; // 30 minutes expiration time
 
     if (
       cachedMeetings &&
       cachedTimeMeetings &&
       new Date() - new Date(parseInt(cachedTimeMeetings)) < expiryTime
     ) {
-  return JSON.parse(cachedMeetings);
+      return JSON.parse(cachedMeetings);
     } else {
       const meetings = await fetchMeetings();
       localStorage.setItem("cachedMeetings", JSON.stringify(meetings));
@@ -403,10 +396,10 @@ function formatDate(timestamp) {
   if (!timestamp) return '';
   if (timestamp.seconds) { // Firestore timestamp
     const date = new Date(timestamp.seconds * 1000);
-    
+
     // Get date in "DD/MM/YYYY" format
     const formattedDate = date.toLocaleDateString("tr-TR");
-    
+
     // Get time in "HH:mm" format
     const hours = date.getHours().toString().padStart(2, '0');
     const minutes = date.getMinutes().toString().padStart(2, '0');
@@ -434,11 +427,11 @@ async function fetchAttorney(id) {
       return attorneySnap.data();
     } else {
       console.log("No such document!");
-      return null; 
+      return null;
     }
   } catch (error) {
     console.error("Error fetching attorney data:", error);
-    throw error; 
+    throw error;
   }
 }
 
@@ -480,41 +473,41 @@ onMounted(async () => {
   if (props.showAll) {
     meetingsData.value = sortedMeetings;
   }
-  else{
+  else {
     meetingsData.value = sortedMeetings.filter(meeting => meeting.attorney_id === props.uid);
-  }   
+  }
 });
 
 </script>
 
 
-  <style scoped>
-  .tooltip {
-    position: relative;
-    display: inline-block;
-  }
-  
-  .tooltip .tooltiptext {
-    visibility: hidden;
-    width: 120px;
-    background-color: #fff;
-    color: rgb(75 85 99);
-    text-align: center;
-    font-size: 0.875rem;
-    line-height: 1rem;
-    border-radius: 6px;
-    padding: 5px;
-    position: absolute;
-    z-index: 1;
-    top: 20%;
-    left: 230%;
-    margin-left: -60px;
-    opacity: 0;
-    transition: opacity 0.3s;
-  }
-  
-  .tooltip:hover .tooltiptext {
-    visibility: visible;
-    opacity: 1;
-  }
-  </style>
+<style scoped>
+.tooltip {
+  position: relative;
+  display: inline-block;
+}
+
+.tooltip .tooltiptext {
+  visibility: hidden;
+  width: 120px;
+  background-color: #fff;
+  color: rgb(75 85 99);
+  text-align: center;
+  font-size: 0.875rem;
+  line-height: 1rem;
+  border-radius: 6px;
+  padding: 5px;
+  position: absolute;
+  z-index: 1;
+  top: 20%;
+  left: 230%;
+  margin-left: -60px;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.tooltip:hover .tooltiptext {
+  visibility: visible;
+  opacity: 1;
+}
+</style>

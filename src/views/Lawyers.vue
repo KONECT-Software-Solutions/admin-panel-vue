@@ -1,11 +1,9 @@
 <template>
-
-       <!-- --><PeriodicSchedule></PeriodicSchedule> 
+<h1>Avukatlar</h1>
    
 
 </template>
 <script setup>
-import PeriodicSchedule from "../components/PeriodicSchedule.vue";
 
 // mock data for schedule
 
