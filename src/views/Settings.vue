@@ -1,5 +1,5 @@
 <template>
-  <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+  <div v-if="userRole === 'attorney'" class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
     <div class="bg-white rounded-lg border border-gray-200 p-6 shadow-lg">
       <h3 class="text-lg font-semibold pb-4 text-gray-900 border-b mb-4 border-gray-300 rounded-t">
         <span class="mb-2">Periyodik Çalışma Saatlerini Seç</span>
@@ -39,7 +39,7 @@
                 </svg>
               </button>
               <button @click="removeException(index)"
-                class="inline-flex items-center ml-2 p-1.5 text-sm font-medium text-center text-gray-500 hover:text-gray-800 hover:bg-gray-200rounded-lg focus:outline-none">
+                class="inline-flex items-center ml-2 p-1.5 text-sm font-medium text-center text-gray-500 hover:text-gray-800 hover:bg-gray-200 rounded-lg focus:outline-none">
                 <svg class="w-5 h-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24"
                   fill="currentColor" viewBox="0 0 24 24">
                   <path fill-rule="evenodd"
@@ -68,16 +68,22 @@
         @save-exception="addException" />
     </div>
   </div>
+  <div v-else>admin</div>
   <!-- -->
 </template>
 
 <script setup>
 import WorkingHoursExceptionModal from "../components/WorkingHoursExceptionModal.vue";
-import { ref } from "vue";
 import WorkingHoursScheduler from "../components/WorkingHoursScheduler.vue";
-import PeriodicSchedule from "../components/PeriodicSchedule.vue";
+import { ref, computed } from "vue";
+import { useStore } from 'vuex';
+
+// Access the Vuex store
+const store = useStore();
 
 const showExceptionModal = ref(false);
+const userRole = computed(() => store.getters.userRole);
+const userUid = computed(() => store.getters.user ? store.getters.user.uid : null);
 
 const exceptions = ref([{
   date: "01/01/22",

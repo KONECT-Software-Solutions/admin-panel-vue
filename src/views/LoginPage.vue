@@ -64,9 +64,9 @@ const login = async () => {
     const userUid = store.getters.user ? store.getters.user.uid : null;
 
     if (userRole === 'attorney' && userUid) {
-      router.push(`/home/${userUid}`); // Redirect attorneys to /home/:uid
+      router.push(`/online-meetings/${userUid}`); // Redirect attorneys to /home/:uid
     } else {
-      router.push('/home'); // Redirect admins to /home
+      router.push('/online-meetings'); // Redirect admins to /home
     }
   } catch (e) {
     error.value = 'Hesap isim veya şifre yanlış. Lütfen tekrar deneyin.';

@@ -47,17 +47,17 @@ function emitTitleChange(title) {
 }
 
 const adminMenus = [
-    { title: 'Ana Sayfa', icon: 'ri-home-2-line', link: '/home' },
+   // { title: 'Ana Sayfa', icon: 'ri-home-2-line', link: '/home' },
     { title: 'Online Görüşmeler', icon: 'ri-video-on-line', link: '/online-meetings' },
     { title: 'Blog Yönetimi', icon: 'ri-article-line', link: '/blogs' },
-    { title: 'Avukatlar', icon: 'ri-team-line', link: '/lawyers' },
+   //{ title: 'Avukatlar', icon: 'ri-team-line', link: '/lawyers' },
     { title: 'Ayarlar', icon: 'ri-settings-2-line', link: '/settings' }
 ];
 
 const attorneyMenus = [
-    { title: 'Ana Sayfa', icon: 'ri-home-2-line', link: '/home' },
+    //{ title: 'Ana Sayfa', icon: 'ri-home-2-line', link: '/home' },
     { title: 'Online Görüşmelerim', icon: 'ri-video-on-line', link: '/online-meetings' },
-    { title: 'Ayarlar', icon: 'ri-settings-2-line', link: '/settings' }
+    { title: 'Randevu Saatlerim', icon: 'ri-settings-2-line', link: '/settings' }
 ];
 
 

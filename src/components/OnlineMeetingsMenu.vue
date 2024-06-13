@@ -80,7 +80,6 @@ onMounted(async () => {
   dataFetched = dataFetched.filter(attorney => attorney.mail !== 'admin@gmail.com');
 
   attorneysData.value = dataFetched
-  console.log(attorneysData.value)
 });
 
 

@@ -1,9 +1,12 @@
 <template>
   <div>
-    <button @click="handleGoBack" class="bg-green-700 text-white px-4 py-1 font-medium rounded mb-4">
+    <button v-if="userRole === 'admin'" @click="handleGoBack"
+      class="bg-green-700 text-white px-4 py-1 font-medium rounded mb-4">
       Geri Dön
     </button>
     <NotesModal :show="showNotesModal" :customerNotes="customerNotes" @close="showNotesModal = false" />
+    <StatusActionModalHandler v-if="showStatusActionModal" :status="statusClicked" @set-meeting="handleSetMeeting" @decline-meeting="handleDeclineMeeting"
+      @close="showStatusActionModal = false" />
     <MeetingCards :totalMeetings="totalMeetings" :approvedMeetings="approvedMeetings"
       :satisfactionRate="satisfactionRate" :meetingStatusSummary="meetingStatusSummary" :topAttorneys="topAttorneys"
       :showTopAttorneys="props.showAll" :showAttorneySchedule="!props.showAll" />
@@ -125,10 +128,10 @@
             </td>
             <td class="py-2 px-4 border-b border-b-gray-200">
               <div class="tooltip">
-                <div :class="buttonClass(meeting.status)"
-                  class="w-10 h-10 flex items-center justify-center font-medium rounded-full ml-2">
+                <button @click="handleStatusClick(meeting.status, meeting.id)" :class="buttonClass(meeting.status)"
+                  class="w-10 h-10 flex items-center justify-center font-medium rounded-full ml-2 ring-0 focus:ring-[0.12rem] focus:ring-gray-600 focus:outline-none">
                   <i :class="iconClass(meeting.status)"></i>
-                </div>
+                </button>
                 <span class="tooltiptext">{{ statusText(meeting.status) }}</span>
               </div>
             </td>
@@ -149,6 +152,7 @@
 import MeetingCards from "../components/MeetingCards.vue";
 import ShadowBox from "../components/container/ShadowBox.vue";
 import NotesModal from "../components/NotesModal.vue";
+import StatusActionModalHandler from "../components/StatusActionModalHandler.vue";
 
 import {
   collection,
@@ -159,6 +163,14 @@ import {
 } from "firebase/firestore";
 import { db } from "../firebase";
 import { onMounted, ref, computed, watch } from "vue";
+import { useStore } from 'vuex';
+
+// Access the Vuex store
+const store = useStore();
+const userRole = computed(() => store.getters.userRole);
+
+const statusClicked = ref(null);
+const meetingIdClicked = ref(null);
 
 
 const props = defineProps({
@@ -168,9 +180,8 @@ const props = defineProps({
 
 const emit = defineEmits(["goBack"]);
 
-const handleGoBack = () => { emit('goBack') };
-
 const showNotesModal = ref(false);
+const showStatusActionModal = ref(false);
 
 const customerNotes = ref(null);
 const filterOptions = ref({
@@ -212,10 +223,8 @@ const topAttorneys = computed(() => {
   return topAttorneys.slice(0, 3);
 });
 
-function handleNotesModal(notes) {
-  showNotesModal.value = true;
-  customerNotes.value = notes
-}
+
+
 
 const meetingsData = ref([]);
 const meetingsRef = collection(db, "meetings");
@@ -226,6 +235,42 @@ const currentPage = ref(1);
 const itemsPerPage = ref(10);
 
 const searchTerm = ref("");
+
+const handleGoBack = () => { emit('goBack') };
+
+function handleSetMeeting() {
+  // change the status of the meeting with meetingId to "1" (accepted)
+  meetingsData.value = meetingsData.value.map((meeting) => {
+    if (meeting.id === meetingIdClicked.value) {
+      meeting.status = "1";
+    }
+    return meeting;
+  });
+}
+
+function handleDeclineMeeting() {
+  // change the status of the meeting with meetingId to "3" (declined)
+  meetingsData.value = meetingsData.value.map((meeting) => {
+    if (meeting.id === meetingIdClicked.value) {
+      meeting.status = "3";
+    }
+    return meeting;
+  });
+}
+
+function handleNotesModal(notes) {
+  showNotesModal.value = true;
+  customerNotes.value = notes
+}
+
+function handleStatusClick(status, id) {
+  showStatusActionModal.value = true;
+  statusClicked.value = status;
+  meetingIdClicked.value = id;
+  console.log("Status clicked:", statusClicked.value);
+  console.log("Meeting ID clicked:", meetingIdClicked.value);
+}
+
 
 // Computed property to filter blogs based on the search term and filters
 const filteredMeetings = computed(() => {
@@ -302,21 +347,21 @@ const statusTextVisible = ref(null);
 const statusDetails = (status) => {
   switch (status) {
     case "0":
-      return { color: 'bg-blue-200', text: 'İstek', icon: 'ri-user-add-line' };
+      return { color: 'bg-blue-300 hover:bg-blue-400 ', text: 'İstek', icon: 'ri-user-add-line' }; // Bu status için alınabilecek aksiyonlar: isteği kabul et, reddet
     case "1":
-      return { color: 'bg-green-200', text: 'Kabul edildi', icon: 'ri-calendar-check-line' };
+      return { color: 'bg-green-300 hover:bg-green-400 ', text: 'Kabul edildi', icon: 'ri-calendar-check-line' }; // Bu status için alınabilecek aksiyonlar: toplantı detaylarını görüntüle
     case "2":
-      return { color: 'bg-gray-200', text: 'Tamamlandı', icon: 'ri-check-line' };
+      return { color: 'bg-gray-300 hover:bg-gray-400 ', text: 'Tamamlandı', icon: 'ri-check-line' };
     case "3":
-      return { color: 'bg-red-200', text: 'Reddedildi', icon: 'ri-close-line' };
+      return { color: 'bg-red-300 hover:bg-red-400 ', text: 'Reddedildi', icon: 'ri-close-line' }; // Bu status için alınabilecek aksiyonlar: reddedilme sebebini görüntüle
     case "4":
-      return { color: 'bg-orange-200', text: 'Müşteri onayı', icon: 'ri-time-line' };
+      return { color: 'bg-orange-200', text: 'Müşteri onayı', icon: 'ri-time-line' }; // Bu status için alınabilecek aksiyonlar: değişikliği görüntüle, onay hatırlatması gönder
     case "5":
-      return { color: 'bg-orange-200', text: 'Avukat onayı', icon: 'ri-time-line' };
+      return { color: 'bg-orange-200', text: 'Avukat onayı', icon: 'ri-time-line' }; // Bu status için alınabilecek aksiyonlar: değişikliği görüntüle, onay hatırlatması gönder
     case "6":
-      return { color: 'bg-black text-white', text: 'Geri ödemeli iptal', icon: 'ri-calendar-close-line' };
+      return { color: 'bg-gray-700 text-white hover:bg-gray-800 ', text: 'Geri ödemeli iptal', icon: 'ri-calendar-close-line' }; // Bu status için alınabilecek aksiyonlar: iptal sebebini görüntüle
     case "7":
-      return { color: 'bg-black text-white', text: 'Geri ödemesiz iptal', icon: 'ri-calendar-close-line' };
+      return { color: 'bg-black text-white', text: 'Geri ödemesiz iptal', icon: 'ri-calendar-close-line' }; // Bu status için alınabilecek aksiyonlar: iptal sebebini görüntüle
     default:
       return { color: 'bg-gray-200', text: 'Unknown status', icon: 'ri-question-line' };
   }
@@ -504,6 +549,11 @@ onMounted(async () => {
   margin-left: -60px;
   opacity: 0;
   transition: opacity 0.3s;
+}
+
+.tooltip-action {
+  top: 20%;
+  left: 100%;
 }
 
 .tooltip:hover .tooltiptext {

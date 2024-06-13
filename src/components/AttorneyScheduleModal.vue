@@ -62,10 +62,6 @@ const availableTimes = computed(() => {
     return mockData[dayOfWeek];
 });
 
-const props = defineProps({
-    customerNotes: String
-});
-
 const emits = defineEmits(['close']);
 
 onMounted(() => {

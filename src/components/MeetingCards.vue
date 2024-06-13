@@ -1,6 +1,8 @@
 <template>
   <attorney-schedule-modal v-if="showAttorneyScheduleModal" @close="showAttorneyScheduleModal = false" />
-  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6" v-bind:class="{
+				'lg:grid-cols-3': isAdmin(),
+			}">
     <!-- Total Online Meetings Card -->
     <div class="bg-white rounded-lg border border-gray-200 p-6 shadow-lg">
       <div class="flex justify-between items-center mb-4">
@@ -52,7 +54,6 @@
           Çizelgeyi Görüntüle
         </button>
       </div>
-
     </div>
 
     <div v-if="showTopAttorneys" class="bg-white border border-gray-200 rounded-lg p-6 shadow-lg">
@@ -92,6 +93,9 @@ const store = useStore();
 // Create computed properties for the user role and UID
 const userRole = computed(() => store.getters.userRole);
 const showAttorneyScheduleModal = ref(false);
+
+const isAdmin = () => userRole.value === 'admin';
+
 
 // props
 const props = defineProps({
@@ -139,5 +143,9 @@ const approvedPercentage = computed(() => {
 const meetingProgress = computed(() => {
   if (props.totalMeetings === 0) return 0;
   return ((props.totalMeetings / 100) * 100).toFixed(2); // assuming 100 is the goal
+});
+
+onMounted(() => {
+  console.log("isAdmin", isAdmin(userRole));
 });
 </script>

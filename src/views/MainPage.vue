@@ -21,7 +21,7 @@ import ContentContainer from '../components/layout/ContentContainer.vue';
 const isSidebarOpen = ref(true);
 
 
-const currentTab = ref('Ana Sayfa');
+const currentTab = ref('Online Görüşmeler');
 
 function handleTitleChange(newTitle) {
     currentTab.value = newTitle;

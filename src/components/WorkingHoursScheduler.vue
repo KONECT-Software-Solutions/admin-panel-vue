@@ -230,11 +230,6 @@ const saveSchedule = () => {
 	emit("save-schedule", schedule);
 };
 
-
-onMounted(() => {
-	console.log("WorkingHoursScheduler component mounted");
-	saveSchedule();
-});
 </script>
 
 <style>
