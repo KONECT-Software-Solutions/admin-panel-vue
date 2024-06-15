@@ -2,11 +2,11 @@
     <div class="fixed inset-0 bg-black bg-opacity-50 z-50"></div>
     <div tabindex="-1"
         class="fixed inset-0 flex items-center justify-center z-50 w-full md:inset-0 h-[calc(100%-1rem)] max-h-full">
-        <div class="relative p-4 w-full max-w-2xl max-h-full">
+        <div class="relative p-4 w-[36rem] max-h-full">
             <!-- Modal content -->
             <div class="relative bg-white rounded-lg shadow">
                 <!-- Modal header -->
-                <div class="flex items-center justify-between p-4 md:p-5 border-b rounded-t">
+                <div class="flex items-center justify-between p-4 border-b rounded-t">
                     <h3 class="text-lg font-semibold text-black">
                         Toplantı Detayları
                     </h3>
@@ -51,20 +51,13 @@
                             class="bg-gray-50 border border-gray-300 rounded-lg flex flex-col items-center justify-center">
                             <vue-countdown class="text-lg font-bold p-4" :time="1 * 3 * 60 * 60 * 1000"
                                 v-slot="{ days, hours, minutes, seconds }">
-                                <div class="flex items-center text-white text-2xl mx-3">
-                                    <div class="text-lg text-gray-900 mr-4">Kalan Süre</div>
-                                    <div
-                                        class="bg-gray-600 border flex px-4 items-center justify-center border-gray-200">
-                                        {{ days }}</div>
-                                    <div
-                                        class="bg-gray-600 border flex px-4 items-center justify-center border-gray-200">
-                                        {{ hours }}</div>
-                                    <div
-                                        class="bg-gray-600 border flex px-4 items-center justify-center border-gray-200">
-                                        {{ minutes }}</div>
-                                    <div
-                                        class="bg-gray-600 border flex px-4 items-center justify-center border-gray-200">
-                                        {{ seconds }}</div>
+                                <div class="flex items-center space-x-2 text-gray-800 text-lg mx-3">
+                                    <div class="mr-2">Kalan Süre:</div>
+                                    <span v-if="days > 1">{{ days }} gün</span>
+                                    <span>{{ hours }} saat</span>
+                                    <span>{{ minutes }} dakika</span>
+                                    <span>{{ seconds }} saniye</span>
+
                                 </div>
                             </vue-countdown>
                         </div>
@@ -74,8 +67,7 @@
                             class="text-white w-32 bg-green-600 hover:bg-green-700 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center">
                             Katıl
                         </a>
-                        <button
-                            class="bg-gray-200 text-xl ri-clipboard-line hover:bg-gray-300 px-2 py-2 rounded-md">
+                        <button class="bg-gray-200 text-xl ri-clipboard-line hover:bg-gray-300 px-2 py-2 rounded-md">
 
                         </button>
                     </div>

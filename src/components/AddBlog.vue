@@ -115,7 +115,6 @@ import {
 } from "firebase/storage";
 import Loading from "./Loading.vue";
 import "@vueup/vue-quill/dist/vue-quill.snow.css";
-import { defineEmits } from "vue";
 
 const emits = defineEmits(["goBlogManagement"]);
 

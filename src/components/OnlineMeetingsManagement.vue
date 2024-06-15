@@ -5,7 +5,7 @@
       Geri Dön
     </button>
     <NotesModal :show="showNotesModal" :customerNotes="customerNotes" @close="showNotesModal = false" />
-    <StatusActionModalHandler v-if="showStatusActionModal" :status="statusClicked" @set-meeting="handleSetMeeting" @decline-meeting="handleDeclineMeeting"
+    <StatusActionModalHandler v-if="showStatusActionModal" :meetingData="clickedMeetingData" @set-meeting="handleSetMeeting" @decline-meeting="handleDeclineMeeting"
       @close="showStatusActionModal = false" />
     <MeetingCards :totalMeetings="totalMeetings" :approvedMeetings="approvedMeetings"
       :satisfactionRate="satisfactionRate" :meetingStatusSummary="meetingStatusSummary" :topAttorneys="topAttorneys"
@@ -128,7 +128,7 @@
             </td>
             <td class="py-2 px-4 border-b border-b-gray-200">
               <div class="tooltip">
-                <button @click="handleStatusClick(meeting.status, meeting.id)" :class="buttonClass(meeting.status)"
+                <button @click="handleStatusClick(meeting)" :class="buttonClass(meeting.status)"
                   class="w-10 h-10 flex items-center justify-center font-medium rounded-full ml-2 ring-0 focus:ring-[0.12rem] focus:ring-gray-600 focus:outline-none">
                   <i :class="iconClass(meeting.status)"></i>
                 </button>
@@ -169,8 +169,7 @@ import { useStore } from 'vuex';
 const store = useStore();
 const userRole = computed(() => store.getters.userRole);
 
-const statusClicked = ref(null);
-const meetingIdClicked = ref(null);
+const clickedMeetingData = ref(null);
 
 
 const props = defineProps({
@@ -263,12 +262,9 @@ function handleNotesModal(notes) {
   customerNotes.value = notes
 }
 
-function handleStatusClick(status, id) {
+function handleStatusClick(meeting) {
   showStatusActionModal.value = true;
-  statusClicked.value = status;
-  meetingIdClicked.value = id;
-  console.log("Status clicked:", statusClicked.value);
-  console.log("Meeting ID clicked:", meetingIdClicked.value);
+  clickedMeetingData.value = meeting;
 }
 
 
@@ -345,7 +341,7 @@ const prevPage = () => {
 const statusTextVisible = ref(null);
 
 const statusDetails = (status) => {
-  switch (status) {
+  switch (status) { 
     case "0":
       return { color: 'bg-blue-300 hover:bg-blue-400 ', text: 'İstek', icon: 'ri-user-add-line' }; // Bu status için alınabilecek aksiyonlar: isteği kabul et, reddet
     case "1":

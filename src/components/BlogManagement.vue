@@ -151,7 +151,6 @@ import {
 import { db } from "../firebase";
 import { onMounted, ref, computed, watch } from "vue";
 import ShadowBox from "../components/container/ShadowBox.vue";
-import { defineEmits } from "vue";
 import { customSortByDate } from "../utils";
 
 const showEditModal = ref(false);

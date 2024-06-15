@@ -1,25 +1,25 @@
 <template>
   <div class="fixed inset-0 bg-black bg-opacity-50 z-50"></div>
   <div class="fixed inset-0 flex items-center justify-center z-50 w-full h-[calc(100%-1rem)] max-h-full">
-    <div class="relative p-4 w-[28rem] max-h-full">
+    <div class="relative p-4 w-[32rem] max-h-full">
       <!-- Modal content -->
       <div class="relative bg-white rounded-lg shadow">
         <!-- Modal header -->
-        <div class="relative flex items-center p-4 border-b rounded-t">
-          <h3 class="text-lg font-semibold text-gray-900 mx-auto">
-            Yeni Randevu İsteği
-          </h3>
-          <button @click="$emit('close')" type="button"
-            class="absolute right-4 text-gray-400 hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 flex justify-center items-center">
-            <svg class="w-3 h-3" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14" aria-hidden="true">
-              <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6" />
-            </svg>
-            <span class="sr-only">Close modal</span>
-          </button>
-        </div>
+        <div class="flex items-center justify-between p-4 border-b rounded-t">
+                    <h3 class="text-lg font-semibold text-black">
+                        Yeni Randevu İsteği
+                    </h3>
+                    <button type="button" @click="$emit('close')"
+                        class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center">
+                        <svg class="w-3 h-3" aria-hidden="true" fill="none" viewBox="0 0 14 14">
+                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6" />
+                        </svg>
+                        <span class="sr-only">Close modal</span>
+                    </button>
+                </div>
         <!-- Modal body -->
-        <div class="px-6 py-4 max-w-md mx-auto bg-white rounded-xl space-y-4">
+        <div class="px-6 py-4 w-full mx-auto bg-white rounded-xl space-y-4">
           <div class="flex items-center justify-center space-x-4">
             <div class="bg-gray-600 text-white rounded-lg w-20 h-24 flex flex-col items-center justify-center">
               <div class="text-sm">HAZ</div>
@@ -33,8 +33,8 @@
                 <span>10:30 - 11:30</span>
               </div>
               <div class="flex space-x-2 mt-2">
-                <span class="bg-gray-100 text-gray-700 text-sm px-3 py-1 rounded-full">Av. Ezgi</span>
-                <span class="bg-gray-100 text-gray-700 text-sm px-3 py-1 rounded-full">Mehmet</span>
+                <span class="bg-gray-100 hover:bg-gray-200 ring-0 ring-gray-400 hover:ring-1 text-gray-700 text-sm px-3 py-1 rounded-full">Av. Ezgi</span>
+                <span class="bg-gray-100 hover:bg-gray-200 ring-0 ring-gray-400 hover:ring-1 text-gray-700 text-sm px-3 py-1 rounded-full">Mehmet</span>
               </div>
             </div>
           </div>
@@ -76,7 +76,7 @@
             <div v-if="isDeclining" class="mb-2 rounded-lg">
               <label for="reason" class="block text-sm font-medium text-gray-700">Reddetme sebebi</label>
               <textarea id="reason" v-model="cancellationReason" rows="3"
-                class="block w-full bg-gray-100 rounded-md border-gray-300 shadow-sm"></textarea>
+                class="block w-full h-32 bg-gray-100 rounded-md border-gray-300 shadow-sm"></textarea>
               <div class="flex items-center justify-center space-x-4 mt-4">
                 <button @click="handleDeclineMeeting"
                   class="bg-red-600 text-white hover:bg-red-700 px-4 py-2 rounded-md">
@@ -94,7 +94,7 @@
 
 <script setup>
 
-import { onMounted, ref } from "vue";
+import { ref } from "vue";
 import Loading from './Loading.vue';
 
 const showLoading = ref(false);
@@ -104,10 +104,10 @@ const isDeclining = ref(false);
 const cancellationReason = ref("");
 
 const props = defineProps({
-  status: {
-    type: String,
+  meetingData: {
+    type: Object,
     required: true,
-  }
+  },
 });
 const emits = defineEmits(["close", "set-meeting", "decline-meeting"]);
 
@@ -127,14 +127,9 @@ const handleDeclineMeeting = () => {
     isDeclining.value = false;
     isMeetingDeclined.value = true;
     emits("decline-meeting");
-
   }, 2000);
 };
 
-onMounted(() => {
-  console.log("action modal mounted");
-  console.log(props.status);
-});
 </script>
 
 <style></style>
