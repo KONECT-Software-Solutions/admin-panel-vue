@@ -116,7 +116,7 @@ import {
 import Loading from "./Loading.vue";
 import "@vueup/vue-quill/dist/vue-quill.snow.css";
 
-const emits = defineEmits(["goBlogManagement"]);
+const emits = defineEmits(["goBlogManagement", "addBlog"]);
 
 const showLoading = ref(false);
 const showLoadingModal = ref(false);
@@ -175,6 +175,7 @@ const handleSubmit = async () => {
 
     // call addBlog' function with the blog data
     console.log("Adding blog post:", blogData);
+    emits("addBlog", blogData);
 
     // Clear form fields
     title.value = "";
