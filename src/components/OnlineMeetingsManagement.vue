@@ -5,8 +5,8 @@
       Geri Dön
     </button>
     <NotesModal :show="showNotesModal" :customerNotes="customerNotes" @close="showNotesModal = false" />
-    <StatusActionModalHandler v-if="showStatusActionModal" :meetingData="clickedMeetingData" @set-meeting="handleSetMeeting" @decline-meeting="handleDeclineMeeting"
-      @close="showStatusActionModal = false" />
+    <StatusActionModalHandler v-if="showStatusActionModal" :keepStatusModalOpen="keepStatusModalOpen" :meetingData="clickedMeetingData"
+      @set-meeting="handleSetMeeting" @reject-meeting="handleRejectMeeting" @close="showStatusActionModal = false" />
     <MeetingCards :totalMeetings="totalMeetings" :approvedMeetings="approvedMeetings"
       :satisfactionRate="satisfactionRate" :meetingStatusSummary="meetingStatusSummary" :topAttorneys="topAttorneys"
       :showTopAttorneys="props.showAll" :showAttorneySchedule="!props.showAll" />
@@ -108,12 +108,12 @@
             </td>
             <td class="py-2 px-4 border-b border-b-gray-200">
               <span class="text-[13px] font-medium text-gray-600">
-                {{ meeting.date }}
+                {{ formatDate(meeting.date_time, format = 'date') }}
               </span>
             </td>
             <td class="py-2 px-4 border-b border-b-gray-200">
               <span class="text-[13px] font-medium text-gray-600">
-                {{ meeting.time }}
+                {{ formatDate(meeting.date_time, format = 'time') }}
               </span>
             </td>
             <td class="py-2 px-4 border-b border-b-gray-200">
@@ -160,17 +160,15 @@ import {
   getDoc,
   addDoc,
   doc,
+  updateDoc
 } from "firebase/firestore";
 import { db } from "../firebase";
 import { onMounted, ref, computed, watch } from "vue";
 import { useStore } from 'vuex';
-
+import { formatDate } from "../utils";
 // Access the Vuex store
 const store = useStore();
 const userRole = computed(() => store.getters.userRole);
-
-const clickedMeetingData = ref(null);
-
 
 const props = defineProps({
   showAll: Boolean,
@@ -179,8 +177,11 @@ const props = defineProps({
 
 const emit = defineEmits(["goBack"]);
 
+const clickedMeetingData = ref(null);
+
 const showNotesModal = ref(false);
 const showStatusActionModal = ref(false);
+const keepStatusModalOpen = ref(false);
 
 const customerNotes = ref(null);
 const filterOptions = ref({
@@ -223,8 +224,6 @@ const topAttorneys = computed(() => {
 });
 
 
-
-
 const meetingsData = ref([]);
 const meetingsRef = collection(db, "meetings");
 const totalMeetings = computed(() => meetingsData.value.length);
@@ -237,21 +236,34 @@ const searchTerm = ref("");
 
 const handleGoBack = () => { emit('goBack') };
 
+function createMeetingUrl(id) {
+  return `https://meet.google.com/${id}`;
+}
+
 function handleSetMeeting() {
   // change the status of the meeting with meetingId to "1" (accepted)
   meetingsData.value = meetingsData.value.map((meeting) => {
-    if (meeting.id === meetingIdClicked.value) {
+
+    if (meeting.id === clickedMeetingData.value.id) {
       meeting.status = "1";
+      meeting.meeting_url = createMeetingUrl(meeting.id);
+      // update the meeting in the database
+      updateMeeting(meeting);
+      // reset the clickedMeetingData ref
+      clickedMeetingData.value = {};
     }
     return meeting;
   });
 }
 
-function handleDeclineMeeting() {
-  // change the status of the meeting with meetingId to "3" (declined)
+function handleRejectMeeting(reject_reason) {
+  // change the status of the meeting with meetingId to "3" (rejected)
   meetingsData.value = meetingsData.value.map((meeting) => {
-    if (meeting.id === meetingIdClicked.value) {
+    if (meeting.id === clickedMeetingData.value.id) {
       meeting.status = "3";
+      meeting.reject_reason = reject_reason;
+      //updateMeeting(meeting);
+
     }
     return meeting;
   });
@@ -265,6 +277,7 @@ function handleNotesModal(notes) {
 function handleStatusClick(meeting) {
   showStatusActionModal.value = true;
   clickedMeetingData.value = meeting;
+  keepStatusModalOpen.value = true;
 }
 
 
@@ -286,7 +299,7 @@ const filteredMeetings = computed(() => {
       if (requests && meeting.status === "0") match = true;
       if (accepted && meeting.status === "1") match = true;
       if (pending && meeting.status === "4") match = true;
-      return match;
+      return match
     });
   }
 
@@ -341,7 +354,7 @@ const prevPage = () => {
 const statusTextVisible = ref(null);
 
 const statusDetails = (status) => {
-  switch (status) { 
+  switch (status) {
     case "0":
       return { color: 'bg-blue-300 hover:bg-blue-400 ', text: 'İstek', icon: 'ri-user-add-line' }; // Bu status için alınabilecek aksiyonlar: isteği kabul et, reddet
     case "1":
@@ -382,30 +395,7 @@ async function fetchMeetings() {
   querySnapshot.forEach((doc) => {
     meetings.push({ id: doc.id, ...doc.data() });
   });
-  meetings = meetings.map((meeting) => {
-    const formattedDateTime = formatDate(meeting.date);
-    return {
-      ...meeting,
-      date: formattedDateTime.date,
-      time: formattedDateTime.time,
-    };
-  });
-
   return meetings;
-}
-
-
-
-// below function is for populating meeting data and adding it to the database
-async function addMeeting(meeting) {
-  try {
-    const docRef = await addDoc(meetingsRef, meeting);
-    console.log("Document written with ID: ", docRef.id);
-    meetingsData.value.push({ id: docRef.id, ...meeting });
-    console.log("Meeting added to the database");
-  } catch (e) {
-    console.error("Error adding document: ", e);
-  }
 }
 
 // Checking and setting local storage
@@ -433,31 +423,32 @@ async function getAllMeetings() {
     return [];
   }
 }
-function formatDate(timestamp) {
-  if (!timestamp) return '';
-  if (timestamp.seconds) { // Firestore timestamp
-    const date = new Date(timestamp.seconds * 1000);
 
-    // Get date in "DD/MM/YYYY" format
-    const formattedDate = date.toLocaleDateString("tr-TR");
+async function updateMeeting(meetingDataToUpdate) {
+  console.log("Received updated blog data:", meetingDataToUpdate);
 
-    // Get time in "HH:mm" format
-    const hours = date.getHours().toString().padStart(2, '0');
-    const minutes = date.getMinutes().toString().padStart(2, '0');
-    const formattedTime = `${hours}:${minutes}`;
+  try {
 
-    // Return an object with date and time
-    return {
-      date: formattedDate,
-      time: formattedTime
-    };
+    console.log("Updating document with ID:", meetingDataToUpdate.id);
+    await updateDoc(doc(db, "meetings", meetingDataToUpdate.id), meetingDataToUpdate); // Ensure updateDoc is awaited
+
+    // Update cachedBlogs in local storage
+    localStorage.setItem("cachedMeetings", JSON.stringify(meetingsData.value));
+  } catch (error) {
+    console.error("Error updating meeting document:", error);
   }
+}
 
-  if (typeof timestamp === 'string') { // Already formatted string
-    return timestamp;
+// below function is for populating meeting data and adding it to the database
+async function addMeeting(meeting) {
+  try {
+    const docRef = await addDoc(meetingsRef, meeting);
+    console.log("Document written with ID: ", docRef.id);
+    meetingsData.value.push({ id: docRef.id, ...meeting });
+    console.log("Meeting added to the database");
+  } catch (e) {
+    console.error("Error adding document: ", e);
   }
-  const date = new Date(timestamp); // Fallback for any other case
-  return date.toLocaleDateString("tr-TR");
 }
 
 async function fetchAttorney(id) {
@@ -476,6 +467,7 @@ async function fetchAttorney(id) {
   }
 }
 
+
 // write sorting function here
 
 function sortMeetings(meetings) {
@@ -491,25 +483,25 @@ function sortMeetings(meetings) {
     "7": 7  // Geri ödemesiz iptal
   };
 
-  // Convert date strings to Date objects and sort the meetings
+  // Convert Firestore timestamps to Date objects and sort the meetings
   return meetings.sort((a, b) => {
     const statusComparison = statusPriority[a.status] - statusPriority[b.status];
     if (statusComparison !== 0) {
       return statusComparison;
     } else {
-      // Convert dates to comparable format (dd.MM.yyyy -> yyyy-MM-dd)
-      const dateA = new Date(a.date.split('.').reverse().join('-'));
-      const dateB = new Date(b.date.split('.').reverse().join('-'));
+      // Convert Firestore timestamps to Date objects
+      const dateA = new Date(a.date_time.seconds * 1000);
+      const dateB = new Date(b.date_time.seconds * 1000);
       return dateA - dateB;
     }
   });
 }
-
 // Usage
 onMounted(async () => {
+
+
   const meetings = await getAllMeetings();
   const sortedMeetings = sortMeetings(meetings);
-
 
   if (props.showAll) {
     meetingsData.value = sortedMeetings;

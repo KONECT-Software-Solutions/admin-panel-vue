@@ -21,22 +21,27 @@
                 </div>
                 <!-- Modal body -->
                 <div class="px-6 py-4">
-                    <div class="flex items-center justify-center space-x-4 mb-4">
+                    <div class="flex items-center justify-center space-x-4">
                         <div
                             class="bg-gray-600 text-white rounded-lg w-20 h-24 flex flex-col items-center justify-center">
-                            <div class="text-sm">HAZ</div>
-                            <div class="text-4xl font-bold">2</div>
-                            <div class="text-sm">Salı</div>
+                            <div class="text-sm">{{ formattedDate.month }}</div>
+                            <div class="text-4xl font-bold">{{ formattedDate.dayNumber }}</div>
+                            <div class="text-sm">{{ formattedDate.dayName }}</div>
                         </div>
                         <div class="p-2">
-                            <h2 class="text-xl font-bold">Toplantı Zamanı</h2>
+                            <h2 class="text-xl font-bold">Onaylıyor musun?</h2>
                             <div class="flex items-center text-gray-500 space-x-2">
                                 <i class="ri-time-line text-lg"></i>
-                                <span>10:30 - 11:30</span>
+                                <span>{{ formattedDate.time }} -</span>
+                                <span>{{ formattedDate.meetingTimeEnd }}</span>
                             </div>
                             <div class="flex space-x-2 mt-2">
-                                <span class="bg-gray-100 text-gray-700 text-sm px-3 py-1 rounded-full">Av. Ezgi</span>
-                                <span class="bg-gray-100 text-gray-700 text-sm px-3 py-1 rounded-full">Mehmet</span>
+                                <span
+                                    class="bg-gray-100 hover:bg-gray-200 ring-0 ring-gray-400 hover:ring-1 text-gray-700 text-sm px-3 py-1 rounded-full">{{
+                                        meetingData.attorney_name }}</span>
+                                <span
+                                    class="bg-gray-100 hover:bg-gray-200 ring-0 ring-gray-400 hover:ring-1 text-gray-700 text-sm px-3 py-1 rounded-full">{{
+                                        meetingData.customer_name }}</span>
                             </div>
                         </div>
                     </div>
@@ -44,12 +49,12 @@
                         <label for="title" class="block mb-2 text-sm font-medium text-gray-900">Danışan Notları</label>
                         <p type="text" name="title" id="title"
                             class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5"
-                            placeholder="Blog yazısı başlığını girin" required="">{{ customerNotes }}</p>
+                            placeholder="Blog yazısı başlığını girin" required="">{{ meetingData.notes }}</p>
                     </div>
                     <div class="mb-4">
                         <div
                             class="bg-gray-50 border border-gray-300 rounded-lg flex flex-col items-center justify-center">
-                            <vue-countdown class="text-lg font-bold p-4" :time="1 * 3 * 60 * 60 * 1000"
+                            <vue-countdown class="text-lg font-bold p-4" :time="countdownTime"
                                 v-slot="{ days, hours, minutes, seconds }">
                                 <div class="flex items-center space-x-2 text-gray-800 text-lg mx-3">
                                     <div class="mr-2">Kalan Süre:</div>
@@ -63,11 +68,12 @@
                         </div>
                     </div>
                     <div class="flex items-center justify-center space-x-4 mt-2">
-                        <a :href="meetingUrl" target="_blank"
+                        <a :href="meetingData.meeting_url" target="_blank"
                             class="text-white w-32 bg-green-600 hover:bg-green-700 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center">
                             Katıl
                         </a>
-                        <button class="bg-gray-200 text-xl ri-clipboard-line hover:bg-gray-300 px-2 py-2 rounded-md">
+                        <button @click="copyToClipboard(meetingData.meeting_url)"
+                            class="bg-gray-200 text-xl ri-clipboard-line hover:bg-gray-300 px-2 py-2 rounded-md">
 
                         </button>
                     </div>
@@ -81,42 +87,39 @@
 import { ref, computed, onMounted } from 'vue';
 import VueCountdown from '@chenfengyuan/vue-countdown';
 
-
 const props = defineProps({
-    meetingUrl: String,
-    meetingTime: String, // ISO date string for the meeting time
+    meetingData: {
+        type: Object,
+        required: true,
+    },
+    formattedDate: {
+        type: Object,
+        required: true,
+    },
 });
 
 const emits = defineEmits(['close']);
 
-// Mock data for customer notes lorem ipsum
-const customerNotes = ref('Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed non risus. Suspendisse lectus tortor, dignissim sit amet, adipiscing nec, ultricies sed, dolor. Cras elementum ultrices diam. Maecenas ligula massa, varius a, semper congue, euismod non, mi.');
-const countdown = ref('');
 
-
-
-// Function to update countdown timer
-const updateCountdown = () => {
-    const meetingDate = new Date(props.meetingTime);
-    const now = new Date();
-    const diff = meetingDate - now;
-
-    if (diff <= 0) {
-        countdown.value = 'Toplantı başladı';
-        clearInterval(interval);
-    } else {
-        const hours = Math.floor(diff / 1000 / 60 / 60);
-        const minutes = Math.floor((diff / 1000 / 60) % 60);
-        countdown.value = `${hours} saat ${minutes} dakika kaldı`;
+const countdownTime = computed(() => {
+    if (props.meetingData.date_time && props.meetingData.date_time.seconds) {
+        const meetingTime = new Date(props.meetingData.date_time.seconds * 1000);
+        const currentTime = new Date();
+        const duration = meetingTime - currentTime;
+        return duration > 0 ? duration : 0; // Ensure the duration is non-negative
     }
-};
-
-let interval = null;
-
-onMounted(() => {
-    updateCountdown();
-    interval = setInterval(updateCountdown, 60000); // Update every minute
+    return 0;
 });
+
+
+async function copyToClipboard(text) {
+    try {
+        await navigator.clipboard.writeText(text);
+    } catch (err) {
+    }
+}
+
+
 </script>
 
 <style scoped></style>
