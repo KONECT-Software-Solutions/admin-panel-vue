@@ -89,6 +89,7 @@
                 toolbar="essential"
                 theme="snow"
                 class="h-[30rem]"
+                placeholder="Yazı içeriği girin..."
                 required />
             </div>
           </div>

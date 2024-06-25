@@ -17,16 +17,16 @@
                     </button>
                 </div>
                 <!-- Modal body -->
-                <form @submit.prevent="handleSubmit(editBlogData)" class="p-4 md:p-5">
+                <form @submit.prevent="handleSubmit(blogDataToUpdate)" class="p-4 md:p-5">
                     <div class="grid gap-4 mb-4 grid-cols-2">
                         <div class="col-span-2">
                             <label for="title" class="block mb-2 text-sm font-medium text-gray-900"></label>
-                            <input v-model="editBlogData.title" type="text" name="title" id="title" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5" placeholder="Blog yazısı başlığını girin" required="">
+                            <input v-model="blogDataToUpdate.title" type="text" name="title" id="title" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5" placeholder="Blog yazısı başlığını girin" required="">
                         </div>
                         
                         <div class="col-span-2">
                             <label for="category" class="block mb-2 text-sm font-medium text-gray-900">Kategori</label>
-                            <select v-model="editBlogData.category" id="category" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5">
+                            <select v-model="blogDataToUpdate.category" id="category" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5">
                                 <option value="Hukuk">Hukuk</option>
                                 <option value="Haberler">Haberler</option>
                                 <option value="Son Dakika">Son Dakika</option>
@@ -36,7 +36,7 @@
                         <div class="col-span-2">
                             <label for="content" class="block mb-2 text-sm font-medium text-gray-900">Yazı İçeriği</label>
                             <div class="bg-gray-100">
-                              <QuillEditor v-model:content="editBlogData.content" contentType="html" id="content" toolbar="essential" theme="snow" class="h-64"/>                 
+                              <QuillEditor v-model:content="blogDataToUpdate.content" contentType="html" id="content" toolbar="essential" theme="snow" class="h-64"/>                 
                             </div>                        </div>
                     </div>
                     <button type="submit" class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">Kaydet</button>
@@ -57,12 +57,12 @@ import '@vueup/vue-quill/dist/vue-quill.snow.css';
 const emits = defineEmits(['close', 'updateBlog']);
 const props = defineProps({
   show: Boolean,
-  editBlogData: Object
+  blogDataToUpdate: Object
 });
 
 const truncatedUrl = computed(() => {
   const maxLength = 20;
-  const url = props.editBlogData.image;
+  const url = props.blogDataToUpdate.image;
   if (url.length <= maxLength) {
     return url;
   } else {
@@ -71,13 +71,13 @@ const truncatedUrl = computed(() => {
 });
 
 const redirectToUrl = () => {
-  window.open(props.editBlogData.image, '_blank');
+  window.open(props.blogDataToUpdate.image, '_blank');
 };
 
-const handleSubmit = (editBlogData) => {
-    editBlogData.updated_date = new Date();
+const handleSubmit = (blogDataToUpdate) => {
+  blogDataToUpdate.updated_date = new Date();
 
-    emits('updateBlog', editBlogData);
+    emits('updateBlog', blogDataToUpdate);
 
     emits('close');
 };

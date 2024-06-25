@@ -8,7 +8,7 @@
 			:show="showEditModal"
 			@close="showEditModal = false"
 			@updateBlog="handleUpdate"
-			:editBlogData="editBlogData" />
+			:blogDataToUpdate="blogDataToUpdate" />
 
 		<BlogCards
 			:totalBlogs="totalBlogs"
@@ -149,21 +149,32 @@ import {
 	doc,
 } from "firebase/firestore";
 import { db } from "../firebase";
-import { onMounted, ref, computed, watch } from "vue";
+import { onMounted, ref, computed, watch, onUpdated } from "vue";
 import ShadowBox from "../components/container/ShadowBox.vue";
-import { customSortByDate } from "../utils";
 
 const showEditModal = ref(false);
 const showDeleteModal = ref(false);
 let blogIdToDelete = null;
-const editBlogData = ref(null);
+const blogDataToUpdate = ref(null);
 
-const emits = defineEmits(["goAddBlog"]);
+const props = defineProps({
+  blogsData: {
+    type: Object,
+    required: true
+  },
+  blogRef: {
+	type: Object,
+	required: true
+  }
+});
+const blogRef = props.blogRef;
+
+const emits = defineEmits(["goAddBlog", "deleteBlog", "updateBlog"]);
 
 function toggleEdit(blog) {
 	showEditModal.value = true;
-	editBlogData.value = blog;
-	console.log(editBlogData.value.created_date);
+	blogDataToUpdate.value = blog;
+	console.log(blogDataToUpdate.value.created_date);
 	console.log("blog id to edit", blog.id);
 }
 
@@ -172,10 +183,17 @@ function confirmDelete(blogId) {
 	showDeleteModal.value = true;
 }
 
-const blogRef = collection(db, "blogs");
-const blogsData = ref([]);
+function handleDelete() {
+	emits('deleteBlog', blogIdToDelete)
+	showDeleteModal.value = false;
+}
 
-const totalBlogs = computed(() => blogsData.value.length);
+function handleUpdate(blogData) {
+	emits('updateBlog', blogData);
+	showEditModal.value = false;
+}
+
+const totalBlogs = computed(() => props.blogsData.length);
 const totalBlogView = ref(324);
 const currentPage = ref(1);
 const itemsPerPage = ref(10);
@@ -185,9 +203,9 @@ const searchTerm = ref("");
 // Computed property to filter blogs based on the search term
 const filteredBlogs = computed(() => {
 	if (!searchTerm.value) {
-		return blogsData.value;
+		return props.blogsData;
 	} else {
-		return blogsData.value.filter((blog) =>
+		return props.blogsData.filter((blog) =>
 			blog.title.toLowerCase().includes(searchTerm.value.toLowerCase())
 		);
 	}
@@ -205,7 +223,7 @@ const paginatedItems = computed(() => {
 	if (filteredBlogs.value.length === 0) {
 		const start = startIndex.value;
 		const end = start + itemsPerPage.value;
-		return blogsData.value.slice(start, end);
+		return props.blogsData.slice(start, end);
 	} else {
 		return filteredBlogs.value.slice(
 			startIndex.value,
@@ -217,7 +235,7 @@ const paginatedItems = computed(() => {
 // Computed property to calculate the total number of pages
 const totalPages = computed(() => {
 	if (filteredBlogs.value.length === 0) {
-		return Math.ceil(blogsData.value.length / itemsPerPage.value);
+		return Math.ceil(props.blogsData.length / itemsPerPage.value);
 	} else {
 		return Math.ceil(filteredBlogs.value.length / itemsPerPage.value);
 	}
@@ -225,7 +243,7 @@ const totalPages = computed(() => {
 
 const blogsCategorySummary = computed(() => {
 	const category = {};
-	blogsData.value.forEach((blog) => {
+	props.blogsData.forEach((blog) => {
 		if (category[blog.category]) {
 			category[blog.category]++;
 		} else {
@@ -249,152 +267,11 @@ const nextPage = () => {
 	}
 };
 
-// Utility function to load blogs data
-async function fetchBlogs() {
-	let blogs = [];
-	const querySnapshot = await getDocs(blogRef);
-	for (const doc of querySnapshot.docs) {
-		let docData = doc.data();
-		docData.id = doc.id;
-		const commentsRef = collection(db, "blogs", doc.id, "comments");
-		const commentData = [];
-		const commentsSnapshot = await getDocs(commentsRef);
-		commentsSnapshot.docs.forEach((commentDoc) => {
-			commentData.push(commentDoc.data());
-		});
-		docData.comments = commentData;
-		blogs.push(docData);
-	}
-	// for each blog created_date = formatDate(blog.created_date)
-	blogs = blogs.map((blog) => {
-		return {
-			...blog,
-			created_date: formatDate(blog.created_date),
-			updated_date: formatDate(blog.updated_date),
-		};
-	});
-	return blogs;
-}
+onMounted(() => {
+	console.log("Blogs data passed to blog management:", props.blogsData);
+});
 
-// Checking and setting local storage
-async function getAllBlogs() {
-	try {
-		// Check if data exists and is not expired
-		const cachedBlogs = localStorage.getItem("cachedBlogs");
-		const cachedTimeBlogs = localStorage.getItem("cachedTimeBlogs");
-		const expiryTime = 30 * 60 * 1000; // 30 minutes expiration time
-
-		if (
-			cachedBlogs &&
-			cachedTimeBlogs &&
-			new Date() - new Date(parseInt(cachedTimeBlogs)) < expiryTime
-		) {
-			return JSON.parse(cachedBlogs);
-		} else {
-			const blogs = await fetchBlogs();
-			localStorage.setItem("cachedBlogs", JSON.stringify(blogs));
-			localStorage.setItem("cachedTimeBlogs", new Date().getTime().toString());
-			return blogs;
-		}
-	} catch (error) {
-		console.error("Error getting blogs with comments:", error);
-		return [];
-	}
-}
-function formatDate(timestamp) {
-	if (!timestamp) return "";
-	if (timestamp.seconds) {
-		// Firestore timestamp
-		const date = new Date(timestamp.seconds * 1000);
-		return date.toLocaleDateString("tr-TR");
-	}
-	if (typeof timestamp === "string") {
-		// Already formatted string
-		return timestamp;
-	}
-	const date = new Date(timestamp); // Fallback for any other case
-	return date.toLocaleDateString("tr-TR");
-}
-
-// Function to delete a blog by ID
-async function handleDelete() {
-	showDeleteModal.value = false;
-	if (blogIdToDelete) {
-		try {
-			// Remove the blog from Firestore
-			await deleteDoc(doc(db, "blogs", blogIdToDelete));
-
-			// Update local blogsData by filtering out the deleted blog
-			blogsData.value = blogsData.value.filter(
-				(blog) => blog.id !== blogIdToDelete
-			);
-
-			// Update cachedBlogs in local storage
-			localStorage.setItem("cachedBlogs", JSON.stringify(blogsData.value));
-
-			console.log(`Blog with ID ${blogIdToDelete} deleted successfully.`);
-		} catch (error) {
-			console.error("Error deleting blog:", error);
-		}
-	}
-}
-
-async function addBlog(blogDataToAdd) {
-	console.log("Received new blog data:", blogDataToAdd);
-
-	// Perform actions with the received blog data, e.g., send to backend, update state, etc.
-	// Calling the function to add the new blog post
-	try {
-		const docRef = await addDoc(blogRef, blogDataToAdd); // Ensure addDoc is awaited
-
-		// Include the ID in the local copy of the blog data
-		const newBlogWithId = {
-			...blogDataToAdd,
-			id: docRef.id,
-			created_date: formatDate(blogDataToAdd.created_date), // This line formats the created_date
-			updated_date: formatDate(blogDataToAdd.updated_date), // This line formats the updated_date
-		};
-		// Update local blogsData with the new blog including the ID
-		blogsData.value = [newBlogWithId, ...blogsData.value];
-
-		// Update cachedBlogs in local storage
-		localStorage.setItem("cachedBlogs", JSON.stringify(blogsData.value));
-	} catch (error) {
-		console.error("Error adding document:", error);
-	}
-}
-
-async function handleUpdate(blogDataToUpdate) {
-	console.log("Received updated blog data:", blogDataToUpdate);
-
-	try {
-		await updateDoc(doc(db, "blogs", blogDataToUpdate.id), blogDataToUpdate); // Ensure updateDoc is awaited
-		const updatedBlog = {
-			...blogDataToUpdate,
-			created_date: formatDate(blogDataToUpdate.created_date), // This line formats the created_date
-			updated_date: formatDate(blogDataToUpdate.updated_date), // This line formats the updated_date
-		};
-
-		// Update local blogsData with the updated blog
-		blogsData.value = blogsData.value.map((blog) => {
-			if (blog.id === blogDataToUpdate.id) {
-				return updatedBlog;
-			} else {
-				return blog;
-			}
-		});
-
-		// Update cachedBlogs in local storage
-		localStorage.setItem("cachedBlogs", JSON.stringify(blogsData.value));
-	} catch (error) {
-		console.error("Error updating document:", error);
-	}
-}
-
-onMounted(async () => {
-	getAllBlogs().then((data) => {
-		data.sort(customSortByDate);
-		blogsData.value = data;
-	});
+onUpdated(() => {
+	console.log("Blogs data updated in blog management:", props.blogsData);
 });
 </script>

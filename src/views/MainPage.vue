@@ -1,8 +1,8 @@
 <template>
     <div class="flex flex-grow">
-        <Sidebar v-if="isSidebarOpen" @toggleSidebar="toggleSidebar" @titleChange="handleTitleChange" />
+        <Sidebar v-if="isSidebarOpen" @toggleSidebar="toggleSidebar" @titleChange="handleTitleChange" class="hidden lg:block" />
         <main class="w-full h-screen overflow-y-scroll">
-            <Navbar @toggleSidebar="toggleSidebar"  :current-tab="currentTab"/>
+            <Navbar @toggleSidebar="toggleSidebar" :current-tab="currentTab"/>
             <ContentContainer>
                 <transition name="fade">
                     <RouterView />
@@ -19,7 +19,7 @@ import Navbar from '../components/layout/Navbar.vue';
 import ContentContainer from '../components/layout/ContentContainer.vue';
 
 const isSidebarOpen = ref(true);
-
+const isMobileSidebarOpen = ref(false);
 
 const currentTab = ref('Online Görüşmeler');
 
@@ -30,6 +30,7 @@ function handleTitleChange(newTitle) {
 function toggleSidebar() {
     isSidebarOpen.value = !isSidebarOpen.value;
 }
+
 </script>
 
 <style scoped>
