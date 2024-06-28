@@ -29,7 +29,7 @@
                             <div class="text-sm">{{ formattedDate.dayName }}</div>
                         </div>
                         <div class="p-2">
-                            <h2 class="text-xl font-bold">Onaylıyor musun?</h2>
+                            <h2 class="text-xl font-bold">Toplantı Detayları</h2>
                             <div class="flex items-center text-gray-500 space-x-2">
                                 <i class="ri-time-line text-lg"></i>
                                 <span>{{ formattedDate.time }} -</span>

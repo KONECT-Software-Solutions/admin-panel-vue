@@ -141,40 +141,40 @@ const days = reactive([
 		name: "Pazartesi",
 		enabled: true,
 		timeSlots: [
-			{ start: "07:00", end: "12:00" },
-			//{ start: "13:30", end: "17:00" },
+			{ start: "08:00", end: "12:00" },
+			{ start: "13:30", end: "17:00" },
 		],
 	},
 	{
 		name: "Salı",
 		enabled: true,
 		timeSlots: [
-			{ start: "08:00", end: "12:00" },
-			//{ start: "13:30", end: "17:00" },
+		{ start: "08:00", end: "12:00" },
+		{ start: "13:30", end: "17:00" },
 		],
 	},
 	{
 		name: "Çarşamba",
 		enabled: true,
 		timeSlots: [
-			{ start: "06:00", end: "12:00" },
-			//{ start: "13:30", end: "17:00" },
+		{ start: "08:00", end: "12:00" },
+			{ start: "13:30", end: "17:00" },
 		],
 	},
 	{
 		name: "Perşembe",
 		enabled: true,
 		timeSlots: [
-			{ start: "09:30", end: "12:00" },
-			//{ start: "13:30", end: "17:00" },
+		{ start: "08:00", end: "12:00" },
+		{ start: "13:30", end: "17:00" },
 		],
 	},
 	{
 		name: "Cuma",
 		enabled: true,
 		timeSlots: [
-			{ start: "10:00", end: "18:00" },
-			//{ start: "13:30", end: "17:00" },
+		{ start: "08:00", end: "12:00" },
+		{ start: "13:30", end: "17:00" },
 		],
 	},
 ]);

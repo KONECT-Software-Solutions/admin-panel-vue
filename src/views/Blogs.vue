@@ -1,15 +1,24 @@
 <template>
   <div>
     <transition name="fade">
-      <BlogManagement v-if="showBlogs && !showAddBlog" @goAddBlog="showAddBlog = true" @deleteBlog="handleDeleteBlog"
-        @updateBlog="handleUpdateBlog" :blogsData="blogsData" :blogRef="blogRef" />
-
+      <BlogManagement
+        v-if="showBlogs && !showAddBlog"
+        @goAddBlog="showAddBlog = true"
+        @deleteBlog="handleDeleteBlog"
+        @updateBlog="handleUpdateBlog"
+        :blogsData="blogsData"
+        :blogRef="blogRef"
+      />
     </transition>
-    <div class="mx-auto flex flex-col justify-center">
-      <Loading v-if="!showBlogs" text="Blog Yazısı Yükleniyor..." />
+    <div v-if="!showBlogs" class="flex items-center justify-center min-h-screen">
+      <Loading text="Blog Yazısı Yükleniyor..." />
     </div>
     <transition name="fade">
-      <AddBlog v-if="showAddBlog" @goBlogManagement="showAddBlog = false" @addBlog="handleAddBlog" />
+      <AddBlog
+        v-if="showAddBlog"
+        @goBlogManagement="showAddBlog = false"
+        @addBlog="handleAddBlog"
+      />
     </transition>
   </div>
 </template>
@@ -96,7 +105,7 @@ async function getAllBlogs() {
     // Check if data exists and is not expired
     const cachedBlogs = localStorage.getItem("cachedBlogs");
     const cachedTimeBlogs = localStorage.getItem("cachedTimeBlogs");
-    const expiryTime = 0 * 60 * 1000; // 30 minutes expiration time
+    const expiryTime = 30 * 60 * 1000; // 30 minutes expiration time
 
     if (
       cachedBlogs &&
