@@ -157,13 +157,11 @@ async function deleteBlog(blogIdToDelete) {
       // Remove the blog from Firestore
       await deleteDoc(doc(db, "blogs", blogIdToDelete));
 
-      console.log("blogs before delete ", blogsData.value);
       // Update local blogsData by filtering out the deleted blog
       blogsData.value = blogsData.value.filter(
         (blog) => blog.id !== blogIdToDelete
       );
 
-      console.log("blogs after delete ", blogsData.value);
 
       // Update cachedBlogs in local storage
       localStorage.setItem("cachedBlogs", JSON.stringify(blogsData.value));

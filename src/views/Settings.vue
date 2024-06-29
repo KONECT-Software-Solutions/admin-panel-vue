@@ -50,6 +50,55 @@ const schedule = ref({
   ],
 });
 
+/*
+run this for inital schedule setup
+const schedule = ref({
+  isWorkingHoursEnabled: true,
+  days: [
+    {
+      name: "Pazartesi",
+      enabled: true,
+      intervals: [
+        { start: "08:00", end: "12:00" },
+        { start: "13:30", end: "17:00" },
+      ],
+    },
+    {
+      name: "Salı",
+      enabled: true,
+      intervals: [
+        { start: "08:00", end: "12:00" },
+        { start: "13:30", end: "17:00" },
+      ],
+    },
+    {
+      name: "Çarşamba",
+      enabled: true,
+      intervals: [
+        { start: "08:00", end: "12:00" },
+        { start: "13:30", end: "17:00" },
+      ],
+    },
+    {
+      name: "Perşembe",
+      enabled: true,
+      intervals: [
+        { start: "08:00", end: "12:00" },
+        { start: "13:30", end: "17:00" },
+      ],
+    },
+    {
+      name: "Cuma",
+      enabled: true,
+      intervals: [
+        { start: "08:00", end: "12:00" },
+        { start: "13:30", end: "17:00" },
+      ],
+    },
+  ],
+});
+*/
+
 const handleAddException = (exception) => {
   exceptions.value.push(exception);
   addException(exception);
@@ -128,7 +177,6 @@ async function fetchScheduleAndExceptions() {
 
     // Update the local schedule and exceptions with fetched data
     if (attorney.schedule) {
-      console.log(attorney.schedule);
       schedule.value = attorney.schedule;
     }
     if (attorney.exceptions) {

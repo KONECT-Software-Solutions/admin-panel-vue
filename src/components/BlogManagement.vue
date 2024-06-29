@@ -267,11 +267,4 @@ const nextPage = () => {
 	}
 };
 
-onMounted(() => {
-	console.log("Blogs data passed to blog management:", props.blogsData);
-});
-
-onUpdated(() => {
-	console.log("Blogs data updated in blog management:", props.blogsData);
-});
 </script>
