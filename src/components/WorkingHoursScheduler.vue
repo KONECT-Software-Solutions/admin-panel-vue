@@ -5,7 +5,7 @@
 				<div class="flex justify-between items-center mb-3">
 					<span class="text-gray-900 text-base font-medium">Çalışma Saatleri</span>
 					<label class="inline-flex items-center cursor-pointer">
-						<input v-model="isWorkingHoursEnabled" type="checkbox" class="sr-only peer" />
+						<input v-model="props.schedule.isWorkingHoursEnabled" type="checkbox" class="sr-only peer" />
 						<div
 							class="relative w-11 h-5 bg-gray-200 rounded-full ring-[0.18rem] peer peer-focus:ring-blue-300 dark:bg-gray-600 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-1 after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-[1.12rem] after:transition-all dark:border-gray-600 peer-checked:bg-blue-600">
 						</div>
@@ -19,7 +19,7 @@
 					</p>
 				</div>
 			</div>
-			<div v-for="(day, index) in days" :key="index" class="border rounded-lg p-4 mb-4" v-bind:class="{
+			<div v-for="(day, index) in schedule.days" :key="index" class="border rounded-lg p-4 mb-4" v-bind:class="{
 				'border-gray-300': day.enabled,
 				'opacity-50': !day.enabled
 			}">
@@ -47,7 +47,7 @@
 					</div>
 				</div>
 				<div v-if="!collapsedStates[index]" class="mt-4">
-					<div v-for="(slot, slotIndex) in day.timeSlots" :key="slotIndex" class="flex items-center mb-2">
+					<div v-for="(slot, slotIndex) in day.intervals" :key="slotIndex" class="flex items-center mb-2">
 						<select v-model="slot.start"
 							class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 w-full p-2.5 mr-2">
 							<option v-for="time in times" :key="time" :value="time">
@@ -61,7 +61,7 @@
 								{{ time }}
 							</option>
 						</select>
-						<div v-if="slotIndex === day.timeSlots.length - 1" class="flex items-center">
+						<div v-if="slotIndex === day.intervals.length - 1" class="flex items-center">
 							<button @click="addTimeSlot(index)" type="button"
 								class="inline-flex items-center ml-2 p-1.5 text-sm font-medium text-center text-gray-500 hover:text-gray-800 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-lg focus:outline-none dark:text-gray-400 dark:hover:text-gray-100">
 								<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
@@ -70,7 +70,7 @@
 										d="M12 4v16m8-8H4" />
 								</svg>
 							</button>
-							<button :disabled="day.timeSlots.length === 1" @click="removeTimeSlot(index, slotIndex)"
+							<button :disabled="day.intervals.length === 1" @click="removeTimeSlot(index, slotIndex)"
 								type="button"
 								class="inline-flex items-center ml-2 p-1.5 text-sm font-medium text-center text-gray-500 hover:text-gray-800 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-lg focus:outline-none dark:text-gray-400 dark:hover:text-gray-100">
 								<svg class="w-5 h-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24"
@@ -105,9 +105,11 @@
 <script setup>
 import { reactive, watch, ref, onMounted } from "vue";
 
-const emit = defineEmits(["save-schedule"]);
+const props = defineProps({
+	schedule: Object,
+});
 
-const isWorkingHoursEnabled = ref(true);
+const emit = defineEmits(["save-schedule"]);
 
 const times = [
 	"07:00",
@@ -136,54 +138,11 @@ const times = [
 ];
 
 
-const days = reactive([
-	{
-		name: "Pazartesi",
-		enabled: true,
-		timeSlots: [
-			{ start: "08:00", end: "12:00" },
-			{ start: "13:30", end: "17:00" },
-		],
-	},
-	{
-		name: "Salı",
-		enabled: true,
-		timeSlots: [
-		{ start: "08:00", end: "12:00" },
-		{ start: "13:30", end: "17:00" },
-		],
-	},
-	{
-		name: "Çarşamba",
-		enabled: true,
-		timeSlots: [
-		{ start: "08:00", end: "12:00" },
-			{ start: "13:30", end: "17:00" },
-		],
-	},
-	{
-		name: "Perşembe",
-		enabled: true,
-		timeSlots: [
-		{ start: "08:00", end: "12:00" },
-		{ start: "13:30", end: "17:00" },
-		],
-	},
-	{
-		name: "Cuma",
-		enabled: true,
-		timeSlots: [
-		{ start: "08:00", end: "12:00" },
-		{ start: "13:30", end: "17:00" },
-		],
-	},
-]);
-
-const collapsedStates = reactive(Array(days.length).fill(true));
+const collapsedStates = reactive(Array(5).fill(true));
 
 
 // if day is not enabled then collapse it
-days.forEach((day, index) => {
+props.schedule.days.forEach((day, index) => {
 	watch(() => day.enabled, (newVal) => {
 		if (!newVal) {
 			collapsedStates[index] = true;
@@ -197,11 +156,11 @@ const toggleCollapse = (index) => {
 };
 
 const addTimeSlot = (index) => {
-	days[index].timeSlots.push({ start: "09:00", end: "17:00" });
+	props.schedule.days[index].intervals.push({ start: "09:00", end: "17:00" });
 };
 
 const removeTimeSlot = (dayIndex, slotIndex) => {
-	days[dayIndex].timeSlots.splice(slotIndex, 1);
+	props.schedule.days[dayIndex].intervals.splice(slotIndex, 1);
 };
 function timeToMinutes(time) {
 	const [hours, minutes] = time.split(':').map(Number);
@@ -211,11 +170,11 @@ function timeToMinutes(time) {
 // create a save schedule function to emit the schedule to the parent component. get the active days and intervals, time slots and all business hours enabled status
 const saveSchedule = () => {
 	const schedule = {
-		isWorkingHoursEnabled: isWorkingHoursEnabled.value,
-		days: days.map((day) => ({
+		isWorkingHoursEnabled: props.schedule.isWorkingHoursEnabled,
+		days: props.schedule.days.map((day) => ({
 			name: day.name,
 			enabled: day.enabled,
-			intervals: day.timeSlots.map((slot) => {
+			intervals: day.intervals.map((slot) => {
 				const startMinutes = timeToMinutes(slot.start);
 				const endMinutes = timeToMinutes(slot.end);
 				const length = (endMinutes - startMinutes) / 60; // convert minutes to hours

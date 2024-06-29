@@ -140,9 +140,9 @@
       </table>
       <div class="pagination-container flex justify-end mt-4 w-full">
         <button @click="prevPage" :disabled="currentPage === 1"
-          class="ri-arrow-left-fill h-8 px-4 m-2 text-l text-white transition-colors duration-150 bg-gray-800 rounded-lg focus:shadow-outline hover:bg-indigo-800"></button>
+          class="ri-arrow-left-fill border border-gray-800 h-8 px-2 m-2 text-xl text-black transition-colors duration-150 bg-white rounded-lg focus:shadow-outline hover:bg-gray-800 hover:text-white"></button>
         <button @click="nextPage" :disabled="currentPage === totalPages"
-          class="ri-arrow-right-fill h-8 px-4 m-2 text-l text-white transition-colors duration-150 bg-gray-800 rounded-lg focus:shadow-outline hover:bg-indigo-800"></button>
+          class="ri-arrow-right-fill border border-gray-800 h-8 px-2 m-2 text-xl text-black transition-colors duration-150 bg-white rounded-lg focus:shadow-outline hover:bg-gray-800 hover:text-white"></button>
       </div>
     </shadow-box>
   </div>

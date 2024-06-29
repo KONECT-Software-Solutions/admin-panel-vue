@@ -4,6 +4,7 @@ import { getAnalytics } from "firebase/analytics";
 import { getAuth, setPersistence, browserLocalPersistence } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
 
+
 // Your web app's Firebase configuration (replace with your actual config)
 const firebaseConfig = {
   apiKey: "AIzaSyDvdTUs36DFXUIZ3S7EGZJlSeeDxXg1mGY",
@@ -30,6 +31,5 @@ setPersistence(auth, browserLocalPersistence)
     console.error("Error setting Firebase Auth persistence:", error);
   });
 
-
 // Export the initialized services for use in other files
-export { app, analytics, auth, db };
+export { app, analytics, auth, db};
