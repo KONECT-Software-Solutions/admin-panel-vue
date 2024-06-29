@@ -4,7 +4,7 @@
       class="bg-green-700 text-white px-4 py-1 font-medium rounded mb-4">
       Geri Dön
     </button>
-    <NotesModal :show="showNotesModal" :customerNotes="customerNotes" @close="showNotesModal = false" />
+    <DocumentsModal :show="showDocumentsModal" @close="showDocumentsModal = false" :customerDocuments="customerDocuments" :customerNotes="customerNotes" />
     <StatusActionModalHandler v-if="showStatusActionModal" :keepStatusModalOpen="keepStatusModalOpen" :meetingData="clickedMeetingData"
       @set-meeting="handleSetMeeting" @reject-meeting="handleRejectMeeting" @close="showStatusActionModal = false" />
     <MeetingCards :totalMeetings="totalMeetings" :approvedMeetings="approvedMeetings"
@@ -75,7 +75,7 @@
             </th>
             <th
               class="w-1/6 text-[12px] uppercase tracking-wide font-medium text-black py-2 px-4 bg-gray-100 text-left">
-              Notlar
+              Evrak
             </th>
             <th
               class="w-1/6 text-[12px] uppercase tracking-wide font-medium text-black py-2 px-4 bg-gray-100 text-left">
@@ -117,7 +117,7 @@
               </span>
             </td>
             <td class="py-2 px-4 border-b border-b-gray-200">
-              <button @click="handleNotesModal(meeting.notes)"
+              <button @click="handleDocumentsModal(meeting.notes, meeting.customer_documents)"
                 class="ri-file-text-line flex items-center justify-center ml-2 text-lg bg-yellow-400 hover:bg-gray-900 text-white font-bold px-2 rounded">
               </button>
             </td>
@@ -151,7 +151,7 @@
 <script setup>
 import MeetingCards from "../components/MeetingCards.vue";
 import ShadowBox from "../components/container/ShadowBox.vue";
-import NotesModal from "../components/NotesModal.vue";
+import DocumentsModal from "./DocumentsModal.vue";
 import StatusActionModalHandler from "../components/StatusActionModalHandler.vue";
 
 import {
@@ -179,11 +179,12 @@ const emit = defineEmits(["goBack"]);
 
 const clickedMeetingData = ref(null);
 
-const showNotesModal = ref(false);
+const showDocumentsModal = ref(false);
 const showStatusActionModal = ref(false);
 const keepStatusModalOpen = ref(false);
 
 const customerNotes = ref(null);
+const customerDocuments = ref([]);
 const filterOptions = ref({
   requests: false,
   accepted: false,
@@ -269,9 +270,10 @@ function handleRejectMeeting(reject_reason) {
   });
 }
 
-function handleNotesModal(notes) {
-  showNotesModal.value = true;
+function handleDocumentsModal(notes, customer_documents) {
+  showDocumentsModal.value = true;
   customerNotes.value = notes
+  customerDocuments.value = customer_documents;
 }
 
 function handleStatusClick(meeting) {
