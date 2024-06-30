@@ -1,5 +1,5 @@
 <template>
-    <div class="h-screen min-w-[16rem] bg-gray-800 p-4 z-50 sidebar-menu transition-opacity ease-in-out delay-150 duration-300 transition-transform">
+    <div class="h-screen min-w-[16rem] bg-gray-800 p-4 z-50 sidebar-menu ease-in-out delay-150 duration-300 transition-transform">
         <a href="#" class="flex items-center pb-4 border-b border-b-gray-800">
             <img src="https://flowbite.s3.amazonaws.com/blocks/marketing-ui/logo.svg" alt="" class="w-8 h-8 rounded object-cover">
             <span class="text-lg font-bold text-white ml-3">Admin Panel</span>
@@ -47,17 +47,19 @@ function emitTitleChange(title) {
 }
 
 const adminMenus = [
-    { title: 'Ana Sayfa', icon: 'ri-home-2-line', link: '/home' },
+   // { title: 'Ana Sayfa', icon: 'ri-home-2-line', link: '/home' },
     { title: 'Online Görüşmeler', icon: 'ri-video-on-line', link: '/online-meetings' },
-    { title: 'Blog Yönetimi', icon: 'ri-article-line', link: '/blog-management' },
-    { title: 'Avukatlar', icon: 'ri-team-line', link: '/lawyers' },
+    { title: 'Blog Yönetimi', icon: 'ri-article-line', link: '/blogs' },
+   //{ title: 'Avukatlar', icon: 'ri-team-line', link: '/lawyers' },
     { title: 'Ayarlar', icon: 'ri-settings-2-line', link: '/settings' }
 ];
 
 const attorneyMenus = [
-    { title: 'Ana Sayfa', icon: 'ri-home-2-line', link: '/home' },
+    //{ title: 'Ana Sayfa', icon: 'ri-home-2-line', link: '/home' },
     { title: 'Online Görüşmelerim', icon: 'ri-video-on-line', link: '/online-meetings' },
+    { title: 'Randevu Saatlerim', icon: 'ri-settings-2-line', link: '/appointment-settings' },
     { title: 'Ayarlar', icon: 'ri-settings-2-line', link: '/settings' }
+
 ];
 
 
