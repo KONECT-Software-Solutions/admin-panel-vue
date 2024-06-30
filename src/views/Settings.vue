@@ -1,11 +1,14 @@
 <template>
+  <div>
 
-  <div v-if="userRole === 'attorney'">
 
-    avukat ayarları
+    <div v-if="userRole === 'attorney'">
 
+      avukat ayarları
+
+    </div>
+    <div v-else>admin ayarları değiştirildi feat-10</div>
   </div>
-  <div v-else>admin ayarları</div>
   <!-- -->
 </template>
 
