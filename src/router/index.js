@@ -6,11 +6,12 @@ import LoginPage from '../views/LoginPage.vue';
 import MainPage from '../views/MainPage.vue'; // Main layout component
 import Home from '../views/Home.vue';
 import OnlineMeetings from '../views/OnlineMeetings.vue';
-import BlogManagement from '../views/BlogManagement.vue';
+import Blogs from '../views/Blogs.vue';
 import Lawyers from '../views/Lawyers.vue';
 import Settings from '../views/Settings.vue';
 import NotFound from '../views/NotFound.vue';
 import Unauthorized from '../views/Unauthorized.vue'; // Add an Unauthorized component
+import AppointmentSettings from '../views/AppointmentSettings.vue';
 
 const routes = [
   {
@@ -58,9 +59,9 @@ const routes = [
         meta: { requiresAuth: true,}
       },
       {
-        path: 'blog-management',
-        name: 'BlogManagement',
-        component: BlogManagement,
+        path: 'blogs',
+        name: 'Blogs',
+        component: Blogs,
         meta: { requiresAuth: true, role: 'admin' }
       },
       {
@@ -79,6 +80,12 @@ const routes = [
         path: 'settings/:uid',
         name: 'SettingsWithUID',
         component: Settings,
+        meta: { requiresAuth: true }
+      },
+      {
+        path: 'appointment-settings/:uid',
+        name: 'AppointmentSettingsWithUID',
+        component: AppointmentSettings,
         meta: { requiresAuth: true }
       }
     ]

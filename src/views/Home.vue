@@ -1,19 +1,22 @@
 <template>
+
     <div>
-      <h1 class="font-bold text-4xl">Home</h1>
-      <div v-if="userRole === 'admin'">
-        <p>Welcome, Admin!</p>
-        <p>Your data {{ userData }}</p>
-        <!-- Admin-specific content -->
-      </div>
-      <div v-else-if="userRole === 'attorney'">
-        <p>Welcome, Attorney!</p>
-        <p>Your data {{ userData }}</p>
-        <!-- Attorney-specific content -->
-      </div>
+        <h1 class="font-bold text-4xl">Home</h1>
+        <div v-if="userRole === 'admin'">
+            <p>Welcome, Admin!</p>
+            <p>Your data {{ userData }}</p>
+            <!-- Admin-specific content -->
+        </div>
+        <div v-else-if="userRole === 'attorney'">
+            <p>Welcome, <span>{{ userRole }}</span>!</p>
+            <p></p>
+            <!-- Attorney-specific content -->
+        </div>
+        <WorkingHoursMeetingSetup :appointmentSettings="appointmentSettings" />
+    
     </div>
 </template>
-  
+
 <script setup>
 import { computed } from 'vue';
 import { useStore } from 'vuex';
@@ -22,6 +25,9 @@ import { doc, getDoc } from 'firebase/firestore';
 import { db } from "../firebase";
 import { ref } from 'vue';
 
+import WorkingHoursMeetingSetup from '../components/WorkingHoursMeetingSetup.vue'
+
+const appointmentSettings = ref([{ duration: '', price: '', type: '', enabled: true }]);
 
 
 // Access the Vuex store
