@@ -26,3 +26,5 @@ jobs:
           firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_TIRYAKI_HUKUK_ADMIN_PANE_9A3F2 }}
           channelId: live
           projectId: tiryaki-hukuk-admin-pane-9a3f2
+        env:
+          FIREBASE_CLI_EXPERIMENTS: webframeworks
