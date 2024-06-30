@@ -11,6 +11,7 @@ import Lawyers from '../views/Lawyers.vue';
 import Settings from '../views/Settings.vue';
 import NotFound from '../views/NotFound.vue';
 import Unauthorized from '../views/Unauthorized.vue'; // Add an Unauthorized component
+import AppointmentSettings from '../views/AppointmentSettings.vue';
 
 const routes = [
   {
@@ -79,6 +80,12 @@ const routes = [
         path: 'settings/:uid',
         name: 'SettingsWithUID',
         component: Settings,
+        meta: { requiresAuth: true }
+      },
+      {
+        path: 'appointment-settings/:uid',
+        name: 'AppointmentSettingsWithUID',
+        component: AppointmentSettings,
         meta: { requiresAuth: true }
       }
     ]

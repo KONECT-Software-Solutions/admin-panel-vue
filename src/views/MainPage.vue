@@ -13,7 +13,7 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { ref, onMounted } from 'vue';
 import Sidebar from '../components/layout/Sidebar.vue';
 import Navbar from '../components/layout/Navbar.vue';
 import ContentContainer from '../components/layout/ContentContainer.vue';
@@ -21,16 +21,20 @@ import ContentContainer from '../components/layout/ContentContainer.vue';
 const isSidebarOpen = ref(true);
 const isMobileSidebarOpen = ref(false);
 
-const currentTab = ref('Online Görüşmeler');
+const currentTab = ref(localStorage.getItem('currentTab') || '');
 
 function handleTitleChange(newTitle) {
     currentTab.value = newTitle;
+    localStorage.setItem('currentTab', newTitle);
 }
 
 function toggleSidebar() {
     isSidebarOpen.value = !isSidebarOpen.value;
 }
 
+onMounted(() => {
+    currentTab.value = localStorage.getItem('currentTab') || '';
+});
 </script>
 
 <style scoped>

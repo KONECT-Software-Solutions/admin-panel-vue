@@ -28,21 +28,21 @@
         <label class="inline-flex items-center space-x-2 p-2 cursor-pointer">
           <input v-model="filterOptions.requests" type="checkbox" class="sr-only peer" />
           <div
-            class="relative w-11 h-5 bg-gray-200 rounded-full ring-[0.18rem] peer peer-focus:ring-blue-300 dark:bg-gray-600 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-1 after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-[1.12rem] after:transition-all dark:border-gray-600 peer-checked:bg-blue-600">
+            class="relative w-11 h-5 bg-gray-200 rounded-full ring-[0.12rem] peer peer-focus:ring-blue-300 dark:bg-gray-600 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-1 after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-[1.12rem] after:transition-all dark:border-gray-600 peer-checked:bg-blue-600">
           </div>
           <p class="text-sm font-medium text-gray-800">Görüşme İstekleri</p>
         </label>
         <label class="inline-flex items-center space-x-2 p-2 cursor-pointer">
           <input v-model="filterOptions.accepted" type="checkbox" class="sr-only peer" />
           <div
-            class="relative w-11 h-5 bg-gray-200 rounded-full ring-[0.18rem] peer peer-focus:ring-blue-300 dark:bg-gray-600 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-1 after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-[1.12rem] after:transition-all dark:border-gray-600 peer-checked:bg-blue-600">
+            class="relative w-11 h-5 bg-gray-200 rounded-full ring-[0.12rem] peer peer-focus:ring-blue-300 dark:bg-gray-600 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-1 after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-[1.12rem] after:transition-all dark:border-gray-600 peer-checked:bg-blue-600">
           </div>
           <p class="text-sm font-medium text-gray-800">Kabul Edilenler</p>
         </label>
         <label class="inline-flex items-center space-x-2 p-2 cursor-pointer">
           <input v-model="filterOptions.pending" type="checkbox" class="sr-only peer" />
           <div
-            class="relative w-11 h-5 bg-gray-200 rounded-full ring-[0.18rem] peer peer-focus:ring-blue-300 dark:bg-gray-600 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-1 after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-[1.12rem] after:transition-all dark:border-gray-600 peer-checked:bg-blue-600">
+            class="relative w-11 h-5 bg-gray-200 rounded-full ring-[0.12rem] peer peer-focus:ring-blue-300 dark:bg-gray-600 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-1 after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-[1.12rem] after:transition-all dark:border-gray-600 peer-checked:bg-blue-600">
           </div>
           <p class="text-sm font-medium text-gray-800">Beklemede Olanlar</p>
         </label>

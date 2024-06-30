@@ -57,7 +57,9 @@ const adminMenus = [
 const attorneyMenus = [
     //{ title: 'Ana Sayfa', icon: 'ri-home-2-line', link: '/home' },
     { title: 'Online Görüşmelerim', icon: 'ri-video-on-line', link: '/online-meetings' },
-    { title: 'Randevu Saatlerim', icon: 'ri-settings-2-line', link: '/settings' }
+    { title: 'Randevu Saatlerim', icon: 'ri-settings-2-line', link: '/appointment-settings' },
+    { title: 'Ayarlar', icon: 'ri-settings-2-line', link: '/settings' }
+
 ];
 
 
