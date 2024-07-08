@@ -34,15 +34,32 @@
           <div class="col-span-2">
             <label
               for="title"
-              class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"></label>
+              class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+              >Başlık</label
+            >
             <input
               v-model="title"
               type="text"
               name="title"
               id="title"
-              class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+              class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5"
               placeholder="Blog yazısı başlığını girin"
               required="" />
+          </div>
+          <div class="col-span-2">
+            <label
+              for="description"
+              class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+              Açıklama
+            </label>
+            <textarea
+              v-model="description"
+              name="description"
+              id="description"
+              class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5"
+              placeholder="Blog yazısı açıklamasını girin"
+              required
+              rows="3"></textarea>
           </div>
           <div class="col-span-2 sm:col-span-1">
             <label
@@ -69,7 +86,7 @@
             <select
               v-model="category"
               id="category"
-              class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500">
+              class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5">
               <option value="Hukuk">Hukuk</option>
               <option value="Haberler">Haberler</option>
               <option value="Son Dakika">Son Dakika</option>
@@ -106,7 +123,7 @@
 </template>
 
 <script setup>
-import { ref, computed } from "vue";
+import { ref, computed, onMounted } from "vue";
 import { QuillEditor } from "@vueup/vue-quill";
 import {
   getStorage,
@@ -115,6 +132,7 @@ import {
   getDownloadURL,
 } from "firebase/storage";
 import Loading from "./Loading.vue";
+import { slugify } from "../utils";
 import "@vueup/vue-quill/dist/vue-quill.snow.css";
 
 const emits = defineEmits(["goBlogManagement", "addBlog"]);
@@ -124,6 +142,7 @@ const showLoadingModal = ref(false);
 
 // Data for blog fields
 const title = ref("");
+const description = ref("");
 const content = ref("");
 const category = ref("Blog Yazısı"); // Default category
 const fileInput = ref(null);
@@ -167,9 +186,10 @@ const handleSubmit = async () => {
       author: "admin",
       created_date: new Date(),
       updated_date: new Date(),
-      url: "https://konect-software-solutions.github.io/tiryaki-hukuk-web-project/blog-single.html",
       title: title.value,
-      image: downloadURL, // Add the image URL
+      description: description.value,
+      slug: slugify(title.value),
+      image: downloadURL,
       content: content.value,
       category: category.value,
     };
@@ -181,6 +201,7 @@ const handleSubmit = async () => {
     // Clear form fields
     title.value = "";
     content.value = "";
+    description.value = "";
     category.value = "Blog Yazısı";
     selectedFile.value = null;
     selectedFileName.value = null;
@@ -190,4 +211,8 @@ const handleSubmit = async () => {
     showLoading.value = false;
   }
 };
+onMounted(() => {
+  console.log("new date test", new Date());
+
+});
 </script>
