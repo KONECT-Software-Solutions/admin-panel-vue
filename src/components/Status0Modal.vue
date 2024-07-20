@@ -9,7 +9,7 @@
           <h3 class="text-lg font-semibold text-black">
             Yeni Randevu İsteği
           </h3>
-          <button type="button" @click="$emit('close')"
+          <button type="buttona" @click="$emit('close')"
             class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center">
             <svg class="w-3 h-3" aria-hidden="true" fill="none" viewBox="0 0 14 14">
               <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"

@@ -9,8 +9,6 @@
       <SuccessModal v-if="showSuccessModalforAppointmentSettings"
         contentText="Randevu seçenek ayarlarınız başarıyla kaydedildi."
         @close="showSuccessModalforAppointmentSettings = false" />
-      <WorkingHoursMeetingSetup :appointmentSettings="appointmentSettings"
-        @save-appointment-settings="handleSaveAppointmentSettings" />
   
   
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
@@ -31,9 +29,10 @@
             @remove-exception="handleRemoveException" />
         </div>
       </div>
-  
-  
-  
+
+      <WorkingHoursMeetingSetup :appointmentSettings="appointmentSettings"
+      @save-appointment-settings="handleSaveAppointmentSettings" />
+    
     </div>
     <div v-else>admin</div>
     <!-- -->
@@ -68,16 +67,11 @@
   
   // Initialize schedule and exceptions
   const exceptions = ref([]);
-  const schedule = ref({
-    isWorkingHoursEnabled: false,
-    days: [
-    ],
-  });
+
   const appointmentSettings = ref([{ duration: '', price: '', type: '' }]);
   
   
-  /*
-  run this for inital schedule setup
+
   const schedule = ref({
     isWorkingHoursEnabled: true,
     days: [
@@ -123,7 +117,7 @@
       },
     ],
   });
-  */
+  
   
   // Handle Functinons
   const handleAddException = (exception) => {

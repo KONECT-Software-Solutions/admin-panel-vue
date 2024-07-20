@@ -34,7 +34,7 @@
           <div class="col-span-2">
             <label
               for="title"
-              class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+              class="block mb-2 text-sm font-medium text-gray-900"
               >Başlık</label
             >
             <input
@@ -46,10 +46,11 @@
               placeholder="Blog yazısı başlığını girin"
               required="" />
           </div>
+
           <div class="col-span-2">
             <label
               for="description"
-              class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+              class="block mb-2 text-sm font-medium text-gray-900">
               Açıklama
             </label>
             <textarea
@@ -61,10 +62,48 @@
               required
               rows="3"></textarea>
           </div>
+          <div class="col-span-2">
+            <label
+              for="tags"
+              class="block mb-2 text-sm font-medium text-gray-900">
+              Etiketler
+            </label>
+            <div
+              class="flex flex-wrap items-center border border-gray p-2 rounded-lg">
+              <span
+                v-for="(tag, index) in tags"
+                :key="index"
+                class="flex items-center bg-gray-100 text-sm border border-gray-300 hover:bg-gray-300 text-gray-900 px-3 py-1 rounded-full mr-2 mb-2">
+                {{ tag }}
+                <button
+                  @click="removeTag(index)"
+                  class="ml-2 focus:outline-none">
+                  <svg
+                    class="w-4 h-4 text-gray-500"
+                    fill="currentColor"
+                    viewBox="0 0 20 20">
+                    <path
+                      fill-rule="evenodd"
+                      d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-10.707a1 1 0 00-1.414-1.414L10 8.586 7.707 6.293a1 1 0 10-1.414 1.414L8.586 10l-2.293 2.293a1 1 0 001.414 1.414L10 11.414l2.293 2.293a1 1 0 001.414-1.414L11.414 10l2.293-2.293z"
+                      clip-rule="evenodd" />
+                  </svg>
+                </button>
+              </span>
+              <input
+                v-model="newTag"
+                name="tags"
+                @keydown.enter.prevent="addTag"
+                placeholder="Yazdıktan sonra Enter tuşuna basarak etiketi ekleyin."
+                class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5" />
+            </div>
+            <p class="mt-2 text-gray-600">
+              {{ remainingTags }} etiket daha ekleyebilirsiniz.
+            </p>
+          </div>
           <div class="col-span-2 sm:col-span-1">
             <label
               for="file-input"
-              class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+              class="block mb-2 text-sm font-medium text-gray-900"
               >Fotoğraf Seç</label
             >
             <input
@@ -80,7 +119,7 @@
           <div class="col-span-2 sm:col-span-1">
             <label
               for="category"
-              class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+              class="block mb-2 text-sm font-medium text-gray-900"
               >Kategori</label
             >
             <select
@@ -96,7 +135,7 @@
           <div class="col-span-2">
             <label
               for="content"
-              class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+              class="block mb-2 text-sm font-medium text-gray-900"
               >Yazı İçeriği</label
             >
             <div class="bg-gray-100">
@@ -139,6 +178,9 @@ const emits = defineEmits(["goBlogManagement", "addBlog"]);
 
 const showLoading = ref(false);
 const showLoadingModal = ref(false);
+const tags = ref(["Hukuk", "Haber", "Ceza Hukuku", "TCK"]);
+const maxTags = 10;
+const newTag = ref("");
 
 // Data for blog fields
 const title = ref("");
@@ -148,6 +190,19 @@ const category = ref("Blog Yazısı"); // Default category
 const fileInput = ref(null);
 const selectedFile = ref(null);
 const selectedFileName = ref(null);
+
+const addTag = () => {
+  if (newTag.value.trim() && !tags.value.includes(newTag.value.trim())) {
+    tags.value.push(newTag.value.trim());
+    newTag.value = "";
+  }
+};
+
+const removeTag = (index) => {
+  tags.value.splice(index, 1);
+};
+
+const remainingTags = computed(() => maxTags - tags.value.length);
 
 const handlePhotoUpload = (event) => {
   const file = event.target.files[0];
@@ -187,6 +242,7 @@ const handleSubmit = async () => {
       created_date: new Date(),
       updated_date: new Date(),
       title: title.value,
+      tags: tags.value,
       description: description.value,
       slug: slugify(title.value),
       image: downloadURL,
@@ -213,6 +269,5 @@ const handleSubmit = async () => {
 };
 onMounted(() => {
   console.log("new date test", new Date());
-
 });
 </script>

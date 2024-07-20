@@ -110,7 +110,7 @@
 									@click="toggleEdit(blog)"
 									class="ri-edit-line text-lg bg-orange-400 hover:bg-gray-900 text-white font-bold px-2 rounded"></button>
 								<button
-									@click="openURL(blog.url)"
+									@click="openURL(blog.slug, blog.id)"
 									class="ri-eye-line text-lg bg-green-500 hover:bg-gray-900 text-white font-bold px-2 rounded"></button>
 								<button
 									@click="confirmDelete(blog.id)"
@@ -265,6 +265,14 @@ const nextPage = () => {
 	if (currentPage.value < totalPages.value) {
 		currentPage.value++;
 	}
+};
+
+// Method to open the blog URL
+const openURL = (slug, id) => {
+	console.log("Opening blog URL:", slug, id);
+	// http://localhost:5173/blog/:slug/:id
+
+	window.open(`http://localhost:5173/blog/${slug}/${id}`, "_blank");
 };
 
 </script>
