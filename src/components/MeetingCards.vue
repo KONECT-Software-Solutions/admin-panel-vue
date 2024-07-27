@@ -128,8 +128,7 @@ const getStatusText = (status) => {
     case "3": return 'Reddedildi';
     case "4": return 'Müşteri Onayı';
     case "5": return 'Avukat Onayı';
-    case "6": return 'Geri Ödemeli İptal';
-    case "7": return 'Geri Ödemesiz İptal';
+    case "6": return 'İptal Edildi';
     default: return 'Unknown';
   }
 };
