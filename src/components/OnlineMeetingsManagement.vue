@@ -97,11 +97,15 @@
             </th>
             <th
               class="w-1/6 text-[12px] uppercase tracking-wide font-medium text-black py-2 px-4 bg-gray-100 text-left">
+              Görüşme Türü
+            </th>
+            <th
+              class="w-1/6 text-[12px] uppercase tracking-wide font-medium text-black py-2 px-4 bg-gray-100 text-left">
               Evrak
             </th>
             <th
               class="w-1/6 text-[12px] uppercase tracking-wide font-medium text-black py-2 px-4 bg-gray-100 text-left">
-              Kategori
+              Ödeme
             </th>
             <th
               class="w-1/6 text-[12px] uppercase tracking-wide font-medium text-black py-2 px-4 bg-gray-100 text-left">
@@ -139,6 +143,17 @@
                 {{ formatDate(meeting.date_time, (format = "time")) }}
               </span>
             </td>
+            <td class="py-2 border-b px-4 border-b-gray-200">
+              <div class="tooltip">
+                <div
+                  class="w-10 h-10 flex items-center justify-center bg-gray-600 text-white text-xl font-medium rounded-full ml-2 ring-0">
+                  <i :class="meetingTypeIcon(meeting.type)"> </i>
+                  <span class="tooltiptext">{{
+                    meetingTypeText(meeting.type)
+                  }}</span>
+                </div>
+              </div>
+            </td>
             <td class="py-2 px-4 border-b border-b-gray-200">
               <button
                 @click="
@@ -149,10 +164,17 @@
                 "
                 class="ri-file-text-line flex items-center justify-center ml-2 text-lg bg-yellow-400 hover:bg-gray-900 text-white font-bold px-2 rounded"></button>
             </td>
-            <td class="py-2 px-4 border-b border-b-gray-200">
-              <span class="text-[13px] font-medium text-gray-600">
-                {{ meeting.category }}
-              </span>
+            <td class="py-2 border-b px-4 border-b-gray-200">
+              <div class="tooltip">
+                <div
+                  class="w-10 h-10 flex items-center justify-center font-medium rounded-full ml-2 ring-0"
+                  :class="paymentStatusClass(meeting.payment_status)">
+                  <i :class="paymentStatusIcon(meeting.payment_status)"> </i>
+                  <span class="tooltiptext">{{
+                    paymentStatusText(meeting.payment_status)
+                  }}</span>
+                </div>
+              </div>
             </td>
             <td class="py-2 px-4 border-b border-b-gray-200">
               <div class="tooltip">
@@ -201,6 +223,8 @@ import { db } from "../firebase";
 import { onMounted, ref, computed, watch } from "vue";
 import { useStore } from "vuex";
 import { formatDate } from "../utils";
+import axios from "axios";
+
 // Access the Vuex store
 const store = useStore();
 const userRole = computed(() => store.getters.userRole);
@@ -273,31 +297,65 @@ const handleGoBack = () => {
 };
 
 const createMeetingUrl = async (start_time, owner_email, customer_email) => {
+  // iso format formatted again because the iso format that google accepts doesnt include the millisecond precision
+  const start_time_iso =
+    new Date(start_time.seconds * 1000).toISOString().split(".")[0] + "Z";
+  console.log("start_time_iso", start_time_iso);
+
   try {
-    const response = await axios.post("http://127.0.0.1:5000/create-meeting", {
-      start_time: start_time,
-      owner_email: owner_email,
-      customer_email: customer_email,
-    });
-    console.log(response.data);
+    const response = await axios.post(
+      "https://obscure-oasis-12313-0014f39ac81c.herokuapp.com/create-meeting",
+      {
+        start_time: start_time_iso,
+        owner_email: owner_email,
+        customer_email: customer_email,
+      }
+    );
+    console.log("response data", response.data); // I get the response data successfully
+    console.log("Meeting created successfully");
+    return response.data.meetLink; // Return the meeting link here
   } catch (error) {
-    console.error("Error sending verification email:", error);
+    if (error.response) {
+      // Log detailed error response from the server
+      console.error("Error response data:", error.response.data);
+      console.error("Error response status:", error.response.status);
+      console.error("Error response headers:", error.response.headers);
+    } else if (error.request) {
+      // The request was made but no response was received
+      console.error("No response received:", error.request);
+    } else {
+      // Something else caused the error
+      console.error("Error setting up the request:", error.message);
+    }
   }
 };
 
-function handleSetMeeting() {
-  // change the status of the meeting with meetingId to "1" (accepted)
-  meetingsData.value = meetingsData.value.map((meeting) => {
-    if (meeting.id === clickedMeetingData.value.id) {
-      meeting.status = "1";
-      meeting.meeting_url = createMeetingUrl(meeting.id);
-      // update the meeting in the database
-      updateMeeting(meeting);
-      // reset the clickedMeetingData ref
-      clickedMeetingData.value = {};
-    }
-    return meeting;
-  });
+async function handleSetMeeting() {
+  meetingsData.value = await Promise.all(
+    meetingsData.value.map(async (meeting) => {
+      if (meeting.id === clickedMeetingData.value.id) {
+        meeting.status = "1";
+        console.log("Meeting data to set meeting", meeting);
+
+        try {
+          const meeting_url = await createMeetingUrl(
+            meeting.date_time,
+            meeting.attorney_email,
+            meeting.customer_email
+          );
+          meeting.meeting_url = meeting_url;
+          await updateMeeting(meeting); // Ensure updateMeeting is awaited
+          console.log("Meeting updated successfully:", meeting);
+
+          // Reset the clickedMeetingData ref
+          clickedMeetingData.value = {};
+        } catch (error) {
+          console.error("Failed to create meeting URL:", error);
+        }
+      }
+      return meeting;
+    })
+  );
 }
 
 function handleRejectMeeting(reject_reason) {
@@ -462,6 +520,87 @@ const statusText = (status) => {
   return statusDetails(status).text;
 };
 
+const paymentStatusDetails = (status) => {
+  switch (status) {
+    case "0":
+      return {
+        class: "bg-orange-300",
+        text: "Bekleniyor",
+        icon: "ri-time-line",
+      };
+    case "1":
+      return {
+        class: "bg-green-300",
+        text: "Ödendi",
+        icon: "ri-check-double-line",
+      };
+    case "2":
+      return {
+        class: "bg-red-300",
+        text: "Ödenmedi",
+        icon: "ri-close-line",
+      };
+    default:
+      return {
+        class: "bg-gray-200",
+        text: "Bilinmiyor",
+        icon: "ri-question-line",
+      };
+  }
+};
+
+const paymentStatusClass = (status) => {
+  return paymentStatusDetails(status).class;
+};
+
+const paymentStatusIcon = (status) => {
+  return paymentStatusDetails(status).icon;
+};
+
+const paymentStatusText = (status) => {
+  return paymentStatusDetails(status).text;
+};
+
+const meetingTypeDetails = (type) => {
+  switch (type) {
+    case "phone":
+      return {
+        class: "bg-orange-300",
+        text: "Telefonla Görüşme",
+        icon: "ri-phone-line",
+      };
+    case "video":
+      return {
+        class: "bg-green-300",
+        text: "Online Video Görüşme",
+        icon: "ri-video-on-line",
+      };
+    case "office":
+      return {
+        class: "bg-red-300",
+        text: "Yüzyüze Görüşme",
+        icon: "ri-user-line",
+      };
+    default:
+      return {
+        class: "bg-gray-200",
+        icon: "ri-question-line",
+      };
+  }
+};
+
+const meetingTypeClass = (type) => {
+  return meetingTypeDetails(type).class;
+};
+
+const meetingTypeIcon = (type) => {
+  return meetingTypeDetails(type).icon;
+};
+
+const meetingTypeText = (type) => {
+  return meetingTypeDetails(type).text;
+};
+
 // Utility function to load blogs data
 async function fetchMeetings() {
   let meetings = [];
@@ -502,7 +641,7 @@ async function getAllMeetings() {
 }
 
 async function updateMeeting(meetingDataToUpdate) {
-  console.log("Received updated blog data:", meetingDataToUpdate);
+  console.log("Received updated meeting data:", meetingDataToUpdate);
 
   try {
     console.log("Updating document with ID:", meetingDataToUpdate.id);
@@ -549,7 +688,6 @@ async function fetchAttorney(id) {
 // write sorting function here
 
 function sortMeetings(meetings) {
-  return meetings;
   // Define the status priorities
   const statusPriority = {
     1: 1, // Kabul edildi
@@ -588,6 +726,7 @@ onMounted(async () => {
       (meeting) => meeting.attorney_id === props.uid
     );
   }
+  console.log("Meetings data:", meetingsData.value);
 });
 </script>
 
@@ -598,20 +737,19 @@ onMounted(async () => {
 }
 
 .tooltip .tooltiptext {
+  white-space: nowrap;
   visibility: hidden;
-  width: 120px;
   background-color: #fff;
   color: rgb(75 85 99);
   text-align: center;
-  font-size: 0.875rem;
+  font-size: 0.75rem;
   line-height: 1rem;
   border-radius: 6px;
   padding: 5px;
   position: absolute;
+  bottom: 70%;
+  left: 70%;
   z-index: 1;
-  top: 20%;
-  left: 230%;
-  margin-left: -60px;
   opacity: 0;
   transition: opacity 0.3s;
 }

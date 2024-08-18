@@ -81,7 +81,7 @@ onMounted(async () => {
 
   //filter out the attorneys, if mail equals to admin@gmail.com
   dataFetched = dataFetched.filter(
-    (attorney) => attorney.mail !== "admin@gmail.com"
+    (attorney) => attorney.email !== "admin@gmail.com"
   );
 
   attorneysData.value = dataFetched;

@@ -129,6 +129,7 @@ const handleSetMeeting = () => {
     isMeetingSet.value = true;
     setTimeout(() => {
       emits("set-meeting");
+      emits("close")
     }, 700);
   }, 2000);
 };
