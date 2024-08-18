@@ -21,7 +21,7 @@ import { ref } from 'vue';
 
 const isOpen = ref(false);
 const notifications = ref([
-    { id: 1, title: "New order", message: "You have received a new order.", url: "#" },
+    { id: 1, title: "New order test", message: "You have received a new order.", url: "#" },
     { id: 2, title: "Payment received", message: "Your latest billing statement is ready.", url: "#" },
     { id: 3, title: "System Update", message: "System updates will be performed tonight.", url: "#" },
     { id: 4, title: "New Feature", message: "A new feature has been added to your dashboard.", url: "#" },
