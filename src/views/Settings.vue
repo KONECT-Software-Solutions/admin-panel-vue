@@ -7,7 +7,7 @@
       avukat ayarları
 
     </div>
-    <div v-else>admin ayarları değiştirildi feat-11 </div>
+    <div v-else>admin ayarları değiştirildi feat-12 test 4 eylül </div>
   </div>
   <!-- -->
 </template>

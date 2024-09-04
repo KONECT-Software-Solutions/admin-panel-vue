@@ -173,6 +173,8 @@ import {
 import Loading from "./Loading.vue";
 import { slugify } from "../utils";
 import "@vueup/vue-quill/dist/vue-quill.snow.css";
+import imageCompression from 'browser-image-compression';
+
 
 const emits = defineEmits(["goBlogManagement", "addBlog"]);
 
@@ -204,11 +206,24 @@ const removeTag = (index) => {
 
 const remainingTags = computed(() => maxTags - tags.value.length);
 
-const handlePhotoUpload = (event) => {
+
+const handlePhotoUpload = async (event) => {
   const file = event.target.files[0];
   if (file && file.type === "image/jpeg") {
-    selectedFile.value = file;
-    selectedFileName.value = file.name;
+    try {
+      // Resize and convert the image to WebP
+      const options = {
+        maxSizeMB: 1, // Maximum file size
+        maxWidthOrHeight: 1400, // Resize to max 1200px
+        useWebWorker: true,
+        fileType: 'image/webp' // Convert to WebP
+      };
+      const compressedFile = await imageCompression(file, options);
+      selectedFile.value = compressedFile;
+      selectedFileName.value = file.name.replace(/\.[^/.]+$/, "") + ".webp"; // Rename file to .webp extension
+    } catch (error) {
+      console.error("Error compressing the image:", error);
+    }
   } else {
     selectedFileName.value = null;
     console.error("Please select a JPEG file.");
@@ -227,7 +242,7 @@ const handleSubmit = async () => {
   const storage = getStorage();
   const fileRef = firebaseStorageRef(
     storage,
-    `images/${selectedFile.value.name}`
+    `images/${selectedFileName.value}`
   );
 
   try {

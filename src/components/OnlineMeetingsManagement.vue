@@ -346,7 +346,8 @@ async function handleSetMeeting() {
           meeting.meeting_url = meeting_url;
           await updateMeeting(meeting); // Ensure updateMeeting is awaited
           console.log("Meeting updated successfully:", meeting);
-
+          
+          sendMeetingAcceptedEmail(meeting);
           // Reset the clickedMeetingData ref
           clickedMeetingData.value = {};
         } catch (error) {
@@ -357,6 +358,32 @@ async function handleSetMeeting() {
     })
   );
 }
+
+const sendMeetingAcceptedEmail = async (meetingData) => {
+  try {
+    const response = await axios.post(
+      "https://obscure-oasis-12313-0014f39ac81c.herokuapp.com/send-meeting-accepted-email",
+      {
+        customer_name: meetingData.customer_name,
+        attorney_name: meetingData.attorney_name,
+        date_for_display: meetingData.date_for_display,
+        day: meetingData.day,
+        slot: meetingData.slot,
+        end_time: meetingData.end_time,
+        customer_email: meetingData.customer_email,
+        meeting_url: meetingData.meeting_url,
+      },
+      {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
+    console.log(response.data);
+  } catch (error) {
+    console.error("Error sending appointment recieved email:", error);
+  }
+};
 
 function handleRejectMeeting(reject_reason) {
   // change the status of the meeting with meetingId to "3" (rejected)
