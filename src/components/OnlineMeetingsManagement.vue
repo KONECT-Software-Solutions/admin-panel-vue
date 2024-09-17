@@ -296,7 +296,7 @@ const handleGoBack = () => {
   emit("goBack");
 };
 
-const createMeetingUrl = async (start_time, owner_email, customer_email) => {
+const createMeetingUrl = async (start_time, attorney_email, customer_email) => {
   // iso format formatted again because the iso format that google accepts doesnt include the millisecond precision
   const start_time_iso =
     new Date(start_time.seconds * 1000).toISOString().split(".")[0] + "Z";
@@ -307,13 +307,14 @@ const createMeetingUrl = async (start_time, owner_email, customer_email) => {
       "https://ykt7hblm31.execute-api.eu-north-1.amazonaws.com/prod/create-meeting",
       {
         start_time: start_time_iso,
-        owner_email: owner_email,
+        attorney_email: attorney_email,
         customer_email: customer_email,
       }
     );
-    console.log("response data", response.data); // I get the response data successfully
+    const meetLink = JSON.parse(response.data.body)['meet_link'];
+    console.log("response data", JSON.parse(response.data.body)['meet_link']); // I get the response data successfully
     console.log("Meeting created successfully");
-    return response.data.meetLink; // Return the meeting link here
+    return meetLink; // Return the meeting link here
   } catch (error) {
     if (error.response) {
       // Log detailed error response from the server
@@ -370,7 +371,7 @@ const sendMeetingAcceptedEmail = async (meetingData) => {
         day: meetingData.day,
         slot: meetingData.slot,
         end_time: meetingData.end_time,
-        customer_email: meetingData.customer_email,
+        email: meetingData.customer_email,
         meeting_url: meetingData.meeting_url,
       },
       {
@@ -379,7 +380,8 @@ const sendMeetingAcceptedEmail = async (meetingData) => {
         },
       }
     );
-    console.log(response.data);
+    console.log(response);
+    console.log("Meeting accepted email sent successfully");
   } catch (error) {
     console.error("Error sending appointment recieved email:", error);
   }
