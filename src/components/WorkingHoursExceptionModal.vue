@@ -115,7 +115,7 @@ const times = [
 
 const saveUnavailableTime = () => {
   const formattedDate = date.value
-    ? format(new Date(date.value), "dd/MM/yy")
+    ? format(new Date(date.value), "yyyy-MM-dd")
     : "";
   const exception = {
     date: formattedDate,
