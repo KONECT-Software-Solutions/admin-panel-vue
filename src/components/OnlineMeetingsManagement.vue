@@ -304,7 +304,7 @@ const createMeetingUrl = async (start_time, owner_email, customer_email) => {
 
   try {
     const response = await axios.post(
-      "https://obscure-oasis-12313-0014f39ac81c.herokuapp.com/create-meeting",
+      "https://ykt7hblm31.execute-api.eu-north-1.amazonaws.com/prod/create-meeting",
       {
         start_time: start_time_iso,
         owner_email: owner_email,
@@ -362,7 +362,7 @@ async function handleSetMeeting() {
 const sendMeetingAcceptedEmail = async (meetingData) => {
   try {
     const response = await axios.post(
-      "https://obscure-oasis-12313-0014f39ac81c.herokuapp.com/send-meeting-accepted-email",
+      "https://ykt7hblm31.execute-api.eu-north-1.amazonaws.com/prod/send-meeting-accepted-email",
       {
         customer_name: meetingData.customer_name,
         attorney_name: meetingData.attorney_name,
