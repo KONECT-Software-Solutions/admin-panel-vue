@@ -122,6 +122,7 @@ const saveUnavailableTime = () => {
     startTime: startTime.value,
     endTime: endTime.value,
     repeat: isRepeatEnabled.value,
+    isMeeting: false
   };
   emit("save-exception", exception);
   emit("close");

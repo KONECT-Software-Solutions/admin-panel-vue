@@ -224,6 +224,7 @@ import { onMounted, ref, computed, watch } from "vue";
 import { useStore } from "vuex";
 import { formatDate } from "../utils";
 import axios from "axios";
+import { add } from "date-fns";
 
 // Access the Vuex store
 const store = useStore();
@@ -331,6 +332,24 @@ const createMeetingUrl = async (start_time, attorney_email, customer_email) => {
   }
 };
 
+// add exception to the attorney's schedule
+// en son burda kaldım. bu fonksiyonu meeting set ederken bir yerde çağrımalıyım. şuan dbde olan meetingleri silmeliyim
+// çünkü meeting id leri ekli değil exceptionlar attorneylere eklenmemiş tüm meetingleri sıfırlayıp test et
+const addException = async (exceptionData) => {
+  try {
+    const attorneyDocRef = doc(db, "attorneys", props.attorneyData.id);
+    const attorneyDoc = await getDoc(attorneyDocRef);
+    if (attorneyDoc.exists()) {
+      const attorneyData = attorneyDoc.data();
+      const exceptions = attorneyData.exceptions || [];
+      exceptions.push(exceptionData);
+      await updateDoc(attorneyDocRef, { exceptions });
+    }
+  } catch (error) {
+    console.error("Error fetching attorney by ID:", error);
+  }
+};
+
 async function handleSetMeeting() {
   meetingsData.value = await Promise.all(
     meetingsData.value.map(async (meeting) => {
@@ -356,8 +375,8 @@ async function handleSetMeeting() {
         }
       }
       return meeting;
-    })
-  );
+    }));
+    
 }
 
 const sendMeetingAcceptedEmail = async (meetingData) => {

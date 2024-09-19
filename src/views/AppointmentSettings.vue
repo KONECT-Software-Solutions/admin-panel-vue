@@ -9,7 +9,7 @@
       <SuccessModal v-if="showSuccessModalforAppointmentSettings"
         contentText="Randevu seçenek ayarlarınız başarıyla kaydedildi."
         @close="showSuccessModalforAppointmentSettings = false" />
-  
+
   
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
         <!-- main component -->
@@ -226,7 +226,11 @@
         schedule.value = attorney.schedule;
       }
       if (attorney.exceptions) {
-        exceptions.value = attorney.exceptions;
+        for (let exception of attorney.exceptions) {
+          if (!exception.isMeeting) {
+            exceptions.value.push(exception);
+          }
+        }
       }
   
       if (attorney.appointment_settings) {
