@@ -224,7 +224,7 @@ import { onMounted, ref, computed, watch } from "vue";
 import { useStore } from "vuex";
 import { formatDate } from "../utils";
 import axios from "axios";
-import { add } from "date-fns";
+import { add, sub } from "date-fns";
 
 // Access the Vuex store
 const store = useStore();
@@ -299,6 +299,7 @@ const handleGoBack = () => {
 
 const createMeetingUrl = async (start_time, attorney_email, customer_email) => {
   // iso format formatted again because the iso format that google accepts doesnt include the millisecond precision
+  return "test-url"
   const start_time_iso =
     new Date(start_time.seconds * 1000).toISOString().split(".")[0] + "Z";
   console.log("start_time_iso", start_time_iso);
@@ -336,14 +337,34 @@ const createMeetingUrl = async (start_time, attorney_email, customer_email) => {
 // en son burda kaldım. bu fonksiyonu meeting set ederken bir yerde çağrımalıyım. şuan dbde olan meetingleri silmeliyim
 // çünkü meeting id leri ekli değil exceptionlar attorneylere eklenmemiş tüm meetingleri sıfırlayıp test et
 const addException = async (exceptionData) => {
+  console.log("Exception data to add:", exceptionData);
   try {
-    const attorneyDocRef = doc(db, "attorneys", props.attorneyData.id);
+    const attorneyDocRef = doc(db, "attorneys", exceptionData.attorney_id);
     const attorneyDoc = await getDoc(attorneyDocRef);
     if (attorneyDoc.exists()) {
       const attorneyData = attorneyDoc.data();
       const exceptions = attorneyData.exceptions || [];
+      delete exceptionData.attorney_id
       exceptions.push(exceptionData);
       await updateDoc(attorneyDocRef, { exceptions });
+    }
+  } catch (error) {
+    console.error("Error fetching attorney by ID:", error);
+  }
+};
+
+const deleteException = async (exceptionData) => {
+  console.log("Exception data to delete:", exceptionData);
+  try {
+    const attorneyDocRef = doc(db, "attorneys", exceptionData.attorney_id);
+    const attorneyDoc = await getDoc(attorneyDocRef);
+    if (attorneyDoc.exists()) {
+      const attorneyData = attorneyDoc.data();
+      const exceptions = attorneyData.exceptions || [];
+      const updatedExceptions = exceptions.filter(
+        (exception) => exception.meeting_id !== exceptionData.meeting_id
+      );
+      await updateDoc(attorneyDocRef, { exceptions: updatedExceptions });
     }
   } catch (error) {
     console.error("Error fetching attorney by ID:", error);
@@ -365,9 +386,18 @@ async function handleSetMeeting() {
           );
           meeting.meeting_url = meeting_url;
           await updateMeeting(meeting); // Ensure updateMeeting is awaited
+          await addException({
+            date: meeting.date,
+            startTime: meeting.slot,
+            endTime: meeting.end_time,
+            repeat: false,
+            isMeeting: true,
+            attorney_id: meeting.attorney_id,
+            meeting_id: meeting.id,
+          });
           console.log("Meeting updated successfully:", meeting);
           
-          sendMeetingAcceptedEmail(meeting);
+          //sendMeetingAcceptedEmail(meeting);
           // Reset the clickedMeetingData ref
           clickedMeetingData.value = {};
         } catch (error) {
@@ -411,8 +441,10 @@ function handleRejectMeeting(reject_reason) {
   meetingsData.value = meetingsData.value.map((meeting) => {
     if (meeting.id === clickedMeetingData.value.id) {
       meeting.status = "3";
-      meeting.reject_reason = reject_reason;
-      //updateMeeting(meeting);
+      meeting.cancel_reason = reject_reason;
+      meeting.payment_status = "2";
+      updateMeeting(meeting);
+      showStatusActionModal.value = false;
     }
     return meeting;
   });
@@ -623,7 +655,7 @@ const meetingTypeDetails = (type) => {
         text: "Online Video Görüşme",
         icon: "ri-video-on-line",
       };
-    case "office":
+    case "inPerson":
       return {
         class: "bg-red-300",
         text: "Yüzyüze Görüşme",
@@ -762,9 +794,33 @@ function sortMeetings(meetings) {
     }
   });
 }
+
+const checkDeadline = (meeting) => {
+  const deadline = new Date(meeting.deadline.seconds * 1000);
+  const currentDate = new Date();
+  if (currentDate > deadline && meeting.status === "1") {
+    // find this meeting in the firestore and update the status to 6
+    const docRef = doc(db, "meetings", meeting.id);
+    updateDoc(docRef, { status: "6" , cancel_reason: "Ödeme süresi geçti.", payment_status: "2"});
+    deleteException({
+        attorney_id: meeting.attorney_id,
+        meeting_id: meeting.id,
+      });
+    return true;
+  } else {
+    return false;
+  }
+};
 // Usage
 onMounted(async () => {
   const meetings = await getAllMeetings();
+  meetings.forEach(meeting => {
+    const deadline_exceeded = checkDeadline(meeting);
+    // log with index
+    console.log(meetings.indexOf(meeting), deadline_exceeded);
+    // add it to the meeting object
+    meeting.deadline_exceeded = deadline_exceeded;
+  });
   const sortedMeetings = sortMeetings(meetings);
 
   if (props.showAll) {

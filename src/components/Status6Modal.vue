@@ -8,7 +8,7 @@
                 <!-- Modal header -->
                 <div class="flex items-center justify-between p-4 border-b rounded-t">
                     <h3 class="text-lg font-semibold text-black">
-                        Reddedilme Edilme Sebebi
+                        İptal Edilme Sebebi
                     </h3>
                     <button type="button" @click="$emit('close')"
                         class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center ">
@@ -25,7 +25,7 @@
                         <label for="title" class="block mb-2 text-sm font-medium text-gray-900"></label>
                         <p type="text" name="title" id="title"
                             class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5"
-                            placeholder="Blog yazısı başlığını girin" required="">{{ rejectReason }}</p>
+                            placeholder="Blog yazısı başlığını girin" required="">{{ cancelReason }}</p>
                     </div>
                 </div>
             </div>
@@ -38,7 +38,7 @@
 
 
 const props = defineProps({
-    rejectReason: String
+    cancelReason: String
 })
 
 const emits = defineEmits(['close']);

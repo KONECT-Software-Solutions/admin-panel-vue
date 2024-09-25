@@ -3,8 +3,8 @@
     :formattedDate="formattedDate" @set-meeting="$emit('set-meeting')" @reject-meeting="handleRejectMeeting" />
   <Status1Modal v-if="meetingData.status === '1' && keepStatusModalOpen" @close="$emit('close')" :meetingData="meetingData"
     :formattedDate="formattedDate" />
-  <Status3Modal v-if="meetingData.status === '3' && keepStatusModalOpen" @close="$emit('close')" :rejectReason="meetingData.reject_reason" />
-
+  <Status3Modal v-if="meetingData.status === '3' && keepStatusModalOpen" @close="$emit('close')" :rejectReason="meetingData.cancel_reason" />
+  <Status6Modal v-if="meetingData.status === '6' && keepStatusModalOpen" @close="$emit('close')" :cancelReason="meetingData.cancel_reason" />
 </template>
 
 <script setup>
@@ -13,6 +13,7 @@ import Status1Modal from "../components/Status1Modal.vue";
 import Status3Modal from "../components/Status3Modal.vue";
 import { onUpdated, computed, onMounted } from "vue";
 import { formatDate } from "../utils";
+import Status6Modal from "../components/Status6Modal.vue";
 
 
 
@@ -47,6 +48,7 @@ const formattedDate = computed(() => {
 
 const handleRejectMeeting = (reject_reason) => {
   emits('reject-meeting', reject_reason)
+  
 };
 
 </script>

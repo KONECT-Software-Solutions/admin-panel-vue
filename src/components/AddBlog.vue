@@ -126,10 +126,10 @@
               v-model="category"
               id="category"
               class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5">
-              <option value="Hukuk">Hukuk</option>
-              <option value="Haberler">Haberler</option>
-              <option value="Son Dakika">Son Dakika</option>
-              <option value="Blog Yazısı">Blog Yazısı</option>
+              <option value="hukuk">Hukuk</option>
+              <option value="haberler">Haberler</option>
+              <option value="son-dakika">Son Dakika</option>
+              <option value="blog">Blog Yazısı</option>
             </select>
           </div>
           <div class="col-span-2">
@@ -188,7 +188,7 @@ const newTag = ref("");
 const title = ref("");
 const description = ref("");
 const content = ref("");
-const category = ref("Blog Yazısı"); // Default category
+const category = ref("blog"); // Default category
 const fileInput = ref(null);
 const selectedFile = ref(null);
 const selectedFileName = ref(null);
