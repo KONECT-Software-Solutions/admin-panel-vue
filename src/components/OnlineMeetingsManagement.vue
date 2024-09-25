@@ -299,7 +299,8 @@ const handleGoBack = () => {
 
 const createMeetingUrl = async (start_time, attorney_email, customer_email) => {
   // iso format formatted again because the iso format that google accepts doesnt include the millisecond precision
-  return "test-url"
+  // uncomment after test
+  //return "test-url"
   const start_time_iso =
     new Date(start_time.seconds * 1000).toISOString().split(".")[0] + "Z";
   console.log("start_time_iso", start_time_iso);
@@ -396,8 +397,8 @@ async function handleSetMeeting() {
             meeting_id: meeting.id,
           });
           console.log("Meeting updated successfully:", meeting);
-          
-          //sendMeetingAcceptedEmail(meeting);
+          // uncomment after test
+          sendMeetingAcceptedEmail(meeting);
           // Reset the clickedMeetingData ref
           clickedMeetingData.value = {};
         } catch (error) {
