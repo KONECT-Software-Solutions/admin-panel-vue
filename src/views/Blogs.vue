@@ -37,7 +37,7 @@ import {
   doc,
 } from "firebase/firestore";
 import { db } from "../firebase";
-import { customSortByDate } from "../utils";
+import { slugify } from "../utils";
 
 const showBlogs = ref(false);
 const showAddBlog = ref(false);
@@ -55,21 +55,6 @@ function handleDeleteBlog(blogIdToDelete) {
 
 function handleUpdateBlog(blogData) {
   updateBlog(blogData);
-}
-
-function formatDate(timestamp) {
-  if (!timestamp) return "";
-  if (timestamp.seconds) {
-    // Firestore timestamp
-    const date = new Date(timestamp.seconds * 1000);
-    return date.toLocaleDateString("tr-TR");
-  }
-  if (typeof timestamp === "string") {
-    // Already formatted string
-    return timestamp;
-  }
-  const date = new Date(timestamp); // Fallback for any other case
-  return date.toLocaleDateString("tr-TR");
 }
 
 // Utility function to load blogs data
@@ -92,8 +77,6 @@ async function fetchBlogs() {
   blogs = blogs.map((blog) => {
     return {
       ...blog,
-      created_date: formatDate(blog.created_date),
-      updated_date: formatDate(blog.updated_date),
     };
   });
   return blogs;
@@ -105,7 +88,7 @@ async function getAllBlogs() {
     // Check if data exists and is not expired
     const cachedBlogs = localStorage.getItem("cachedBlogs");
     const cachedTimeBlogs = localStorage.getItem("cachedTimeBlogs");
-    const expiryTime = 30 * 60 * 1000; // 30 minutes expiration time
+    const expiryTime = 0 * 60 * 1000; // 30 minutes expiration time
 
     if (
       cachedBlogs &&
@@ -137,8 +120,6 @@ async function addBlog(blogDataToAdd) {
     const newBlogWithId = {
       ...blogDataToAdd,
       id: docRef.id,
-      created_date: formatDate(blogDataToAdd.created_date), // This line formats the created_date
-      updated_date: formatDate(blogDataToAdd.updated_date), // This line formats the updated_date
     };
     // Update local blogsData with the new blog including the ID
     blogsData.value = [newBlogWithId, ...blogsData.value];
@@ -175,15 +156,16 @@ async function deleteBlog(blogIdToDelete) {
 
 async function updateBlog(blogDataToUpdate) {
   console.log("Received updated blog data:", blogDataToUpdate);
+  blogDataToUpdate.updated_date = new Date();
+  blogDataToUpdate.slug = slugify(blogDataToUpdate.title)
+  
 
   try {
     await updateDoc(doc(db, "blogs", blogDataToUpdate.id), blogDataToUpdate); // Ensure updateDoc is awaited
     const updatedBlog = {
       ...blogDataToUpdate,
-      created_date: formatDate(blogDataToUpdate.created_date), // This line formats the created_date
-      updated_date: formatDate(blogDataToUpdate.updated_date), // This line formats the updated_date
     };
-
+    
     // Update local blogsData with the updated blog
     blogsData.value = blogsData.value.map((blog) => {
       if (blog.id === blogDataToUpdate.id) {
@@ -199,11 +181,14 @@ async function updateBlog(blogDataToUpdate) {
     console.error("Error updating document:", error);
   }
 }
+function sortBlogsByDate(blogs) {
+	return blogs.sort((a, b) => b.created_date - a.created_date);
+}
 
 
 onMounted(async () => {
   let data = await getAllBlogs();
-  data.sort(customSortByDate);
+  data = sortBlogsByDate(data);
   blogsData.value = data;
   showBlogs.value = true;
 });

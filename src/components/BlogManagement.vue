@@ -86,7 +86,7 @@
 						</td>
 						<td class="py-4 px-4 border-b border-b-gray-200">
 							<span class="text-[13px] font-medium text-gray-600">{{
-								blog.created_date
+								formatDate(blog.created_date)
 							}}</span>
 						</td>
 						<td class="py-4 px-4 border-b border-b-gray-200">
@@ -99,7 +99,7 @@
 						<td class="py-4 px-4 border-b border-b-gray-200">
 							<div class="flex space-x-5">
 								<span class="text-[13px] font-medium text-gray-600">{{
-									blog.updated_date
+									formatDate(blog.updated_date)
 								}}</span>
 							</div>
 						</td>
@@ -170,6 +170,25 @@ const props = defineProps({
 const blogRef = props.blogRef;
 
 const emits = defineEmits(["goAddBlog", "deleteBlog", "updateBlog"]);
+
+function formatDate(timestamp) {
+  let date;
+  
+  // Handle Firestore Timestamp or JavaScript Date object
+  if (timestamp && timestamp.seconds) {
+    // Convert Firestore Timestamp to JavaScript Date object
+    date = new Date(timestamp.seconds * 1000);
+  } else if (timestamp instanceof Date) {
+    date = timestamp;
+  } else {
+    return ""; // Return empty string if timestamp is invalid
+  }
+
+  const day = date.getDate().toString().padStart(2, "0");
+  const month = (date.getMonth() + 1).toString().padStart(2, "0");
+  const year = date.getFullYear();
+  return `${day}/${month}/${year}`;
+}
 
 function toggleEdit(blog) {
 	showEditModal.value = true;
@@ -274,5 +293,9 @@ const openURL = (slug, id) => {
 
 	window.open(`http://localhost:5173/blog/${slug}/${id}`, "_blank");
 };
+
+onMounted(async () => {
+	console.log("Blogs data:", props.blogsData);
+});
 
 </script>
