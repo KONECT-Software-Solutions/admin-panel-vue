@@ -37,11 +37,11 @@
                                     <div class="flex items-center">
                                         <div class="flex flex-col items-center justify-center mr-4">
                                             <i class="ri-file-fill text-3xl"></i>
-                                            <p class="text-sm text-gray-500">{{ document.kind }}</p>
+                                            <p class="text-sm text-gray-500">{{ formatDocName(document.kind) }}</p>
                                         </div>
                                         <div>
-                                            <p>{{ document.name }}</p>
-                                            <p class="text-sm text-gray-500">{{ document.size }}</p>
+                                            <p>{{ formatDocName(document.name) }}</p>
+                                            <p class="text-sm text-gray-500">{{ docSizeConverter(document.size) }}</p>
                                         </div>
 
                                     </div>
@@ -81,6 +81,22 @@ const emits = defineEmits(['close']);
 
 const downloadDocument = (document) => {
     window.open(document.file_url, '_blank');
+}
+
+const formatDocName = (name,) => {
+    return name.length > 15 ? name.substring(0, 6) + "..." + name.substring(name.length - 8) : name;
+}
+
+const docSizeConverter = (size) => {
+    if (size >= 1073741824) {
+        return (size / 1073741824).toFixed(2) + ' GB';
+    } else if (size >= 1048576) {
+        return (size / 1048576).toFixed(2) + ' MB';
+    } else if (size >= 1024) {
+        return (size / 1024).toFixed(2) + ' KB';
+    } else {
+        return size + ' B';
+    }
 }
 
 </script>

@@ -1,5 +1,5 @@
 <template>
-  <div class="py-2 px-6 bg-white flex items-center shadow-md sticky top-0 left-0 z-30 justify-between">
+  <div class="py-2 px-6 bg-white flex items-center shadow-md sticky top-0 left-0 z-40 justify-between">
     <div class="flex items-center">
         <button @click="$emit('toggleSidebar')" class="text-lg text-gray-600 sidebar-toggle">
             <i class="ri-menu-line"></i>

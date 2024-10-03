@@ -263,6 +263,7 @@ const handleSubmit = async () => {
       image: downloadURL,
       content: content.value,
       category: category.value,
+      view_count: 0,
     };
 
     // call addBlog' function with the blog data
