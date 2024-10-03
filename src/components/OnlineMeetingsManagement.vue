@@ -15,7 +15,7 @@
       v-if="showStatusActionModal"
       :keepStatusModalOpen="keepStatusModalOpen"
       :meetingData="clickedMeetingData"
-      @set-meeting="handleSetMeeting"
+      @accept-meeting="handleAcceptMeeting"
       @reject-meeting="handleRejectMeeting"
       @close="showStatusActionModal = false" />
     <MeetingCards
@@ -25,7 +25,8 @@
       :meetingStatusSummary="meetingStatusSummary"
       :topAttorneys="topAttorneys"
       :showTopAttorneys="props.showAll"
-      :showAttorneySchedule="!props.showAll" />
+      :showAttorneySchedule="!props.showAll" 
+      :uid="props.uid"/>
 
     <shadow-box class="p-6">
       <div class="flex justify-between mb-4 items-start">
@@ -372,7 +373,7 @@ const deleteException = async (exceptionData) => {
   }
 };
 
-async function handleSetMeeting() {
+async function handleAcceptMeeting() {
   meetingsData.value = await Promise.all(
     meetingsData.value.map(async (meeting) => {
       if (meeting.id === clickedMeetingData.value.id) {

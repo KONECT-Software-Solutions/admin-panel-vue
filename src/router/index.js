@@ -12,6 +12,7 @@ import Settings from '../views/Settings.vue';
 import NotFound from '../views/NotFound.vue';
 import Unauthorized from '../views/Unauthorized.vue'; // Add an Unauthorized component
 import AppointmentSettings from '../views/AppointmentSettings.vue';
+import NotificationsPage from '../views/NotificationsPage.vue';
 
 const routes = [
   {
@@ -68,6 +69,12 @@ const routes = [
         path: 'lawyers',
         name: 'Lawyers',
         component: Lawyers,
+        meta: { requiresAuth: true, role: 'admin' }
+      },
+      {
+        path: 'notifications',
+        name: 'Notifications',
+        component: NotificationsPage,
         meta: { requiresAuth: true, role: 'admin' }
       },
       {

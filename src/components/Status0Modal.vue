@@ -68,7 +68,7 @@
             </div>
             <div v-if="!isMeetingSet && !isMeetingRejected && !isRejecting"
               class="flex items-center justify-center space-x-4 mt-2">
-              <button @click="handleSetMeeting" class="bg-green-600 text-white hover:bg-green-700 px-4 py-2 rounded-md">
+              <button @click="handleAcceptMeeting" class="bg-green-600 text-white hover:bg-green-700 px-4 py-2 rounded-md">
                 <Loading v-if="showLoading" text="Oluşturuluyor" />
                 <span v-else>Evet</span>
               </button>
@@ -120,15 +120,15 @@ const props = defineProps({
 });
 
 
-const emits = defineEmits(["close", "set-meeting", "reject-meeting"]);
+const emits = defineEmits(["close", "accept-meeting", "reject-meeting"]);
 
-const handleSetMeeting = () => {
+const handleAcceptMeeting = () => {
   showLoading.value = true;
   setTimeout(() => {
     showLoading.value = false;
     isMeetingSet.value = true;
     setTimeout(() => {
-      emits("set-meeting");
+      emits("accept-meeting");
       emits("close")
     }, 700);
   }, 2000);

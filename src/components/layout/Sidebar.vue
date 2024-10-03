@@ -51,13 +51,14 @@ const adminMenus = [
     { title: 'Online Görüşmeler', icon: 'ri-video-on-line', link: '/online-meetings' },
     { title: 'Blog Yönetimi', icon: 'ri-article-line', link: '/blogs' },
    //{ title: 'Avukatlar', icon: 'ri-team-line', link: '/lawyers' },
+    { title: 'Bildirimler', icon: 'ri-message-line', link: '/notifications' },
     { title: 'Ayarlar', icon: 'ri-settings-2-line', link: '/settings' }
 ];
 
 const attorneyMenus = [
     //{ title: 'Ana Sayfa', icon: 'ri-home-2-line', link: '/home' },
     { title: 'Online Görüşmelerim', icon: 'ri-video-on-line', link: '/online-meetings' },
-    { title: 'Randevu Saatlerim', icon: 'ri-settings-2-line', link: '/appointment-settings' },
+    { title: 'Randevu Ayarlarım', icon: 'ri-calendar-schedule-line', link: '/appointment-settings' },
     { title: 'Ayarlar', icon: 'ri-settings-2-line', link: '/settings' }
 
 ];

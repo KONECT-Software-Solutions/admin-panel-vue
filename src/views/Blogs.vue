@@ -7,27 +7,27 @@
         @deleteBlog="handleDeleteBlog"
         @updateBlog="handleUpdateBlog"
         :blogsData="blogsData"
-        :blogRef="blogRef"
-      />
+        :blogRef="blogRef" />
     </transition>
-    <div v-if="!showBlogs" class="flex items-center justify-center min-h-screen">
+    <div
+      v-if="!showBlogs"
+      class="flex items-center justify-center min-h-screen">
       <Loading text="Blog Yazısı Yükleniyor..." />
     </div>
     <transition name="fade">
       <AddBlog
         v-if="showAddBlog"
         @goBlogManagement="showAddBlog = false"
-        @addBlog="handleAddBlog"
-      />
+        @addBlog="handleAddBlog" />
     </transition>
   </div>
 </template>
 
 <script setup>
-import BlogManagement from '../components/BlogManagement.vue';
-import AddBlog from '../components/AddBlog.vue';
-import Loading from '../components/Loading.vue';
-import { ref, onMounted, onBeforeMount, onUpdated } from 'vue';
+import BlogManagement from "../components/BlogManagement.vue";
+import AddBlog from "../components/AddBlog.vue";
+import Loading from "../components/Loading.vue";
+import { ref, onMounted, onBeforeMount, onUpdated } from "vue";
 import {
   collection,
   getDocs,
@@ -61,23 +61,8 @@ function handleUpdateBlog(blogData) {
 async function fetchBlogs() {
   let blogs = [];
   const querySnapshot = await getDocs(blogRef);
-  for (const doc of querySnapshot.docs) {
-    let docData = doc.data();
-    docData.id = doc.id;
-    const commentsRef = collection(db, "blogs", doc.id, "comments");
-    const commentData = [];
-    const commentsSnapshot = await getDocs(commentsRef);
-    commentsSnapshot.docs.forEach((commentDoc) => {
-      commentData.push(commentDoc.data());
-    });
-    docData.comments = commentData;
-    blogs.push(docData);
-  }
-  // for each blog created_date = formatDate(blog.created_date)
-  blogs = blogs.map((blog) => {
-    return {
-      ...blog,
-    };
+  querySnapshot.forEach((doc) => {
+    blogs.push({ id: doc.id, ...doc.data() });
   });
   return blogs;
 }
@@ -143,7 +128,6 @@ async function deleteBlog(blogIdToDelete) {
         (blog) => blog.id !== blogIdToDelete
       );
 
-
       // Update cachedBlogs in local storage
       localStorage.setItem("cachedBlogs", JSON.stringify(blogsData.value));
 
@@ -157,15 +141,14 @@ async function deleteBlog(blogIdToDelete) {
 async function updateBlog(blogDataToUpdate) {
   console.log("Received updated blog data:", blogDataToUpdate);
   blogDataToUpdate.updated_date = new Date();
-  blogDataToUpdate.slug = slugify(blogDataToUpdate.title)
-  
+  blogDataToUpdate.slug = slugify(blogDataToUpdate.title);
 
   try {
     await updateDoc(doc(db, "blogs", blogDataToUpdate.id), blogDataToUpdate); // Ensure updateDoc is awaited
     const updatedBlog = {
       ...blogDataToUpdate,
     };
-    
+
     // Update local blogsData with the updated blog
     blogsData.value = blogsData.value.map((blog) => {
       if (blog.id === blogDataToUpdate.id) {
@@ -182,17 +165,16 @@ async function updateBlog(blogDataToUpdate) {
   }
 }
 function sortBlogsByDate(blogs) {
-	return blogs.sort((a, b) => b.created_date - a.created_date);
+  return blogs.sort((a, b) => b.created_date - a.created_date);
 }
-
 
 onMounted(async () => {
   let data = await getAllBlogs();
   data = sortBlogsByDate(data);
   blogsData.value = data;
   showBlogs.value = true;
-});
 
+});
 </script>
 
 <style scoped>
