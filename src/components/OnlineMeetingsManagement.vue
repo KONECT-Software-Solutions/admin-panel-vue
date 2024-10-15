@@ -800,7 +800,7 @@ function sortMeetings(meetings) {
 const checkDeadline = (meeting) => {
   const deadline = new Date(meeting.deadline.seconds * 1000);
   const currentDate = new Date();
-  if (currentDate > deadline && meeting.status === "1") {
+  if (currentDate > deadline && meeting.status === "0") {
     // find this meeting in the firestore and update the status to 6
     const docRef = doc(db, "meetings", meeting.id);
     updateDoc(docRef, { status: "6" , cancel_reason: "Ödeme süresi geçti.", payment_status: "2"});

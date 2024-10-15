@@ -31,12 +31,14 @@ import { ref, onMounted, onBeforeMount, onUpdated } from "vue";
 import {
   collection,
   getDocs,
+  getDoc,
   addDoc,
   deleteDoc,
   updateDoc,
   doc,
 } from "firebase/firestore";
-import { db } from "../firebase";
+import { deleteObject, ref as storageRef } from "firebase/storage"
+import { db, storage} from "../firebase";
 import { slugify } from "../utils";
 
 const showBlogs = ref(false);
@@ -120,23 +122,48 @@ async function addBlog(blogDataToAdd) {
 async function deleteBlog(blogIdToDelete) {
   if (blogIdToDelete) {
     try {
-      // Remove the blog from Firestore
-      await deleteDoc(doc(db, "blogs", blogIdToDelete));
+      // 1. Fetch the blog document to get the image_id field
+      const blogDocRef = doc(db, "blogs", blogIdToDelete);
+      const blogDoc = await getDoc(blogDocRef);
 
-      // Update local blogsData by filtering out the deleted blog
-      blogsData.value = blogsData.value.filter(
-        (blog) => blog.id !== blogIdToDelete
-      );
+      if (blogDoc.exists()) {
+        const blogData = blogDoc.data();
+        const imageId = blogData.image_id;
+        // 2. Delete the image from Firebase Storage if image_id exists
+        if (imageId) {
+          const imagePath = `images/${imageId}`; // Adjust the path if needed
+          console.log("blog image path to delete", imagePath)
+          const storageRef_ = storageRef(storage, imagePath);
 
-      // Update cachedBlogs in local storage
-      localStorage.setItem("cachedBlogs", JSON.stringify(blogsData.value));
+          try {
+            await deleteObject(storageRef_);
+            console.log(`Image with ID ${imageId} deleted successfully.`);
+          } catch (error) {
+            console.error("Error deleting image:", error);
+          }
+        }
 
-      console.log(`Blog with ID ${blogIdToDelete} deleted successfully.`);
+        // 3. Delete the blog from Firestore
+        await deleteDoc(blogDocRef);
+
+        // 4. Update local blogsData by filtering out the deleted blog
+        blogsData.value = blogsData.value.filter(
+          (blog) => blog.id !== blogIdToDelete
+        );
+
+        // 5. Update cachedBlogs in local storage
+        localStorage.setItem("cachedBlogs", JSON.stringify(blogsData.value));
+
+        console.log(`Blog with ID ${blogIdToDelete} deleted successfully.`);
+      } else {
+        console.error("Blog not found");
+      }
     } catch (error) {
       console.error("Error deleting blog:", error);
     }
   }
 }
+
 
 async function updateBlog(blogDataToUpdate) {
   console.log("Received updated blog data:", blogDataToUpdate);

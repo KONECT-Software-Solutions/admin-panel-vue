@@ -165,7 +165,6 @@
 import { ref, computed, onMounted } from "vue";
 import { QuillEditor } from "@vueup/vue-quill";
 import {
-  getStorage,
   ref as firebaseStorageRef,
   uploadBytes,
   getDownloadURL,
@@ -174,6 +173,11 @@ import Loading from "./Loading.vue";
 import { slugify } from "../utils";
 import "@vueup/vue-quill/dist/vue-quill.snow.css";
 import imageCompression from 'browser-image-compression';
+import { storage } from "../firebase";
+import { v4 as uuidv4 } from 'uuid';
+
+
+
 
 
 const emits = defineEmits(["goBlogManagement", "addBlog"]);
@@ -238,13 +242,15 @@ const handleSubmit = async () => {
     console.error("Please select an image file.");
     return;
   }
-
-  const storage = getStorage();
+  
+  const imageId = uuidv4();
+  console.log("imageId is:", imageId)
   const fileRef = firebaseStorageRef(
     storage,
-    `images/${selectedFileName.value}`
+    `images/${imageId}`
   );
 
+  console.log(imageId)
   try {
     console.log("Uploading file...");
     await uploadBytes(fileRef, selectedFile.value);
@@ -264,6 +270,7 @@ const handleSubmit = async () => {
       content: content.value,
       category: category.value,
       view_count: 0,
+      image_id: imageId
     };
 
     // call addBlog' function with the blog data
