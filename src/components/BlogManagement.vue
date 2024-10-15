@@ -194,7 +194,6 @@ function confirmDelete(blogId) {
 
 function handleDelete() {
   emits("deleteBlog", blogIdToDelete);
-  showDeleteModal.value = false;
 }
 
 function handleUpdate(blogData) {

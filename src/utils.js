@@ -46,9 +46,19 @@ function formatDate(timestamp, format = "all") {
 }
 
 function slugify(text) {
+  const turkishCharMap = {
+    'Ç': 'C', 'ç': 'c',
+    'Ğ': 'G', 'ğ': 'g',
+    'İ': 'I', 'ı': 'i',
+    'Ö': 'O', 'ö': 'o',
+    'Ş': 'S', 'ş': 's',
+    'Ü': 'U', 'ü': 'u'
+  };
+
   return text
     .toString()
     .toLowerCase()
+    .replace(/[ÇçĞğİıÖöŞşÜü]/g, char => turkishCharMap[char]) // Replace Turkish chars
     .replace(/\s+/g, '-')           // Replace spaces with -
     .replace(/[^\w-]+/g, '')        // Remove all non-word chars
     .replace(/--+/g, '-')           // Replace multiple - with single -

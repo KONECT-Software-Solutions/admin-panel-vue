@@ -130,8 +130,8 @@ const handleAcceptMeeting = () => {
     setTimeout(() => {
       emits("accept-meeting");
       emits("close")
-    }, 700);
-  }, 2000);
+    }, 1000);
+  }, 4000);
 };
 
 const handleRejectMeeting = () => {

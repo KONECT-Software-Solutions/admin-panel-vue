@@ -1,6 +1,6 @@
 <template>
   <Status0Modal v-if="meetingData.status === '0' && keepStatusModalOpen" @close="$emit('close')" :meetingData="meetingData"
-    :formattedDate="formattedDate" @set-meeting="$emit('set-meeting')" @reject-meeting="handleRejectMeeting" />
+    :formattedDate="formattedDate" @accept-meeting="$emit('accept-meeting')" @reject-meeting="handleRejectMeeting" />
   <Status1Modal v-if="meetingData.status === '1' && keepStatusModalOpen" @close="$emit('close')" :meetingData="meetingData"
     :formattedDate="formattedDate" />
   <Status3Modal v-if="meetingData.status === '3' && keepStatusModalOpen" @close="$emit('close')" :rejectReason="meetingData.cancel_reason" />
@@ -17,7 +17,7 @@ import Status6Modal from "../components/Status6Modal.vue";
 
 
 
-const emits = defineEmits(["close", "set-meeting", "reject-meeting"]);
+const emits = defineEmits(["close", "accept-meeting", "reject-meeting"]);
 
 const props = defineProps({
   meetingData: {
