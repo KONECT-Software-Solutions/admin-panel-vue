@@ -221,11 +221,10 @@ import {
   updateDoc,
 } from "firebase/firestore";
 import { db } from "../firebase";
-import { onMounted, ref, computed, watch } from "vue";
+import { onMounted, ref, computed } from "vue";
 import { useStore } from "vuex";
 import { formatDate } from "../utils";
 import axios from "axios";
-import { add, sub } from "date-fns";
 
 // Access the Vuex store
 const store = useStore();
@@ -301,7 +300,6 @@ const handleGoBack = () => {
 const createMeetingUrl = async (start_time, attorney_email, customer_email) => {
   // iso format formatted again because the iso format that google accepts doesnt include the millisecond precision
   // uncomment after test
-  //return "test-url"
   const start_time_iso =
     new Date(start_time.seconds * 1000).toISOString().split(".")[0] + "Z";
   console.log("start_time_iso", start_time_iso);
@@ -399,6 +397,7 @@ async function handleAcceptMeeting() {
           });
           console.log("Meeting updated successfully:", meeting);
           // uncomment after test
+          console.log("meeting accepted mail sended")
           sendMeetingAcceptedEmail(meeting);
           // Reset the clickedMeetingData ref
           clickedMeetingData.value = {};
@@ -424,6 +423,7 @@ const sendMeetingAcceptedEmail = async (meetingData) => {
         end_time: meetingData.end_time,
         email: meetingData.customer_email,
         meeting_url: meetingData.meeting_url,
+        type: meetingData.type,
       },
       {
         headers: {
