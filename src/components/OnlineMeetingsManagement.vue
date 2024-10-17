@@ -297,9 +297,13 @@ const handleGoBack = () => {
   emit("goBack");
 };
 
-const createMeetingUrl = async (start_time, attorney_email, customer_email) => {
+const createMeetingUrl = async (start_time, attorney_email, customer_email, type) => {
   // iso format formatted again because the iso format that google accepts doesnt include the millisecond precision
   // uncomment after test
+  if (type !== 'video'){
+    return 'no-meeting-url-type-is-not-video'
+  }
+  
   const start_time_iso =
     new Date(start_time.seconds * 1000).toISOString().split(".")[0] + "Z";
   console.log("start_time_iso", start_time_iso);
@@ -382,7 +386,8 @@ async function handleAcceptMeeting() {
           const meeting_url = await createMeetingUrl(
             meeting.date_time,
             meeting.attorney_email,
-            meeting.customer_email
+            meeting.customer_email,
+            meeting.type
           );
           meeting.meeting_url = meeting_url;
           await updateMeeting(meeting); // Ensure updateMeeting is awaited

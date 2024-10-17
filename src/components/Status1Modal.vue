@@ -101,12 +101,13 @@
               <a
                 :href="meetingData.meeting_url"
                 target="_blank"
-                class="px-4 py-2 border rounded-lg bg-green-600 text-white hover:bg-slate-700 hover:text-slate-100 transition duration-300">
-                Google Meet ile katılın
+                class="flex items-center justify-center space-x-3 px-6 py-2 rounded-lg bg-gradient-to-r from-green-400 to-lime-400 text-white shadow-md hover:shadow-lg hover:from-green-500 hover:to-lime-500 transition-all duration-300 ease-in-out transform hover:scale-105">
+                <img
+                  src="../assets/google-meet-svgrepo-com.svg"
+                  class="w-8 h-8"
+                  alt="google-meet" />
+                <span class="text-lg font-semibold">Katıl</span>
               </a>
-              <button
-                @click="copyToClipboard(meetingData.meeting_url)"
-                class="bg-gray-200 ri-clipboard-line hover:bg-gray-300 px-2 py-2 rounded-md"></button>
             </div>
           </div>
           <div v-if="meetingData.type === 'phone'">
@@ -127,7 +128,10 @@
               </vue-countdown>
 
               <!-- Force this text to go to a new line -->
-              <span> kaldı. Vakit geldiğinde danışanınıza aşağıdaki numaradan ulaşabilirsiniz.</span>
+              <span>
+                kaldı. Vakit geldiğinde danışanınıza aşağıdaki numaradan
+                ulaşabilirsiniz.</span
+              >
             </p>
 
             <div class="flex items-center justify-center mt-4">
@@ -157,7 +161,8 @@
 
               <!-- Force this text to go to a new line -->
               <span>
-                kaldı. Danışanınıza aşşağıdaki iletişim bilgilerinden ulaşabilirsiniz.
+                kaldı. Danışanınıza aşşağıdaki iletişim bilgilerinden
+                ulaşabilirsiniz.
               </span>
             </p>
 
@@ -170,7 +175,7 @@
               <div
                 class="text-white flex space-x-1 bg-green-600 items-center hover:bg-green-700 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5">
                 <i class="ri-mail-line text-3xl"></i>
-                <p>{{ meetingData.customer_email}}</p>
+                <p>{{ meetingData.customer_email }}</p>
               </div>
             </div>
           </div>
