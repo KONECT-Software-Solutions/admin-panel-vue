@@ -11,19 +11,21 @@
             Bu blog yazısını silmek istediğinize emin misiniz?
           </p>
         </div>
-        <div class="flex justify-end">
-          <button
+        <div class="flex justify-end space-x-2">
+          <Button
             @click="handleDelete"
             id="confirmDelete"
-            class="bg-red-600 text-white rounded px-4 py-2 mr-2">
-            Evet
-          </button>
-          <button
+            text="Evet"
+            color="green"
+            :wFull="false">
+          </Button>
+          <Button
             @click="$emit('close')"
+            text="Hayır"
             id="cancelDelete"
-            class="bg-gray-300 text-gray-800 rounded px-4 py-2">
-            Hayır
-          </button>
+            color="red"
+            :wFull="false">
+          </Button>
         </div>
       </div>
 
@@ -36,11 +38,12 @@
       <div v-else-if="showSuccess">
         <p class="text-sm mb-4">Blog yazısı başarıyla silindi.</p>
         <div class="flex justify-end">
-          <button
-            @click="handleClose"
-            class="bg-green-600 text-white px-4 py-1 font-medium rounded mb-2">
-            Geri Dön
-          </button>
+          <Button
+          @click="handleClose"
+            text="Tamam"
+            color="blue"
+            :wFull="false">
+          </Button>
         </div>
       </div>
 
@@ -48,11 +51,12 @@
       <div v-else-if="showFailure">
         <p class="text-sm mb-4">Blog yazısı silinirken bir hata oluştu.</p>
         <div class="flex justify-end">
-          <button
-            @click="handleClose"
-            class="bg-green-600 text-white px-4 py-1 font-medium rounded mb-2">
-            Geri Dön
-          </button>
+          <Button
+          @click="handleClose"
+            text="Geri Dön"
+            color="blue"
+            :wFull="false">
+          </Button>
         </div>
       </div>
     </div>
@@ -62,6 +66,7 @@
 <script setup>
 import { ref } from "vue";
 import Loading from "./Loading.vue";
+import Button from "./Button.vue";
 
 const props = defineProps({
   show: Boolean,

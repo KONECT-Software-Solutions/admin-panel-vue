@@ -34,7 +34,7 @@
       @save-appointment-settings="handleSaveAppointmentSettings" />
     
     </div>
-    <div v-else>admin</div>
+    <div v-else>Admin</div>
     <!-- -->
   </template>
   
