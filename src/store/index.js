@@ -2,7 +2,7 @@
 import { createStore } from 'vuex';
 import { auth } from '../firebase';
 import { signInWithEmailAndPassword, signOut, onAuthStateChanged, setPersistence, browserLocalPersistence } from 'firebase/auth';
-import { doc, getDoc } from 'firebase/firestore';
+import { doc, getDoc, getDocs, collection } from 'firebase/firestore';
 import { db } from "../firebase";
 
 const store = createStore({
@@ -10,7 +10,8 @@ const store = createStore({
     isAuthenticated: false,
     user: null,
     role: null,
-    errorMessage: null
+    errorMessage: null,
+    notifications: []
   },
   mutations: {
     login(state, { user, role }) {
@@ -33,6 +34,10 @@ const store = createStore({
     },
     setRole(state, role) {
       state.role = role;
+    },
+    setNotifications(state, notifications){
+      state.notifications = notifications;
+      console.log("state notifs", state.notifications)
     }
   },
   actions: {
@@ -46,10 +51,8 @@ const store = createStore({
         const userDoc = await getDoc(doc(db, 'attorneys', user.uid));
         let role = null;
         if (userDoc.exists()) {
-          role = userDoc.data().role; // Get the user role
-        } else {
-          role = 'admin'; // Assume admin role if not in attorneys collection
-        }
+          role = userDoc.data().role || "none"; // Get the user role
+        } 
 
         if (role) {
           commit('login', { user: { email: user.email, uid: user.uid }, role });
@@ -85,9 +88,7 @@ const store = createStore({
             const userDoc = await getDoc(doc(db, 'attorneys', user.uid));
             let role = null;
             if (userDoc.exists()) {
-              role = userDoc.data().role;
-            } else {
-              role = 'admin';
+              role = userDoc.data().role || "none"; // Get the user role
             }
             commit('setRole', role);
           } else {
@@ -97,13 +98,28 @@ const store = createStore({
           resolve(user);
         });
       });
+    },
+    async fetchNotifications({ commit }) {
+      console.log("fetchnotifs")
+      const notifications = []
+      const notificationsRef = collection(db, "notifications");
+      const notificationsSnapshot = await getDocs(notificationsRef);
+      notificationsSnapshot.forEach((doc) => {
+        notifications.push(doc.data());
+      });
+      // sort notifications by date_tmsp field
+      notifications.sort((a, b) => {
+        return b.date_tmsp - a.date_tmsp;
+      });
+      commit("setNotifications", notifications);
     }
   },
   getters: {
     isAuthenticated: state => state.isAuthenticated,
     user: state => state.user,
     userRole: state => state.role,
-    errorMessage: state => state.errorMessage
+    errorMessage: state => state.errorMessage,
+    notifications: state => state.notifications
   }
 });
 

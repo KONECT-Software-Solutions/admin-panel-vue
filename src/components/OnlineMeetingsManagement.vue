@@ -1,11 +1,5 @@
 <template>
   <div>
-    <button
-      v-if="userRole === 'admin'"
-      @click="handleGoBack"
-      class="bg-green-700 text-white px-4 py-1 font-medium rounded mb-4">
-      Geri Dön
-    </button>
     <DocumentsModal
       :show="showDocumentsModal"
       @close="showDocumentsModal = false"
@@ -25,12 +19,20 @@
       :meetingStatusSummary="meetingStatusSummary"
       :topAttorneys="topAttorneys"
       :showTopAttorneys="props.showAll"
-      :showAttorneySchedule="!props.showAll" 
-      :uid="props.uid"/>
+      :showAttorneySchedule="!props.showAll"
+      :uid="props.uid" />
 
     <shadow-box class="p-6">
-      <div class="flex justify-between mb-4 items-start">
+      <div class="flex justify-between mb-4 items-center">
         <h1 class="font-medium">Online Görüşmeler</h1>
+        <Button
+          v-if="userRole === 'admin'"
+          @click="handleGoBack"
+          type="submit"
+          text="Geri Dön"
+          color="blue"
+          :wFull="false">
+        </Button>
       </div>
       <form action="" class="flex items-center mb-4">
         <div class="relative w-full mr-2">
@@ -211,6 +213,7 @@ import MeetingCards from "../components/MeetingCards.vue";
 import ShadowBox from "../components/container/ShadowBox.vue";
 import DocumentsModal from "./DocumentsModal.vue";
 import StatusActionModalHandler from "../components/StatusActionModalHandler.vue";
+import Button from "../components/Button.vue";
 
 import {
   collection,
@@ -297,13 +300,18 @@ const handleGoBack = () => {
   emit("goBack");
 };
 
-const createMeetingUrl = async (start_time, attorney_email, customer_email, type) => {
+const createMeetingUrl = async (
+  start_time,
+  attorney_email,
+  customer_email,
+  type
+) => {
   // iso format formatted again because the iso format that google accepts doesnt include the millisecond precision
   // uncomment after test
-  if (type !== 'video'){
-    return 'no-meeting-url-type-is-not-video'
+  if (type !== "video") {
+    return "no-meeting-url-type-is-not-video";
   }
-  
+
   const start_time_iso =
     new Date(start_time.seconds * 1000).toISOString().split(".")[0] + "Z";
   console.log("start_time_iso", start_time_iso);
@@ -317,8 +325,8 @@ const createMeetingUrl = async (start_time, attorney_email, customer_email, type
         customer_email: customer_email,
       }
     );
-    const meetLink = JSON.parse(response.data.body)['meet_link'];
-    console.log("response data", JSON.parse(response.data.body)['meet_link']); // I get the response data successfully
+    const meetLink = JSON.parse(response.data.body)["meet_link"];
+    console.log("response data", JSON.parse(response.data.body)["meet_link"]); // I get the response data successfully
     console.log("Meeting created successfully");
     return meetLink; // Return the meeting link here
   } catch (error) {
@@ -348,7 +356,7 @@ const addException = async (exceptionData) => {
     if (attorneyDoc.exists()) {
       const attorneyData = attorneyDoc.data();
       const exceptions = attorneyData.exceptions || [];
-      delete exceptionData.attorney_id
+      delete exceptionData.attorney_id;
       exceptions.push(exceptionData);
       await updateDoc(attorneyDocRef, { exceptions });
     }
@@ -402,7 +410,7 @@ async function handleAcceptMeeting() {
           });
           console.log("Meeting updated successfully:", meeting);
           // uncomment after test
-          console.log("meeting accepted mail sended")
+          console.log("meeting accepted mail sended");
           sendMeetingAcceptedEmail(meeting);
           // Reset the clickedMeetingData ref
           clickedMeetingData.value = {};
@@ -411,8 +419,8 @@ async function handleAcceptMeeting() {
         }
       }
       return meeting;
-    }));
-    
+    })
+  );
 }
 
 const sendMeetingAcceptedEmail = async (meetingData) => {
@@ -421,12 +429,14 @@ const sendMeetingAcceptedEmail = async (meetingData) => {
       "https://ykt7hblm31.execute-api.eu-north-1.amazonaws.com/prod/send-meeting-accepted-email",
       {
         customer_name: meetingData.customer_name,
+        customer_email: meetingData.customer_email,
+        customer_phone: meetingData.customer_phone,
+        attorney_email: meetingData.attorney_email,
         attorney_name: meetingData.attorney_name,
         date_for_display: meetingData.date_for_display,
         day: meetingData.day,
         slot: meetingData.slot,
         end_time: meetingData.end_time,
-        email: meetingData.customer_email,
         meeting_url: meetingData.meeting_url,
         type: meetingData.type,
       },
@@ -443,6 +453,7 @@ const sendMeetingAcceptedEmail = async (meetingData) => {
   }
 };
 
+
 function handleRejectMeeting(reject_reason) {
   // change the status of the meeting with meetingId to "3" (rejected)
   meetingsData.value = meetingsData.value.map((meeting) => {
@@ -451,6 +462,7 @@ function handleRejectMeeting(reject_reason) {
       meeting.cancel_reason = reject_reason;
       meeting.payment_status = "2";
       updateMeeting(meeting);
+      // buraya exception delete ve file delete fonksiyonları gelecek
       showStatusActionModal.value = false;
     }
     return meeting;
@@ -808,11 +820,15 @@ const checkDeadline = (meeting) => {
   if (currentDate > deadline && meeting.status === "0") {
     // find this meeting in the firestore and update the status to 6
     const docRef = doc(db, "meetings", meeting.id);
-    updateDoc(docRef, { status: "6" , cancel_reason: "Ödeme süresi geçti.", payment_status: "2"});
+    updateDoc(docRef, {
+      status: "6",
+      cancel_reason: "Ödeme süresi geçti.",
+      payment_status: "2",
+    });
     deleteException({
-        attorney_id: meeting.attorney_id,
-        meeting_id: meeting.id,
-      });
+      attorney_id: meeting.attorney_id,
+      meeting_id: meeting.id,
+    });
     return true;
   } else {
     return false;
@@ -821,10 +837,8 @@ const checkDeadline = (meeting) => {
 // Usage
 onMounted(async () => {
   const meetings = await getAllMeetings();
-  meetings.forEach(meeting => {
+  meetings.forEach((meeting) => {
     const deadline_exceeded = checkDeadline(meeting);
-    // log with index
-    console.log(meetings.indexOf(meeting), deadline_exceeded);
     // add it to the meeting object
     meeting.deadline_exceeded = deadline_exceeded;
   });

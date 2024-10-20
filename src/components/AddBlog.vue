@@ -9,12 +9,13 @@
           {{ showLoading ? "" : "Blog yazısı yüklendi." }}
         </div>
         <div class="flex justify-end">
-          <button
+          <Button
             v-if="!showLoading"
-            @click="emits('goBlogManagement')"
-            class="bg-green-600 text-white px-4 py-1 font-medium rounded mb-2">
-            Geri Dön
-          </button>
+            text="Geri Dön"
+            color="blue"
+            :wFull="false"
+            @click="emits('goBlogManagement')">
+          </Button>
         </div>
       </div>
     </div>
@@ -23,11 +24,12 @@
       <div
         class="flex items-center justify-between p-4 md:p-5 border-b rounded-t">
         <h3 class="text-lg font-semibold text-gray-900">Yeni Blog Yazısı</h3>
-        <button
-          @click="emits('goBlogManagement')"
-          class="bg-green-600 text-white px-4 py-1 font-medium rounded mb-4">
-          Geri Dön
-        </button>
+        <Button
+            text="Geri Dön"
+            color="blue"
+            :wFull="false"
+            @click="emits('goBlogManagement')">
+          </Button>
       </div>
       <form @submit.prevent="handleSubmit" class="p-4 md:p-5">
         <div class="grid gap-4 mb-4 grid-cols-2">
@@ -150,12 +152,14 @@
             </div>
           </div>
         </div>
-        <button
-          type="submit"
-          :disabled="showLoading"
-          class="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-600">
-          Blog Yazısı Ekle
-        </button>
+        <Button
+            v-if="!showLoading"
+            :disabled="showLoading"
+            type="submit"
+            text="Blog Yazısı Ekle"
+            color="blue"
+            :wFull="false">
+          </Button>
       </form>
     </div>
   </div>
@@ -170,15 +174,12 @@ import {
   getDownloadURL,
 } from "firebase/storage";
 import Loading from "./Loading.vue";
+import Button from "./Button.vue";
 import { slugify } from "../utils";
 import "@vueup/vue-quill/dist/vue-quill.snow.css";
-import imageCompression from 'browser-image-compression';
+import imageCompression from "browser-image-compression";
 import { storage } from "../firebase";
-import { v4 as uuidv4 } from 'uuid';
-
-
-
-
+import { v4 as uuidv4 } from "uuid";
 
 const emits = defineEmits(["goBlogManagement", "addBlog"]);
 
@@ -210,7 +211,6 @@ const removeTag = (index) => {
 
 const remainingTags = computed(() => maxTags - tags.value.length);
 
-
 const handlePhotoUpload = async (event) => {
   const file = event.target.files[0];
   if (file && file.type === "image/jpeg") {
@@ -220,7 +220,7 @@ const handlePhotoUpload = async (event) => {
         maxSizeMB: 1, // Maximum file size
         maxWidthOrHeight: 1400, // Resize to max 1200px
         useWebWorker: true,
-        fileType: 'image/webp' // Convert to WebP
+        fileType: "image/webp", // Convert to WebP
       };
       const compressedFile = await imageCompression(file, options);
       selectedFile.value = compressedFile;
@@ -242,15 +242,12 @@ const handleSubmit = async () => {
     console.error("Please select an image file.");
     return;
   }
-  
-  const imageId = uuidv4();
-  console.log("imageId is:", imageId)
-  const fileRef = firebaseStorageRef(
-    storage,
-    `images/${imageId}`
-  );
 
-  console.log(imageId)
+  const imageId = uuidv4();
+  console.log("imageId is:", imageId);
+  const fileRef = firebaseStorageRef(storage, `images/${imageId}`);
+
+  console.log(imageId);
   try {
     console.log("Uploading file...");
     await uploadBytes(fileRef, selectedFile.value);
@@ -270,7 +267,7 @@ const handleSubmit = async () => {
       content: content.value,
       category: category.value,
       view_count: 0,
-      image_id: imageId
+      image_id: imageId,
     };
 
     // call addBlog' function with the blog data

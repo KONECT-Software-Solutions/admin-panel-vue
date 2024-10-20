@@ -16,13 +16,14 @@
       :blogsCategorySummary="blogsCategorySummary" />
 
     <shadow-box class="p-6">
-      <div class="flex justify-between mb-4 items-start">
+      <div class="flex justify-between mb-4 items-center">
         <h1 class="font-medium">Blog Yönetimi</h1>
-        <button
-          @click="emits('goAddBlog')"
-          class="bg-green-600 text-white px-4 py-1 font-medium rounded">
-          + Ekle
-        </button>
+        <Button
+          text="+ Ekle"
+          color="blue"
+          :wFull="false"
+          @click="emits('goAddBlog')">
+        </Button>
       </div>
       <form action="" class="flex items-center mb-4">
         <div class="relative w-full mr-2">
@@ -139,6 +140,7 @@ import BlogModalEdit from "../components/BlogModalEdit.vue";
 import BlogCards from "../components/BlogCards.vue";
 import { onMounted, ref, computed } from "vue";
 import ShadowBox from "../components/container/ShadowBox.vue";
+import Button from "../components/Button.vue";
 import { collection, getDocs } from "firebase/firestore";
 import { db } from "../firebase";
 

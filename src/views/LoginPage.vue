@@ -89,11 +89,14 @@ const login = async () => {
 
     const userRole = store.getters.userRole;
     const userUid = store.getters.user ? store.getters.user.uid : null;
-
+    console.log(userRole);
     if (userRole === "attorney" && userUid) {
       router.push(`/online-meetings/${userUid}`); // Redirect attorneys to /home/:uid
-    } else {
+    } else if (userRole === "admin") {
       router.push("/online-meetings"); // Redirect admins to /home
+    }
+    else {
+      throw new Error("Invalid user role");
     }
   } catch (e) {
     error.value = "Hesap isim veya şifre yanlış. Lütfen tekrar deneyin.";

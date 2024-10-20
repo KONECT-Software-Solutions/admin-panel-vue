@@ -81,13 +81,7 @@ const routes = [
         path: 'settings',
         name: 'Settings',
         component: Settings,
-        meta: { requiresAuth: true }
-      },
-      {
-        path: 'settings/:uid',
-        name: 'SettingsWithUID',
-        component: Settings,
-        meta: { requiresAuth: true }
+        meta: { requiresAuth: true, role: 'admin' }
       },
       {
         path: 'appointment-settings/:uid',
@@ -116,9 +110,13 @@ router.beforeEach(async (to, from, next) => {
     const userRole = store.getters.userRole;
     if (to.meta.role && to.meta.role !== userRole) {
       // If the route requires a specific role and the user doesn't have it, redirect to home or an appropriate page
-      if (userRole === 'attorney') {
-        next('/home');
-      } else {
+      if (userRole === 'admin') {
+        next('/online-metings');
+      } else if (userRole === 'attorney') {
+        next(`/online-meetings/${store.getters.user.uid}`);
+      }
+      else
+      {
         next('/unauthorized');
       }
     } else {

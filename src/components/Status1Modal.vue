@@ -135,11 +135,12 @@
             </p>
 
             <div class="flex items-center justify-center mt-4">
-              <div
-                class="text-white flex space-x-1 bg-green-600 items-center hover:bg-green-700 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5">
-                <i class="ri-phone-line text-3xl"></i>
-                <p>+90 {{ meetingData.customer_phone }}</p>
-              </div>
+                <Button
+                color="blue"
+                :wFull="false"
+                :text="' +90 ' + meetingData.customer_phone">
+              </Button>
+              
             </div>
           </div>
           <div v-if="meetingData.type === 'inPerson'">
@@ -167,16 +168,16 @@
             </p>
 
             <div class="flex items-center space-x-2 justify-center mt-4">
-              <div
-                class="text-white flex space-x-1 bg-green-600 items-center hover:bg-green-700 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5">
-                <i class="ri-phone-line text-3xl"></i>
-                <p>+90 {{ meetingData.customer_phone }}</p>
-              </div>
-              <div
-                class="text-white flex space-x-1 bg-green-600 items-center hover:bg-green-700 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5">
-                <i class="ri-mail-line text-3xl"></i>
-                <p>{{ meetingData.customer_email }}</p>
-              </div>
+              <Button
+                color="blue"
+                :wFull="false"
+                :text="' +90 ' + meetingData.customer_phone">
+              </Button>
+              <Button
+                color="blue"
+                :wFull="false"
+                :text="' +90 ' + meetingData.customer_email">
+              </Button>
             </div>
           </div>
         </div>
@@ -188,6 +189,7 @@
 <script setup>
 import { ref, computed, onMounted } from "vue";
 import VueCountdown from "@chenfengyuan/vue-countdown";
+import Button from "./Button.vue";
 
 const props = defineProps({
   meetingData: {
