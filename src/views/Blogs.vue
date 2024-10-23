@@ -12,7 +12,7 @@
     <div
       v-if="!showBlogs"
       class="flex items-center justify-center min-h-screen">
-      <Loading text="Blog Yazısı Yükleniyor..." />
+      <Loading text="" />
     </div>
     <transition name="fade">
       <AddBlog
