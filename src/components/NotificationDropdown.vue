@@ -10,7 +10,7 @@
       class="absolute right-0 mt-2 w-64 border border-gray-300 shadow-xl bg-white rounded-md z-50">
       <ul class="max-h-64 overflow-auto">
         <li
-          v-for="notification in notifications"
+          v-for="notification in notifications.slice(0, 5)"
           :key="notification.id"
           class="border-b last:border-b-0">
           <router-link to="/notifications">

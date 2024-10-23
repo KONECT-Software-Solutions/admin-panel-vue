@@ -46,7 +46,7 @@
         <Button
           @click="$emit('close')"
           color="blue"
-          :wFull="false"
+          :wFull="true"
           text="Geri Dön">
         </Button>
       </div>

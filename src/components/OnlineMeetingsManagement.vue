@@ -11,6 +11,7 @@
       :meetingData="clickedMeetingData"
       @accept-meeting="handleAcceptMeeting"
       @reject-meeting="handleRejectMeeting"
+      @save-result="handleSaveResult"
       @close="showStatusActionModal = false" />
     <MeetingCards
       :totalMeetings="totalMeetings"
@@ -66,12 +67,12 @@
         </label>
         <label class="inline-flex items-center space-x-2 p-2 cursor-pointer">
           <input
-            v-model="filterOptions.pending"
+            v-model="filterOptions.cancelled"
             type="checkbox"
             class="sr-only peer" />
           <div
             class="relative w-11 h-5 bg-gray-200 rounded-full ring-[0.12rem] peer peer-focus:ring-blue-300 dark:bg-gray-600 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-1 after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-[1.12rem] after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
-          <p class="text-sm font-medium text-gray-800">Beklemede Olanlar</p>
+          <p class="text-sm font-medium text-gray-800">İptal Edilenler</p>
         </label>
       </div>
 
@@ -162,7 +163,8 @@
                 @click="
                   handleDocumentsModal(
                     meeting.notes,
-                    meeting.customer_documents
+                    meeting.customer_documents,
+                    meeting.status
                   )
                 "
                 class="ri-file-text-line flex items-center justify-center ml-2 text-lg bg-yellow-400 hover:bg-gray-900 text-white font-bold px-2 rounded"></button>
@@ -195,15 +197,20 @@
           </tr>
         </tbody>
       </table>
-      <div class="pagination-container flex justify-end mt-4 w-full">
+      <div class="mt-4 flex justify-between items-center">
         <button
-          @click="prevPage"
           :disabled="currentPage === 1"
-          class="ri-arrow-left-fill border border-gray-800 h-8 px-2 m-2 text-xl text-black transition-colors duration-150 bg-white rounded-lg focus:shadow-outline hover:bg-gray-800 hover:text-white"></button>
+          @click="prevPage"
+          class="px-3 py-1 bg-gray-200 rounded disabled:opacity-50">
+          <i class="ri-arrow-left-double-line text-xxl"></i>
+        </button>
+        <span>{{ currentPage }}/{{ totalPages }}</span>
         <button
-          @click="nextPage"
           :disabled="currentPage === totalPages"
-          class="ri-arrow-right-fill border border-gray-800 h-8 px-2 m-2 text-xl text-black transition-colors duration-150 bg-white rounded-lg focus:shadow-outline hover:bg-gray-800 hover:text-white"></button>
+          @click="nextPage"
+          class="px-3 py-1 bg-gray-200 rounded disabled:opacity-50">
+          <i class="ri-arrow-right-double-line text-xxl"></i>
+        </button>
       </div>
     </shadow-box>
   </div>
@@ -214,7 +221,6 @@ import ShadowBox from "../components/container/ShadowBox.vue";
 import DocumentsModal from "./DocumentsModal.vue";
 import StatusActionModalHandler from "../components/StatusActionModalHandler.vue";
 import Button from "../components/Button.vue";
-
 import {
   collection,
   getDocs,
@@ -228,6 +234,7 @@ import { onMounted, ref, computed } from "vue";
 import { useStore } from "vuex";
 import { formatDate } from "../utils";
 import axios from "axios";
+import { getStorage, ref as storageRef, deleteObject } from "firebase/storage";
 
 // Access the Vuex store
 const store = useStore();
@@ -240,6 +247,16 @@ const props = defineProps({
 
 const emit = defineEmits(["goBack"]);
 
+const meetingsData_ = computed(() => store.getters.meetings);
+const meetingsData = ref(meetingsData_.value);
+const meetingsRef = collection(db, "meetings");
+const totalMeetings = computed(() => meetingsData.value.length);
+
+const currentPage = ref(1);
+const itemsPerPage = ref(10);
+
+const searchTerm = ref("");
+
 const clickedMeetingData = ref(null);
 
 const showDocumentsModal = ref(false);
@@ -251,7 +268,7 @@ const customerDocuments = ref([]);
 const filterOptions = ref({
   requests: false,
   accepted: false,
-  pending: false,
+  cancelled: false,
 });
 const satisfactionRate = ref(85);
 
@@ -268,6 +285,7 @@ const meetingStatusSummary = computed(() => {
 });
 
 const approvedMeetings = computed(() => {
+  console.log("approvedMeetings computed property", meetingsData.value);
   return meetingsData.value.filter((meeting) => meeting.status === "1").length;
 });
 
@@ -286,15 +304,6 @@ const topAttorneys = computed(() => {
     .map(([name, meetings]) => ({ name, meetings }));
   return topAttorneys.slice(0, 3);
 });
-
-const meetingsData = ref([]);
-const meetingsRef = collection(db, "meetings");
-const totalMeetings = computed(() => meetingsData.value.length);
-
-const currentPage = ref(1);
-const itemsPerPage = ref(10);
-
-const searchTerm = ref("");
 
 const handleGoBack = () => {
   emit("goBack");
@@ -453,16 +462,61 @@ const sendMeetingAcceptedEmail = async (meetingData) => {
   }
 };
 
+async function deleteFiles(customer_documents) {
+  const storage = getStorage();
+
+  for (const document of customer_documents) {
+    try {
+      // Extract file path from URL
+      const url = new URL(document.file_url);
+      const filePath = decodeURIComponent(
+        url.pathname.split("/o/")[1].split("?")[0]
+      );
+
+      // Reference to the file in storage
+      const fileRef = storageRef(storage, filePath);
+
+      // Delete the file
+      await deleteObject(fileRef);
+      console.log(`Successfully deleted: ${document.name}`);
+    } catch (error) {
+      console.error(`Error deleting file: ${document.name}`, error);
+    }
+  }
+}
+
+function handleSaveResult(meetingResult, meetingResultText) {
+  meetingsData.value = meetingsData.value.map((meeting) => {
+    if (meeting.id === clickedMeetingData.value.id) {
+      console.log("updating meeting result for: ", meeting);
+      meeting.result = meetingResult;
+      meeting.result_text = meetingResultText;
+      updateMeeting(meeting);
+      setTimeout(() => {
+        showStatusActionModal.value = false;
+      }, 4000);
+    }
+    return meeting;
+  });
+}
 
 function handleRejectMeeting(reject_reason) {
   // change the status of the meeting with meetingId to "3" (rejected)
   meetingsData.value = meetingsData.value.map((meeting) => {
     if (meeting.id === clickedMeetingData.value.id) {
+      console.log(
+        "Meeting data to delete on handlerejectmeeting function",
+        clickedMeetingData.value.id
+      );
+      if (meeting.customer_documents.length > 0) {
+        console.log("Deleting files:", meeting.customer_documents);
+        deleteFiles(meeting.customer_documents);
+        meeting.customer_documents = [];
+      }
       meeting.status = "3";
       meeting.cancel_reason = reject_reason;
       meeting.payment_status = "2";
       updateMeeting(meeting);
-      // buraya exception delete ve file delete fonksiyonları gelecek
       showStatusActionModal.value = false;
     }
     return meeting;
@@ -493,14 +547,20 @@ const filteredMeetings = computed(() => {
     );
   }
 
-  const { requests, accepted, pending } = filterOptions.value;
+  const { requests, accepted, cancelled } = filterOptions.value;
 
-  if (requests || accepted || pending) {
+  if (requests || accepted || cancelled) {
     meetings = meetings.filter((meeting) => {
       let match = false;
       if (requests && meeting.status === "0") match = true;
       if (accepted && meeting.status === "1") match = true;
-      if (pending && meeting.status === "4") match = true;
+      if (
+        cancelled &&
+        (meeting.status === "6" ||
+          meeting.status === "3" ||
+          meeting.status === "7")
+      )
+        match = true;
       return match;
     });
   }
@@ -570,7 +630,7 @@ const statusDetails = (status) => {
       }; // Bu status için alınabilecek aksiyonlar: toplantı detaylarını görüntüle
     case "2":
       return {
-        color: "bg-gray-300 hover:bg-gray-400 ",
+        color: "bg-green-300 hover:bg-green-400 ",
         text: "Tamamlandı",
         icon: "ri-check-line",
       };
@@ -596,6 +656,12 @@ const statusDetails = (status) => {
       return {
         color: "bg-gray-600 text-white hover:bg-gray-700 ",
         text: "İptal Edildi",
+        icon: "ri-close-line",
+      };
+    case "7":
+      return {
+        color: "bg-gray-600 text-white hover:bg-gray-700 ",
+        text: "Ödeme Süresi Geçti",
         icon: "ri-calendar-close-line",
       }; // Bu status için alınabilecek aksiyonlar: iptal sebebini görüntüle
     default:
@@ -631,12 +697,12 @@ const paymentStatusDetails = (status) => {
       return {
         class: "bg-green-300",
         text: "Ödendi",
-        icon: "ri-check-double-line",
+        icon: "ri-shield-check-line",
       };
     case "2":
       return {
         class: "bg-red-300",
-        text: "Ödenmedi",
+        text: "Ödeme alınmadı",
         icon: "ri-close-line",
       };
     default:
@@ -700,56 +766,13 @@ const meetingTypeText = (type) => {
   return meetingTypeDetails(type).text;
 };
 
-// Utility function to load blogs data
-async function fetchMeetings() {
-  let meetings = [];
-  const querySnapshot = await getDocs(meetingsRef);
-  querySnapshot.forEach((doc) => {
-    meetings.push({ id: doc.id, ...doc.data() });
-  });
-  return meetings;
-}
-
-// Checking and setting local storage
-async function getAllMeetings() {
-  try {
-    // Check if data exists and is not expired
-    const cachedMeetings = localStorage.getItem("cachedMeetings");
-    const cachedTimeMeetings = localStorage.getItem("cachedTimeMeetings");
-    const expiryTime = 0 * 60 * 1000; // 30 minutes expiration time
-
-    if (
-      cachedMeetings &&
-      cachedTimeMeetings &&
-      new Date() - new Date(parseInt(cachedTimeMeetings)) < expiryTime
-    ) {
-      return JSON.parse(cachedMeetings);
-    } else {
-      const meetings = await fetchMeetings();
-      localStorage.setItem("cachedMeetings", JSON.stringify(meetings));
-      localStorage.setItem(
-        "cachedTimeMeetings",
-        new Date().getTime().toString()
-      );
-      return meetings;
-    }
-  } catch (error) {
-    console.error("Error getting meetings:", error);
-    return [];
-  }
-}
-
 async function updateMeeting(meetingDataToUpdate) {
-  console.log("Received updated meeting data:", meetingDataToUpdate);
-
   try {
     console.log("Updating document with ID:", meetingDataToUpdate.id);
     await updateDoc(
       doc(db, "meetings", meetingDataToUpdate.id),
       meetingDataToUpdate
-    ); // Ensure updateDoc is awaited
-
-    // Update cachedBlogs in local storage
+    );
     localStorage.setItem("cachedMeetings", JSON.stringify(meetingsData.value));
   } catch (error) {
     console.error("Error updating meeting document:", error);
@@ -785,73 +808,19 @@ async function fetchAttorney(id) {
 }
 
 // write sorting function here
-
-function sortMeetings(meetings) {
-  // Define the status priorities
-  const statusPriority = {
-    1: 1, // Kabul edildi
-    0: 2, // İstek
-    4: 3, // Müşteri onayı
-    5: 3, // Avukat onayı
-    2: 4, // Tamamlandı
-    3: 5, // Reddedildi
-    6: 6, // Geri ödemeli iptal
-    7: 7, // Geri ödemesiz iptal
-  };
-
-  // Convert Firestore timestamps to Date objects and sort the meetings
-  return meetings.sort((a, b) => {
-    const statusComparison =
-      statusPriority[a.status] - statusPriority[b.status];
-    if (statusComparison !== 0) {
-      return statusComparison;
-    } else {
-      // Convert Firestore timestamps to Date objects
-      const dateA = new Date(a.date_time.seconds * 1000);
-      const dateB = new Date(b.date_time.seconds * 1000);
-      return dateA - dateB;
-    }
-  });
-}
-
-const checkDeadline = (meeting) => {
-  const deadline = new Date(meeting.deadline.seconds * 1000);
-  const currentDate = new Date();
-  if (currentDate > deadline && meeting.status === "0") {
-    // find this meeting in the firestore and update the status to 6
-    const docRef = doc(db, "meetings", meeting.id);
-    updateDoc(docRef, {
-      status: "6",
-      cancel_reason: "Ödeme süresi geçti.",
-      payment_status: "2",
-    });
-    deleteException({
-      attorney_id: meeting.attorney_id,
-      meeting_id: meeting.id,
-    });
-    return true;
-  } else {
-    return false;
-  }
-};
 // Usage
 onMounted(async () => {
-  const meetings = await getAllMeetings();
-  meetings.forEach((meeting) => {
-    const deadline_exceeded = checkDeadline(meeting);
-    // add it to the meeting object
-    meeting.deadline_exceeded = deadline_exceeded;
-  });
-  const sortedMeetings = sortMeetings(meetings);
+  console.log("meetings", meetingsData.value);
+  if (!meetingsData.value.length) {
+    store.dispatch("fetchMeetings");
+  }
 
-  if (props.showAll) {
-    meetingsData.value = sortedMeetings;
-  } else {
-    meetingsData.value = sortedMeetings.filter(
+  if (!props.showAll) {
+    // filter the meetings by attorney id
+    meetingsData.value = meetingsData.value.filter(
       (meeting) => meeting.attorney_id === props.uid
     );
   }
-  console.log("Meetings data:", meetingsData.value);
 });
 </script>
 

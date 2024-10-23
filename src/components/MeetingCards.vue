@@ -67,7 +67,7 @@
       class="bg-white flex justify-center rounded-lg border border-gray-200 p-2 shadow-lg">
       <div v-if="uid">
         <img
-          :src="`/assets/images/${uid}.jpg`"
+          :src="`/assets/images/${uid}.webp`"
           alt="Attorney Photo"
           class="w-56 object-cover rounded-md" />
       </div>
@@ -165,12 +165,10 @@ const getStatusText = (status) => {
       return "Tamamlandı";
     case "3":
       return "Reddedildi";
-    case "4":
-      return "Müşteri Onayı";
-    case "5":
-      return "Avukat Onayı";
     case "6":
       return "İptal Edildi";
+      case "7":
+      return "Süresi Geçti";
     default:
       return "Unknown";
   }

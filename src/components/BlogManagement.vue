@@ -120,16 +120,21 @@
           </tr>
         </tbody>
       </table>
-      <div class="pagination-container flex justify-end mt-4 w-full">
-        <button
-          @click="prevPage"
-          :disabled="currentPage === 1"
-          class="ri-arrow-left-fill border border-gray-800 h-8 px-2 m-2 text-xl text-black transition-colors duration-150 bg-white rounded-lg focus:shadow-outline hover:bg-gray-800 hover:text-white"></button>
-        <button
-          @click="nextPage"
-          :disabled="currentPage === totalPages"
-          class="ri-arrow-right-fill border border-gray-800 h-8 px-2 m-2 text-xl text-black transition-colors duration-150 bg-white rounded-lg focus:shadow-outline hover:bg-gray-800 hover:text-white"></button>
-      </div>
+      <div class="mt-4 flex justify-between items-center">
+      <button
+        :disabled="currentPage === 1"
+        @click="prevPage"
+        class="px-3 py-1 bg-gray-200 rounded disabled:opacity-50">
+        <i class="ri-arrow-left-double-line text-xxl"></i>
+      </button>
+      <span>{{ currentPage }}/{{ totalPages }}</span>
+      <button
+        :disabled="currentPage === totalPages"
+        @click="nextPage"
+        class="px-3 py-1 bg-gray-200 rounded disabled:opacity-50">
+        <i class="ri-arrow-right-double-line text-xxl"></i>
+      </button>
+    </div>
     </shadow-box>
   </div>
 </template>

@@ -10,7 +10,8 @@
             </li>
         </ul>
     </div>
-    <div class="flex items-center">
+    <div v-if="userRole === 'admin'" 
+    class="flex items-center">
         <NotificationDropdown />
     </div>
 </div>
@@ -19,8 +20,11 @@
 
 <script setup>
 import NotificationDropdown from '../NotificationDropdown.vue';
-import ProfileDropdown from '../ProfileDropdown.vue';
-import { ref } from 'vue';
+import { computed } from 'vue';
+import { useStore } from 'vuex';
+
+const store = useStore();
+const userRole = computed(() => store.getters.userRole);
 
 // Accept currentTab as a prop
 const props = defineProps({
