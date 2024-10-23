@@ -18,6 +18,7 @@ import Sidebar from '../components/layout/Sidebar.vue';
 import Navbar from '../components/layout/Navbar.vue';
 import ContentContainer from '../components/layout/ContentContainer.vue';
 import { useStore } from "vuex"
+import { set } from 'lodash';
 
 const store = useStore()
 const isSidebarOpen = ref(true);
@@ -36,7 +37,9 @@ function toggleSidebar() {
 
 onMounted( async () => {
     currentTab.value = localStorage.getItem('currentTab') || '';
+
     await store.dispatch("fetchNotifications")
+    await store.dispatch("fetchMeetings")
 });
 </script>
 
